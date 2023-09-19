@@ -1,0 +1,14 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Test the installation, configuration and product start
+      ansible.builtin.set_fact:
+        r_elasticsearch_actions:
+          - install
+          - configure
+
+    - name: Replace this task with one that validates your content
+      ansible.builtin.include_role:
+        name: bartokit.elastic.elasticsearch

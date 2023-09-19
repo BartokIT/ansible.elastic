@@ -1,0 +1,36 @@
+---
+dependency:
+  name: galaxy
+  options:
+    requirements-file: molecule/requirements.yml
+driver:
+  name: podman
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+platforms:
+  - name: master1
+    image: registry.access.redhat.com/ubi8/ubi-init
+    groups:
+      - instance
+    network: molecule-elastic-search-test
+    tmpfs:
+      - /run
+    pre_build_image: true
+  - name: master2
+    image: registry.access.redhat.com/ubi8/ubi-init
+    groups:
+      - instance
+    network: molecule-elastic-search-test
+    tmpfs:
+      - /run
+    pre_build_image: true
+  - name: master3
+    image: registry.access.redhat.com/ubi8/ubi-init
+    groups:
+      - instance
+    network: molecule-elastic-search-test
+    tmpfs:
+      - /run
+    pre_build_image: true

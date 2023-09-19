@@ -1,0 +1,8 @@
+---
+- name: Sanity check configuration variables
+  when: not r_elasticsearch_installation_info.installed
+  block:
+  - name: Install | Install Elasticsearch
+    ansible.builtin.dnf:
+      name: '{{ r_elasticsearch_rpm_name }} == {{ r_elasticsearch_version }}'
+      state: present

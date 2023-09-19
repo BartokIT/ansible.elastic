@@ -1,0 +1,17 @@
+---
+- name: Prepare
+  hosts: all
+  tasks:
+    - name: Import a key from a url
+      ansible.builtin.rpm_key:
+        state: present
+        key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+    - name: Add multiple repositories into the same file (2/2)
+      ansible.builtin.yum_repository:
+        name: elastic8
+        description: Elasticsearch repository for 8.x packages
+        file: elasticsearch
+        baseurl: https://artifacts.elastic.co/packages/8.x/yum
+        enabled: true
+        gpgcheck: false

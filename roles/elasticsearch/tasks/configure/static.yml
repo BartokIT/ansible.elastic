@@ -1,0 +1,81 @@
+---
+- name: Check that Elasticsearch is installed
+  ansible.builtin.assert:
+    that:
+      - r_elasticsearch_installation_info.installed
+    msg: "Please install first the product"
+
+- name: Keystore management
+  when: r_elasticsearch_keystore_password | d(false, true)
+  block:
+    - name: Put keystore password in a file
+      ansible.builtin.copy:
+        content: "{{ r_elasticsearch_keystore_password }}"
+        dest: "{{ r_elasticsearch_keystore_password_file }}"
+        owner: elasticsearch
+        group: root
+        mode: 0600
+
+    - name: Create dropin service folder
+      ansible.builtin.file:
+        state: directory
+        path: /etc/systemd/system/{{ _r_elasticsearch_systemd_name }}.d
+        group: root
+        owner: root
+        mode: 0775
+
+    - name: Set environment variable for keystore password
+      ansible.builtin.copy:
+        content: |-
+          [Service]
+          Environment="ES_KEYSTORE_PASSPHRASE_FILE={{ r_elasticsearch_keystore_password_file }}"
+        dest: /etc/systemd/system/{{ _r_elasticsearch_systemd_name }}.d/keystore.conf
+        group: root
+        owner: root
+        mode: 0644
+
+- name: Configure jvm heap settings
+  ansible.builtin.copy:
+    content: |-
+      -Xms{{ r_elasticsearch_jvm_initial_heap }}
+      -Xmx{{ r_elasticsearch_jvm_maximum_heap }}
+    dest: "{{ _r_elasticsearch_config_folder }}/jvm.options.d/heap.options"
+    mode: 0660
+    owner: root
+    group: "{{ _r_elasticsearch_group }}"
+
+- name: Write elasticsearch.yml configuration file
+  ansible.builtin.template:
+    src: elasticsearch.yml.j2
+    dest: "{{ _r_elasticsearch_config_folder }}/elasticsearch.yml"
+    mode: 0660
+    owner: root
+    group: "{{ _r_elasticsearch_group }}"
+
+- name: Create the PKCS12 http file
+  community.crypto.openssl_pkcs12:
+    action: export
+    path: /etc/elasticsearch/certs/elastic.p12
+    friendly_name: elastic
+    privatekey_path: /etc/pki/tls/private/{{ ansible_fqdn }}.key
+    certificate_path: /etc/pki/tls/certs/{{ ansible_fqdn }}.pem
+    other_certificates: /etc/pki/tls/certs/ca-certificate.pem
+    privatekey_passphrase: omit
+    passphrase: omit
+    state: present
+    mode: '0660'
+    owner: root
+    group: elasticsearch
+
+- name: Write the CA certificate
+  ansible.builtin.copy:
+    content: "{{ r_elasticsearch_configuration_ssl_certificate_authorities }}"
+    dest: /etc/elasticsearch/certs/ca.crt
+    owner: root
+    group: elasticsearch
+    mode: '0660'
+
+- name: Manage keystore
+  bartokit.elastic.elasticsearch_keystore:
+    force: "{{  'enforce_keystore' in r_elasticsearch_configure_actions }}"
+    credentials: "{{ r_elasticsearch_keystore }}"

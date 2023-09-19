@@ -1,0 +1,76 @@
+# {{ ansible_managed }}
+# ======================== Elasticsearch Configuration =========================
+# ---------------------------------- Cluster -----------------------------------
+cluster.name: {{ r_elasticsearch_configuration.cluster.name }}
+node.name: {{ r_elasticsearch_configuration.node.name }}
+{%- if r_elasticsearch_node_rack | d(false, true) %}
+node.attr.rack: {{ r_elasticsearch_node_rack }}
+{%- endif %}
+node.roles: {{ r_elasticsearch_configuration.node.roles | list }}
+# ----------------------------------- Paths ------------------------------------
+path.data: /var/lib/elasticsearch
+path.logs: /var/log/elasticsearch
+
+# ----------------------------------- Memory -----------------------------------
+#
+# Lock the memory on startup:
+#
+#bootstrap.memory_lock: true
+#
+# Make sure that the heap size is set to about half the memory available
+# on the system and that the owner of the process is allowed to use this
+# limit.
+#
+# Elasticsearch performs poorly when the system is swapping the memory.
+#
+# ---------------------------------- Network -----------------------------------
+
+network:
+  {{ r_elasticsearch_configuration.network | to_nice_yaml(indent=2) | trim | indent(2) }}
+
+http:
+  {{ r_elasticsearch_configuration.http | to_nice_yaml(indent=2) | trim | indent(2) }}
+
+# --------------------------------- Discovery ----------------------------------
+discovery.seed_hosts: {{ r_elasticsearch_cluster_nodes | selectattr('roles','bartokit.elastic.contains', 'master') | map(attribute='name') | list }}
+#
+# Bootstrap the cluster using an initial set of master-eligible nodes:
+#
+cluster.initial_master_nodes: {{ r_elasticsearch_cluster_nodes | selectattr('roles','bartokit.elastic.contains', 'master') | map(attribute='name') | list }}
+#
+# For more information, consult the discovery and cluster formation module documentation.
+#
+# --------------------------------- Readiness ----------------------------------
+#
+# Enable an unauthenticated TCP readiness endpoint on localhost
+#
+#readiness.port: 9399
+#
+# ---------------------------------- Various -----------------------------------
+#
+# Allow wildcard deletion of indices:
+#
+#action.destructive_requires_name: false
+
+#----------------------- BEGIN SECURITY AUTO CONFIGURATION -----------------------
+#
+# The following settings, TLS certificates, and keys have been automatically
+# generated to configure Elasticsearch security features
+#
+# --------------------------------------------------------------------------------
+
+# Enable security features
+xpack.security.enabled: {{ r_elasticsearch_configuration.xpack.security.enabled }}
+
+xpack.security.enrollment.enabled: {{ r_elasticsearch_configuration.xpack.security.enrollment.enabled }}
+
+# Enable encryption for HTTP API client connections, such as Kibana, Logstash, and Agents
+xpack.security.http.ssl:
+  {{ r_elasticsearch_configuration.xpack.security.http.ssl | to_nice_yaml(indent=2) | trim | indent(2) }}
+
+# Enable encryption and mutual authentication between cluster nodes
+xpack.security.transport.ssl:
+  {{ r_elasticsearch_configuration.xpack.security.transport.ssl | to_nice_yaml(indent=2) | trim | indent(2) }}
+
+
+#----------------------- END SECURITY AUTO CONFIGURATION -------------------------

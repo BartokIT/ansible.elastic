@@ -1,0 +1,159 @@
+---
+# ---- run behaviour modification ----
+# action allowed in r_elasticsearch_actions
+# - install
+# - configure
+# - stop
+# - upgrade
+# - start
+# - uninstall
+r_elasticsearch_actions: []
+
+# more granular configuration actions
+r_elasticsearch_configure_actions: []
+
+# installation variables
+r_elasticsearch_version: '8.9.2'
+r_elasticsearch_rpm_name: elasticsearch
+r_elasticsearch_installation_info:
+  installed: false
+  version: ''
+
+# start && stop
+_r_elasticsearch_systemd_name: elasticsearch.service
+
+# generic configuration
+__r_elasticsearch_show_nolog: false   # only for debug purpose
+
+
+# static configuration
+_r_elasticsearch_config_folder: /etc/elasticsearch
+## password quality settings
+_r_elasticsearch_password_minlength: 12
+_r_elasticsearch_password_minuppercase: 3
+_r_elasticsearch_password_minlowercase: 3
+_r_elasticsearch_password_mindigits: 2
+_r_elasticsearch_password_minspecialchars: 1
+_r_elasticsearch_password_specialchars: '!._@#'
+
+## linux username and password
+_r_elasticsearch_username: elasticsearch
+_r_elasticsearch_group: elasticsearch
+
+## elasticsearch.yml configurations
+r_elasticsearch_node_name: ''
+r_elasticsearch_node_rack: ''
+r_elasticsearch_cluster_nodes:
+  - host: '{{ ansible_fqdn }}'
+    name: '{{ ansible_fqdn }}'
+    roles:
+      - master
+r_elasticsearch_cluster_name: 'es_cluster'
+
+_r_elasticsearch_configuration_schema:
+  network.host:
+    type: string
+    secure: false
+    reloadable: false
+  path.data:
+    type: string
+    secure: false
+    reloadable: false
+  path.logs:
+    type: string
+    secure: false
+    reloadable: false
+  cluster.name:
+    type: string
+    secure: false
+    reloadable: false
+  discovery.seed_hosts:
+    type: list
+    secure: false
+    reloadable: false
+  cluster.initial_master_nodes:
+    type: list
+    secure: false
+    reloadable: false
+  # AUDIT
+  xpack.security.audit.enabled:
+    type: bool
+    secure: false
+    reloadable: false
+  xpack.security.audit.logfile.events.include:
+    type: list
+    secure: false
+    reloadable: true
+  xpack.security.audit.logfile.events.exclude:
+    type: list
+    secure: false
+    reloadable: true
+  xpack.security.audit.logfile.events.emit_request_body:
+    type: bool
+    secure: false
+    reloadable: true
+  xpack.security.audit.logfile.emit_node_name:
+    type: bool
+    secure: false
+    reloadable: true
+  xpack.security.audit.logfile.emit_node_host_address:
+    type: bool
+    secure: false
+    reloadable: true
+  xpack.security.audit.logfile.emit_node_host_name:
+    type: bool
+    secure: false
+    reloadable: true
+  xpack.security.audit.logfile.emit_node_id:
+    type: bool
+    secure: false
+    reloadable: true
+
+
+_r_elasticsearch_configuration:
+  network:
+    host: "0.0.0.0"
+  http:
+    host: "0.0.0.0"
+    port: 9200
+  cluster:
+    name: '{{ r_elasticsearch_cluster_name }}'
+  node:
+    name: '{{ r_elasticsearch_node_name }}'
+    roles: >-
+      {{ (r_elasticsearch_cluster_nodes |
+      selectattr('host', 'equalto', ansible_fqdn) | first).roles | list }}
+  xpack:
+    security:
+      enabled: true
+      enrollment:
+        enabled: true
+      http:
+        ssl:
+          enabled: true
+          keystore:
+            path: certs/elastic.p12
+      transport:
+        ssl:
+          enabled: true
+          verification_mode: certificate
+          keystore:
+            path: certs/elastic.p12
+          certificate_authorities: certs/ca.crt
+
+r_elasticsearch_configuration_ssl_certificate_authorities: ''
+r_elasticsearch_configuration: {}
+
+## keystore settings
+r_elasticsearch_keystore_password:
+r_elasticsearch_keystore_password_file: "{{ _r_elasticsearch_config_folder }}/keystore.password"
+r_elasticsearch_keystore:
+_r_elasticsearch_keystore:
+  "bootstrap.password": "{{ r_elasticsearch_users_initial_elastic_password }}"
+
+## jvm setting
+r_elasticsearch_jvm_initial_heap: 1g
+r_elasticsearch_jvm_maximum_heap: 1g
+
+# reloadable configuration
+r_elasticsearch_users_initial_elastic_password: bA3nb0g.Hyw
