@@ -17,7 +17,7 @@ class BartokITAnsibleModule(AnsibleModule):
 
     """
 
-    def __init__(self, mode, module_args, parameters_argument='keys', supports_check_mode=True):
+    def __init__(self, mode, module_args, parameter_name_with_keys='keys', supports_check_mode=True):
         """
         Initialize the ansible modules.
 
@@ -33,7 +33,7 @@ class BartokITAnsibleModule(AnsibleModule):
             raise Exception("Mode %s not know" % mode)
         self.mode = mode
         self.__changed = True
-        self.__parameters_argument = parameters_argument
+        self.__parameters_argument = parameter_name_with_keys
         self.behaviour = dict()
 
     def settings(self, compare_values=True):

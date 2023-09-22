@@ -79,3 +79,4 @@
   bartokit.elastic.elasticsearch_keystore:
     force: "{{  'enforce_keystore' in r_elasticsearch_configure_actions }}"
     credentials: "{{ r_elasticsearch_keystore }}"
+    password: "{{ r_elasticsearch_keystore_password | d(omit) }}"
