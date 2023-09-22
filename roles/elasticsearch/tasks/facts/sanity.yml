@@ -37,13 +37,13 @@
           - "Password must at least of {{ _r_elasticsearch_password_minspecialchars }} special chars choosed from {{ _r_elasticsearch_password_specialchars }}"
       when: r_elasticsearch_keystore_password | d(false, true)
 
-    - name: Facts | Sanity | Combine elasticsearch keystores
+    - name: Facts | Sanity | Set elatic node
       ansible.builtin.set_fact:
-        r_elasticsearch_keystore: "{{ r_elasticsearch_keystore | combine(_r_elasticsearch_keystore) }}"
-      no_log: "{{ not (__r_elasticsearch_show_nolog | bool) }}"
-
-    - name: Facts | Sanity | ombine elasticsearch configuration with defaults
-      ansible.builtin.set_fact:
-        r_elasticsearch_configuration: "{{ r_elasticsearch_configuration | combine(_r_elasticsearch_configuration, recursive=True) }}"
         r_elasticsearch_node_name: "{{ (r_elasticsearch_cluster_nodes | selectattr('host', '==', ansible_fqdn) | first).name }}"
         r_elasticsearch_node_rack: "{{ (r_elasticsearch_cluster_nodes | selectattr('host', '==', ansible_fqdn) | first).rack | d(omit) }}"
+      no_log: "{{ not (__r_elasticsearch_show_nolog | bool) }}"
+
+    - name: Facts | Sanity | Combine elasticsearch configurations with defaults
+      ansible.builtin.set_fact:
+        r_elasticsearch_keystore: "{{ r_elasticsearch_keystore | combine(_r_elasticsearch_keystore) }}"
+        r_elasticsearch_configuration: "{{ r_elasticsearch_configuration | combine(_r_elasticsearch_configuration, recursive=True) }}"

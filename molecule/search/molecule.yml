@@ -13,7 +13,7 @@ platforms:
   - name: master1
     image: registry.access.redhat.com/ubi8/ubi-init
     groups:
-      - instance
+      - cluster
     network: molecule-elastic-search-test
     tmpfs:
       - /run
@@ -21,7 +21,7 @@ platforms:
   - name: master2
     image: registry.access.redhat.com/ubi8/ubi-init
     groups:
-      - instance
+      - cluster
     network: molecule-elastic-search-test
     tmpfs:
       - /run
@@ -29,8 +29,29 @@ platforms:
   - name: master3
     image: registry.access.redhat.com/ubi8/ubi-init
     groups:
-      - instance
+      - cluster
     network: molecule-elastic-search-test
     tmpfs:
       - /run
     pre_build_image: true
+provisioner:
+  name: ansible
+  options:
+    diff: true
+  inventory:
+    host_vars:
+      master1:
+        ansible_host: master1
+        node: master1
+        roles:
+          - master
+      master2:
+        ansible_host: master2
+        node: master2
+        roles:
+          - master
+      master3:
+        ansible_host: master3
+        node: master3
+        roles:
+          - master

@@ -3,6 +3,10 @@
   hosts: all
   gather_facts: false
   tasks:
+
+    - name: Read configurations
+      ansible.builtin.include_tasks: ../elasticsearch_configuration.yml
+
     - name: Test the installation, configuration and product start
       ansible.builtin.set_fact:
         r_elasticsearch_actions:

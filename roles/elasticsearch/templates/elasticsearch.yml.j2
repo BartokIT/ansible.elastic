@@ -3,7 +3,7 @@
 # ---------------------------------- Cluster -----------------------------------
 cluster.name: {{ r_elasticsearch_configuration.cluster.name }}
 node.name: {{ r_elasticsearch_configuration.node.name }}
-{%- if r_elasticsearch_node_rack | d(false, true) %}
+{% if r_elasticsearch_node_rack | d(false, true) %}
 node.attr.rack: {{ r_elasticsearch_node_rack }}
 {%- endif %}
 node.roles: {{ r_elasticsearch_configuration.node.roles | list }}

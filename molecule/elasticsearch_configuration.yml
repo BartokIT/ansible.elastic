@@ -1,0 +1,18 @@
+---
+- name: Get certificate
+  ansible.builtin.slurp:
+    path: /etc/pki/tls/certs/ca-certificate.pem
+  register: _converge_ca_certificate
+
+- name: Cluster configuration
+  ansible.builtin.set_fact:
+    r_elasticsearch_cluster_nodes: >-
+      {%- filter list -%}
+        [{%- for node in groups.cluster -%}
+            { 'host': '{{ node }}', 'name': '{{ node }}', 'roles': {{ hostvars[node].roles }} },
+      {%- endfor -%}]{%- endfilter -%}
+    r_elasticsearch_keystore:
+      xpack.security.http.ssl.keystore.secure_password: omit
+      xpack.security.transport.ssl.keystore.secure_password: omit
+    r_elasticsearch_configuration_ssl_certificate_authorities: "{{ _converge_ca_certificate.content | b64decode }}"
+    r_elasticsearch_keystore_password: 'adfs8NSM2nc.ug'

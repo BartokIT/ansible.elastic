@@ -1,8 +1,18 @@
 ---
 - name: Sanity check configuration variables
   when: not r_elasticsearch_installation_info.installed
-  block:
-  - name: Install | Install Elasticsearch
-    ansible.builtin.dnf:
-      name: '{{ r_elasticsearch_rpm_name }} == {{ r_elasticsearch_version }}'
-      state: present
+  ansible.builtin.block:
+    - name: Install | Install python modules
+      ansible.builtin.dnf:
+        name: 'python3-cryptography'
+        state: present
+
+    - name: Install | Install Elasticsearch
+      ansible.builtin.dnf:
+        name: '{{ r_elasticsearch_rpm_name }} == {{ r_elasticsearch_version }}'
+        state: present
+      notify:
+        - _r_elasticsearch_gather_installation_facts
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
