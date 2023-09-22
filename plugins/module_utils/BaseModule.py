@@ -96,23 +96,30 @@ class BartokITAnsibleModule(AnsibleModule):
         to_be_removed = []
 
         # initialization
-        self.__keys = self.initialization(self.__parameters_argument, self.params)
+        self.__keys = self.initialization(
+            self.__parameters_argument, self.params)
 
         # store current keys to avoid get continuosly
         current_keys = self.list_current_keys(self.__keys)
         to_be_added = []
         to_be_removed = []
         to_be_updated = []
-
+        diff_before_keys = []
+        diff_after_keys = []
         if self.mode == 'present':
             to_be_added = self.list_input_keys() - current_keys
-            to_be_updated = list(set(current_keys) & set(self.list_input_keys()))
+            to_be_updated = list(set(current_keys) &
+                                 set(self.list_input_keys()))
+            diff_before_keys = set(current_keys).intersection(set(self.list_input_keys()))
         elif self.mode == 'absent':
             to_be_removed = self.list_input_keys()
+            diff_before_keys = set(current_keys).intersection(set(self.list_input_keys()))
         else:
             to_be_added = self.list_input_keys() - current_keys
             to_be_removed = current_keys - self.list_input_keys()
-            to_be_updated = list(set(current_keys) & set(self.list_input_keys()))
+            to_be_updated = list(set(current_keys) &
+                                 set(self.list_input_keys()))
+            diff_before_keys = current_keys
 
         # pre management hool
         self.__changed = self.pre_crud()
@@ -130,7 +137,8 @@ class BartokITAnsibleModule(AnsibleModule):
 
         # update key only if input value differ from current value
         for key in to_be_updated:
-            different = self.compare_key(key, self.__keys[key], self.read_key(key))
+            different = self.compare_key(
+                key, self.__keys[key], self.read_key(key))
             if different:
                 self.__changed = True
                 self.update_key(key, self.__keys[key], self.read_key(key))
@@ -138,7 +146,18 @@ class BartokITAnsibleModule(AnsibleModule):
         if self.post_crud():
             self.__changed = True
 
-        result = {'changed': self.__changed}
+        after_run_keys = self.list_current_keys(self.__keys)
+        if self.mode == 'present':
+            diff_after_keys = set(after_run_keys).intersection(set(self.list_input_keys()))
+        elif self.mode == 'absent':
+            diff_after_keys = set(after_run_keys).intersection(set(self.list_input_keys()))
+        else:
+            diff_after_keys = after_run_keys
+        diff_before_keys = list(diff_before_keys)
+        diff_after_keys = list(diff_after_keys)
+        diff_before_keys.sort()
+        diff_after_keys.sort()
+        result = {'diff': {'before': '\n'.join(diff_before_keys) , 'after': '\n'.join(diff_after_keys)}, 'changed': self.__changed}
         self.exit_json(**result)
 
     def run(self):

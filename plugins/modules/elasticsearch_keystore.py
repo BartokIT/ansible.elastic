@@ -86,7 +86,7 @@ class BartokITElasticsearchKeystore(BartokITAnsibleModule):
 
     def __init__(self, module_args):
         """Call the constructor of the parent class."""
-        super().__init__(mode='present', parameter_name_with_keys='credentials',
+        super().__init__(mode='multiple', parameter_name_with_keys='credentials',
                          module_args=module_args, supports_check_mode=False)
         self.__bin_path = '/usr/share/elasticsearch/bin/'
         self.__keystore_executable = os.path.join(
@@ -113,7 +113,6 @@ class BartokITElasticsearchKeystore(BartokITAnsibleModule):
         """
         self.settings(compare_values=parameters['force'])
         self.__password_protected = self.is_password_protected()
-
         return parameters[parameters_argument]
 
     def read_key(self, key):
@@ -121,18 +120,46 @@ class BartokITElasticsearchKeystore(BartokITAnsibleModule):
 
         read_command = []
         if self.__password_protected:
+
             expect_command = """
             spawn  {} show {}
             expect "Enter password for the elasticsearch keystore"
             send -- "{}\\n"
             expect eof
-            """.format(self.__keystore_executable, key, self.params.password)
-            read_commands = ["expect", "-c", expect_command]
+            """.format(self.__keystore_executable, key, self.params['password'])
+
+            read_command = ["expect", "-c", expect_command]
+
         else:
             read_command = [self.__keystore_executable, "show", key]
+
         rc, stdout, stderr = self.run_command(
             read_command, check_rc=True)
-        return stdout
+        element = [item.strip() for item in stdout.split("\n") if item.strip()][-1]
+        return element
+
+    def delete_key(self, key, current_value):
+        """Read keystore settings."""
+
+        delete_command = []
+        if self.__password_protected:
+
+            expect_command = """
+            spawn  {} remove {}
+            expect "Enter password for the elasticsearch keystore"
+            send -- "{}\\n"
+            expect eof
+            """.format(self.__keystore_executable, key, self.params['password'])
+
+            delete_command = ["expect", "-c", expect_command]
+
+        else:
+            delete_command = [self.__keystore_executable, "remove", key]
+
+        rc, stdout, stderr = self.run_command(
+            delete_command, check_rc=True)
+
+        return None
 
     def create_key(self, key, value):
         """Add keystore settings."""
@@ -146,7 +173,7 @@ class BartokITElasticsearchKeystore(BartokITAnsibleModule):
             expect "Enter value for"
             send -- "{}\\n"
             expect eof
-            """.format(self.__keystore_executable, key, self.params.password, value)
+            """.format(self.__keystore_executable, key, self.params['password'], value)
             add_command = ["expect", "-c", expect_command]
         else:
             data=value
@@ -166,7 +193,7 @@ class BartokITElasticsearchKeystore(BartokITAnsibleModule):
             expect "Enter value for"
             send -- "{}\\n"
             expect eof
-            """.format(self.__keystore_executable, key, self.params.password, input_value)
+            """.format(self.__keystore_executable, key, self.params['password'], input_value)
             add_command = ["expect", "-c", expect_command]
         else:
             data=input_value
@@ -178,7 +205,7 @@ class BartokITElasticsearchKeystore(BartokITAnsibleModule):
         """Return the list of keys actually present."""
         data= None
         if self.__password_protected:
-            data=self.params.password
+            data=self.params['password']
         list_command = "{} list".format(self.__keystore_executable)
         rc, stdout, stderr = self.run_command(list_command, check_rc=True, data=data)
         return stdout.splitlines()
