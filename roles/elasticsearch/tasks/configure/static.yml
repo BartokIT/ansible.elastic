@@ -1,7 +1,4 @@
 ---
-- name: Fail after the previous task
-  fail:
-
 - name: Check that Elasticsearch is installed
   ansible.builtin.assert:
     that:

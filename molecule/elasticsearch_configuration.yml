@@ -6,6 +6,7 @@
 
 - name: Cluster configuration
   ansible.builtin.set_fact:
+    r_elasticsearch_cluster_name: molecule_cluster
     r_elasticsearch_cluster_nodes: >-
       {%- filter list -%}
         [{%- for node in groups.cluster -%}

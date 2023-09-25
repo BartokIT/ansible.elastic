@@ -1,2 +1,113 @@
 ---
 # vars file for elasticsearch
+_r_elasticsearch_configuration_schema:
+  network.host:
+    type: string
+    secure: false
+    reloadable: false
+  path.data:
+    type: string
+    secure: false
+    reloadable: false
+  path.logs:
+    type: string
+    secure: false
+    reloadable: false
+  cluster.name:
+    type: string
+    secure: false
+    reloadable: false
+  node.name:
+    type: string
+    secure: false
+    reloadable: false
+  discovery.seed_hosts:
+    type: list
+    secure: false
+    reloadable: false
+  cluster.initial_master_nodes:
+    type: list
+    secure: false
+    reloadable: false
+  # AUDIT
+  xpack.security.audit.enabled:
+    type: bool
+    secure: false
+    reloadable: false
+  xpack.security.audit.logfile.events.include:
+    type: list
+    secure: false
+    reloadable: true
+  xpack.security.audit.logfile.events.exclude:
+    type: list
+    secure: false
+    reloadable: true
+  xpack.security.audit.logfile.events.emit_request_body:
+    type: bool
+    secure: false
+    reloadable: true
+  xpack.security.audit.logfile.emit_node_name:
+    type: bool
+    secure: false
+    reloadable: true
+  xpack.security.audit.logfile.emit_node_host_address:
+    type: bool
+    secure: false
+    reloadable: true
+  xpack.security.audit.logfile.emit_node_host_name:
+    type: bool
+    secure: false
+    reloadable: true
+  xpack.security.audit.logfile.emit_node_id:
+    type: bool
+    secure: false
+    reloadable: true
+  # circuit breaker
+  indices.breaker.total.use_real_memory:
+    type: bool
+    secure: false
+    reloadable: false
+  indices.breaker.total.limit:
+    type: percentual
+    secure: false
+    reloadable: true
+  indices.breaker.fielddata.overhead:
+    type: percentual
+    secure: false
+    reloadable: true
+  indices.breaker.request.limit:
+    type: percentual
+    secure: false
+    reloadable: true
+  indices.breaker.request.overhead:
+    type: int
+    secure: false
+    reloadable: true
+  network.breaker.inflight_requests.limit:
+    type: percentual
+    secure: false
+    reloadable: true
+  network.breaker.inflight_requests.overhead:
+    type: percentual
+    secure: false
+    reloadable: true
+  indices.breaker.accounting.limit:
+    type: percentual
+    secure: false
+    reloadable: true
+  script.max_compilations_rate:
+    type: string
+    secure: false
+    reloadable: true
+  script.painless.regex.enabled:
+    type: string
+    secure: false
+    reloadable: false
+    choices:
+      - limited
+      - true
+      - false
+  script.painless.regex.limit-factor:
+    type: string
+    secure: false
+    reloadable: false

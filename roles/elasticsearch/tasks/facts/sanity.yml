@@ -47,3 +47,10 @@
       ansible.builtin.set_fact:
         r_elasticsearch_keystore: "{{ r_elasticsearch_keystore | combine(_r_elasticsearch_keystore) }}"
         r_elasticsearch_configuration: "{{ r_elasticsearch_configuration | combine(_r_elasticsearch_configuration, recursive=True) }}"
+
+- name: Include variables
+  include_vars:
+    dir: vars/main.yml
+
+- debug:
+     msg: "{{ _r_elasticsearch_configuration is bartokit.elastic.validate_configuration(_r_elasticsearch_configuration_schema) }}"
