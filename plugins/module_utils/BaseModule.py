@@ -2,6 +2,7 @@
 # Copyright: (c) 2022, BartokIT <bartokit@tutanota.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 """A module containing base Ansible module class."""
+import copy
 from ansible.module_utils.basic import AnsibleModule
 from typing import Any
 
@@ -33,7 +34,7 @@ class BartokITAnsibleModule(AnsibleModule):
             raise Exception("Mode %s not know" % mode)
         self.mode = mode
         self.__changed = True
-        self.__parameters_argument = parameter_name_with_keys
+        self.__parameter_name_with_keys = parameter_name_with_keys
         self.behaviour = dict()
 
     def settings(self, compare_values=True):
@@ -60,6 +61,10 @@ class BartokITAnsibleModule(AnsibleModule):
     def delete_key(self, key, current_value):
         """Delete a key."""
         raise Exception("Delete key not implemented")
+
+    def pre_run(self):
+        """Execute actions before the manage of the keys."""
+        return False
 
     def pre_crud(self):
         """Execute actions before the manage of the keys."""
@@ -90,14 +95,23 @@ class BartokITAnsibleModule(AnsibleModule):
         """Return the list of keys in input."""
         return self.__keys.keys()  # type: ignore
 
+    def describe_info_for_output(self):
+        """Return information to print"""
+        return {}
+
     def _run(self):
         """Run the Ansible module."""
         to_be_added = []
         to_be_removed = []
+        diff_before_output = {}
+        diff_after_output = {}
 
         # initialization
         self.__keys = self.initialization(
-            self.__parameters_argument, self.params)
+            self.__parameter_name_with_keys, self.params)
+
+        diff_before_output = copy.deepcopy(self.describe_info_for_output())
+        self.__changed = self.pre_run()
 
         # store current keys to avoid get continuosly
         current_keys = self.list_current_keys(self.__keys)
@@ -106,14 +120,17 @@ class BartokITAnsibleModule(AnsibleModule):
         to_be_updated = []
         diff_before_keys = []
         diff_after_keys = []
+
         if self.mode == 'present':
             to_be_added = self.list_input_keys() - current_keys
             to_be_updated = list(set(current_keys) &
                                  set(self.list_input_keys()))
-            diff_before_keys = set(current_keys).intersection(set(self.list_input_keys()))
+            diff_before_keys = set(current_keys).intersection(
+                set(self.list_input_keys()))
         elif self.mode == 'absent':
             to_be_removed = self.list_input_keys()
-            diff_before_keys = set(current_keys).intersection(set(self.list_input_keys()))
+            diff_before_keys = set(current_keys).intersection(
+                set(self.list_input_keys()))
         else:
             to_be_added = self.list_input_keys() - current_keys
             to_be_removed = current_keys - self.list_input_keys()
@@ -122,7 +139,7 @@ class BartokITAnsibleModule(AnsibleModule):
             diff_before_keys = current_keys
 
         # pre management hool
-        self.__changed = self.pre_crud()
+        self.__changed =  True if self.pre_crud() else self.__changed
         # delete keys
         for key in to_be_removed:
             self.delete_key(key, self.read_key(key))
@@ -148,16 +165,24 @@ class BartokITAnsibleModule(AnsibleModule):
 
         after_run_keys = self.list_current_keys(self.__keys)
         if self.mode == 'present':
-            diff_after_keys = set(after_run_keys).intersection(set(self.list_input_keys()))
+            diff_after_keys = set(after_run_keys).intersection(
+                set(self.list_input_keys()))
         elif self.mode == 'absent':
-            diff_after_keys = set(after_run_keys).intersection(set(self.list_input_keys()))
+            diff_after_keys = set(after_run_keys).intersection(
+                set(self.list_input_keys()))
         else:
             diff_after_keys = after_run_keys
+
+        # calculate key differences
         diff_before_keys = list(diff_before_keys)
         diff_after_keys = list(diff_after_keys)
         diff_before_keys.sort()
         diff_after_keys.sort()
-        result = {'diff': {'before': '\n'.join(diff_before_keys) , 'after': '\n'.join(diff_after_keys)}, 'changed': self.__changed}
+        diff_after_output =  copy.deepcopy(self.describe_info_for_output())
+        diff_before_output.update({self.__parameter_name_with_keys: diff_before_keys})
+        diff_after_output.update({self.__parameter_name_with_keys: diff_after_keys})
+        result = {'diff': {'before': diff_before_output, 'after': diff_after_output}, 'changed': self.__changed}
+        result.update(diff_after_output)
         self.exit_json(**result)
 
     def run(self):

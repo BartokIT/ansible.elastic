@@ -1,10 +1,4 @@
 ---
-- name: Manage keystore
-  bartokit.elastic.elasticsearch_keystore:
-    force: "{{  'enforce_keystore' in r_elasticsearch_configure_actions }}"
-    credentials: "{{ r_elasticsearch_keystore }}"
-    password: "{{ r_elasticsearch_keystore_password | d(omit) }}"
-
 - name: Fail after the previous task
   fail:
 
@@ -17,6 +11,13 @@
 - name: Keystore management
   when: r_elasticsearch_keystore_password | d(false, true)
   block:
+
+    - name: Manage keystore
+      bartokit.elastic.elasticsearch_keystore:
+        force: "{{  'enforce_keystore' in r_elasticsearch_configure_actions }}"
+        credentials: "{{ r_elasticsearch_keystore }}"
+        password: "{{ r_elasticsearch_keystore_password | d(omit) }}"
+
     - name: Put keystore password in a file
       ansible.builtin.copy:
         content: "{{ r_elasticsearch_keystore_password }}"

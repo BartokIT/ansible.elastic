@@ -115,6 +115,30 @@ class BartokITElasticsearchKeystore(BartokITAnsibleModule):
         self.__password_protected = self.is_password_protected()
         return parameters[parameters_argument]
 
+    def pre_run(self):
+        """Execute actions before the manage of the keys."""
+
+        if not self.__password_protected:
+            # Protect the keystore with the specified password
+            expect_command = """
+            spawn  {} passwd
+            expect "Enter new password"
+            send -- "{}\\n"
+            expect "Enter same password"
+            send -- "{}\\n"
+            expect eof
+            """.format(self.__keystore_executable, self.params['password'],  self.params['password'])
+            set_command = ["expect", "-c", expect_command]
+            rc, stdout, stderr = self.run_command(
+            set_command, check_rc=True)
+            self.__password_protected = self.is_password_protected()
+            return True
+        else:
+            # verify if the password is correct
+            pass
+
+        return False
+
     def read_key(self, key):
         """Read keystore settings."""
 
@@ -139,7 +163,7 @@ class BartokITElasticsearchKeystore(BartokITAnsibleModule):
         return element
 
     def delete_key(self, key, current_value):
-        """Read keystore settings."""
+        """Delete keystore key."""
 
         delete_command = []
         if self.__password_protected:
@@ -200,6 +224,10 @@ class BartokITElasticsearchKeystore(BartokITAnsibleModule):
             add_command = [self.__keystore_executable, "add", "--force", "--stdin", key]
         rc, stdout, stderr = self.run_command(
             add_command, check_rc=True, data=data)
+
+    def describe_info_for_output(self):
+        """Return information to print"""
+        return {'protected': self.__password_protected}
 
     def list_current_keys(self, input_keys):
         """Return the list of keys actually present."""

@@ -2,9 +2,11 @@
 - name: Sanity check configuration variables
   when: not r_elasticsearch_installation_info.installed
   block:
-    - name: Install | Install python modules
+    - name: Install | Install expect and python modules
       ansible.builtin.dnf:
-        name: 'python3-cryptography'
+        name:
+          - python3-cryptography
+          - expect
         state: present
 
     - name: Install | Install Elasticsearch

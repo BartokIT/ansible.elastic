@@ -17,4 +17,5 @@
       xpack.security.http.ssl.keystore.secure_password: 'uesl3NAZSCKEZ_Hzfr7CPg'
       xpack.security.transport.ssl.keystore.secure_password: XC9sxbnkTzCP9aTEc74LfQ
       xpack.security.transport.ssl.truststore.secure_password: XC9sxbnkTzCP9aTEc74LfQ
+      #test.secure.key: passwd1
     r_elasticsearch_configuration_ssl_certificate_authorities: "{{ _converge_ca_certificate.content | b64decode }}"
