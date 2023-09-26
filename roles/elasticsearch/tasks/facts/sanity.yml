@@ -49,8 +49,14 @@
         r_elasticsearch_configuration: "{{ r_elasticsearch_configuration | combine(_r_elasticsearch_configuration, recursive=True) }}"
 
 - name: Include variables
-  include_vars:
-    dir: vars/main.yml
+  ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ r_elasticsearch_version | regex_replace('^([0-9])\\.([0-9]*).*', '\\1.\\2') }}.yml"
+        - main.yml
+      paths:
+        - 'vars'
 
-- debug:
-     msg: "{{ _r_elasticsearch_configuration is bartokit.elastic.validate_configuration(_r_elasticsearch_configuration_schema) }}"
+- assert:
+     that: "{{ _r_elasticsearch_configuration is bartokit.elastic.validate_configuration(_r_elasticsearch_configuration_schema) }}"
