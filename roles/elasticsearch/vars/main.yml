@@ -25,6 +25,11 @@ _r_elasticsearch_configuration_schema:
     type: list
     secure: false
     reloadable: false
+  # NODE
+  node.roles:
+    type: list
+    secure: false
+    reloadable: false
   # AUDIT
   xpack.security.audit.enabled:
     type: bool
@@ -297,5 +302,33 @@ _r_elasticsearch_configuration_schema:
     reloadable: false
   xpack.security.fips_mode.enabled:
     type: bool
+    secure: false
+    reloadable: false
+  xpack.security.http.ssl.enabled:
+    type: bool
+    secure: false
+    reloadable: false
+  xpack.security.transport.ssl.enabled:
+    type: bool
+    secure: false
+    reloadable: false
+  xpack.security.http.ssl.keystore.path:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.transport.ssl.keystore.path:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.transport.ssl.verification_mode:
+    type: string
+    secure: false
+    reloadable: false
+    choices:
+      - full
+      - certificate
+      - none
+  xpack.security.transport.ssl.certificate_authorities:
+    type: list
     secure: false
     reloadable: false

@@ -23,4 +23,4 @@
     r_elasticsearch_configuration:
 #      cluster.routing.allocation.allow_rebalance: pippo
       indices.breaker.total.limit: '10%'
-      network.tcp.send_buffer_size: 10pp
+      network.tcp.send_buffer_size: 10kb
