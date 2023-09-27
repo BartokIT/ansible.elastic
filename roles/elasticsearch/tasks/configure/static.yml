@@ -5,6 +5,24 @@
       - r_elasticsearch_installation_info.installed
     msg: "Please install first the product"
 
+- name: Configure jvm heap settings
+  ansible.builtin.copy:
+    content: |-
+      -Xms{{ r_elasticsearch_jvm_initial_heap }}
+      -Xmx{{ r_elasticsearch_jvm_maximum_heap }}
+    dest: "{{ _r_elasticsearch_config_folder }}/jvm.options.d/heap.options"
+    mode: 0660
+    owner: root
+    group: "{{ _r_elasticsearch_group }}"
+
+- name: Write elasticsearch.yml configuration file
+  ansible.builtin.template:
+    src: elasticsearch.yml.j2
+    dest: "{{ _r_elasticsearch_config_folder }}/elasticsearch.yml"
+    mode: 0660
+    owner: root
+    group: "{{ _r_elasticsearch_group }}"
+
 - name: Keystore management
   when: r_elasticsearch_keystore_password | d(false, true)
   block:
@@ -41,23 +59,7 @@
         owner: root
         mode: 0644
 
-- name: Configure jvm heap settings
-  ansible.builtin.copy:
-    content: |-
-      -Xms{{ r_elasticsearch_jvm_initial_heap }}
-      -Xmx{{ r_elasticsearch_jvm_maximum_heap }}
-    dest: "{{ _r_elasticsearch_config_folder }}/jvm.options.d/heap.options"
-    mode: 0660
-    owner: root
-    group: "{{ _r_elasticsearch_group }}"
 
-- name: Write elasticsearch.yml configuration file
-  ansible.builtin.template:
-    src: elasticsearch.yml.j2
-    dest: "{{ _r_elasticsearch_config_folder }}/elasticsearch.yml"
-    mode: 0660
-    owner: root
-    group: "{{ _r_elasticsearch_group }}"
 
 - name: Create the PKCS12 http file
   community.crypto.openssl_pkcs12:

@@ -21,6 +21,11 @@
       #test.secure.key: passwd1
     r_elasticsearch_configuration_ssl_certificate_authorities: "{{ _converge_ca_certificate.content | b64decode }}"
     r_elasticsearch_configuration:
-#      cluster.routing.allocation.allow_rebalance: pippo
-      indices.breaker.total.limit: '10%'
-      network.tcp.send_buffer_size: 10kb
+      #cluster.routing.allocation.allow_rebalance: pippo
+      indices:
+        breaker:
+          total:
+            limit: '10%'
+      network:
+        tcp:
+          send_buffer_size: 10kb
