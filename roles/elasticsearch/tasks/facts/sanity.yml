@@ -46,7 +46,7 @@
     - name: Facts | Sanity | Combine elasticsearch configurations with defaults
       ansible.builtin.set_fact:
         r_elasticsearch_keystore: "{{ r_elasticsearch_keystore | combine(_r_elasticsearch_keystore) }}"
-        r_elasticsearch_configuration: "{{ r_elasticsearch_configuration | combine(_r_elasticsearch_configuration, recursive=True) }}"
+        r_elasticsearch_configuration: "{{ _r_elasticsearch_configuration | combine(r_elasticsearch_configuration, recursive=True) }}"
 
 - name: Include variables
   ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
@@ -58,5 +58,6 @@
       paths:
         - 'vars'
 
-- assert:
-     that: "{{ _r_elasticsearch_configuration is bartokit.elastic.validate_configuration(_r_elasticsearch_configuration_schema) }}"
+- name: Check the validity of the configuration
+  assert:
+     that: "{{ r_elasticsearch_configuration is bartokit.elastic.validate_configuration(_r_elasticsearch_configuration_schema) }}"

@@ -45,13 +45,21 @@ def validate_configuration(configuration, schema):
             if schema[key]['type'] == 'bool':
                 if type(flatted_dict[key]) != type(True):
                     validation_errors += ["The key {} must be boolean (found {})".format(key, type(flatted_dict[key]))]
+            if schema[key]['type'] == 'int':
+                try:
+                    int(flatted_dict[key])
+                except ValueError:
+                    validation_errors += ["The key {} must be int (found {})".format(key, flatted_dict[key])]
             elif schema[key]['type'] == 'percentual':
-                if not re.match("[0-0]+%", flatted_dict[key]):
-                    validation_errors += ["The key {} must be a percentual (found {})".format(key, type(flatted_dict[key]))]
+                if not re.match("[0-9]+%", flatted_dict[key]):
+                    validation_errors += ["The key {} must be a percentual (found {})".format(key, flatted_dict[key])]
+            elif schema[key]['type'] == 'byte':
+                if not re.match("[0-9]+(b|kb|mb|gb|tb|pb)", flatted_dict[key]):
+                    validation_errors += ["The key {} must be a byte multiple (found {})".format(key, flatted_dict[key])]
             elif schema[key]['type'] == 'string':
                 if 'choices' in schema[key]:
                     if flatted_dict[key] not in schema[key]['choices']:
-                        validation_errors += ["The key {} must be one of {} ({} found)".format(key, "%s" %  schema[key]['choices'], flatted_dict[key]['string'])]
+                        validation_errors += ["The key {} must be one of {} ({} found)".format(key, "%s" %  schema[key]['choices'], flatted_dict[key])]
     if validation_errors:
         raise errors.AnsibleFilterError(validation_errors)
 
