@@ -1,6 +1,6 @@
 ---
 - name: Sanity check configuration variables
-  when: not r_elasticsearch_installation_info.installed
+  when: not r_elasticsearch_info.installed
   block:
     - name: Install | Install expect and python modules
       ansible.builtin.dnf:

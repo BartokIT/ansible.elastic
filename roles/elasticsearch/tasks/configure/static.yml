@@ -2,7 +2,7 @@
 - name: Check that Elasticsearch is installed
   ansible.builtin.assert:
     that:
-      - r_elasticsearch_installation_info.installed
+      - r_elasticsearch_info.installed
     msg: "Please install first the product"
 
 - name: Kernel parameters
@@ -95,7 +95,11 @@
         mode: 0644
 
 - name: SSL/TLS keystore management
-  when: ('ssl' in r_elasticsearch_configure_actions)
+  when:
+    - ('ssl' in r_elasticsearch_configure_actions)
+    - r_elasticsearch_configuration.xpack.security.enabled | bool
+    - r_elasticsearch_configuration.xpack.security.http.ssl.enabled | bool or
+      r_elasticsearch_configuration.xpack.security.transport.ssl.enabled | bool
   block:
     - name: Create the PKCS12 http file
       community.crypto.openssl_pkcs12:

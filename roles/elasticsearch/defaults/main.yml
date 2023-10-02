@@ -23,7 +23,7 @@ _r_elasticsearch_triggered_restart: false
 # ---- installation variables ----
 r_elasticsearch_version: '8.9.2'
 r_elasticsearch_rpm_name: elasticsearch
-r_elasticsearch_installation_info:
+r_elasticsearch_info:
   installed: false
   version: ''
 
@@ -91,8 +91,10 @@ _r_elasticsearch_configuration:
       http:
         ssl:
           enabled: true
+          verification_mode: certificate
           keystore:
             path: certs/elastic.p12
+          certificate_authorities: certs/ca.crt
       transport:
         ssl:
           enabled: true

@@ -324,6 +324,14 @@ _r_elasticsearch_configuration_schema:
     type: string
     secure: false
     reloadable: false
+  xpack.security.http.ssl.verification_mode:
+    type: string
+    secure: false
+    reloadable: false
+    choices:
+      - full
+      - certificate
+      - none
   xpack.security.transport.ssl.verification_mode:
     type: string
     secure: false
@@ -333,6 +341,10 @@ _r_elasticsearch_configuration_schema:
       - certificate
       - none
   xpack.security.transport.ssl.certificate_authorities:
+    type: list
+    secure: false
+    reloadable: false
+  xpack.security.http.ssl.certificate_authorities:
     type: list
     secure: false
     reloadable: false

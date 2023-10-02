@@ -14,3 +14,6 @@
 
 - name: Facts | Include variable sanity checks
   ansible.builtin.include_tasks: facts/sanity.yml
+
+- name: Facts | Include installation facts gather
+  ansible.builtin.include_tasks: facts/installation.yml

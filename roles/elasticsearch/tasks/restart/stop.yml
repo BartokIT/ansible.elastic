@@ -1,4 +1,4 @@
-- name: Start the elasticsearch service
+- name: Stop the elasticsearch service
   systemd:
     name: elasticsearch
     state: stopped

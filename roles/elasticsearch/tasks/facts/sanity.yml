@@ -53,6 +53,19 @@
         r_elasticsearch_configuration: "{{ r_elasticsearch_configuration | combine({ 'node': { 'attr': { r_elasticsearch_configuration.cluster.routing.allocation.awareness.attributes: r_elasticsearch_node_rack }}}, recursive=True) }}"
       when: r_elasticsearch_node_rack
 
+    - name: Facts | Sanity | Ensure SSL configuration correctness
+      ansible.builtin.assert:
+        that:
+          - >-
+            r_elasticsearch_configuration.xpack.security.http.ssl.keystore.path ==
+            r_elasticsearch_configuration.xpack.security.transport.ssl.keystore.path
+          - >-
+
+      when:
+        - r_elasticsearch_configuration.xpack.security.enabled | bool
+        - r_elasticsearch_configuration.xpack.security.http.ssl.enabled | bool or
+          r_elasticsearch_configuration.xpack.security.transport.ssl.enabled | bool
+
 # validation of the configuration
 - name: Include variables
   ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
