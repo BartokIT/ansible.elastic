@@ -15,11 +15,17 @@ platforms:
     groups:
       - cluster
     network: molecule-elastic-search-test
+    volume_mounts:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    command: "/usr/sbin/init"
     tmpfs:
       - /run
     pre_build_image: true
   - name: master2
     image: registry.access.redhat.com/ubi8/ubi-init
+    volume_mounts:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    command: "/usr/sbin/init"
     groups:
       - cluster
     network: molecule-elastic-search-test
@@ -28,6 +34,9 @@ platforms:
     pre_build_image: true
   - name: master3
     image: registry.access.redhat.com/ubi8/ubi-init
+    volume_mounts:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    command: "/usr/sbin/init"
     groups:
       - cluster
     network: molecule-elastic-search-test

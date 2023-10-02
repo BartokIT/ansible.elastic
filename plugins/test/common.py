@@ -37,6 +37,8 @@ def contains(items, element):
 
 def validate_configuration(configuration, schema):
     flatted_dict = flatten_dict(configuration)
+    # added attribute for routing awareness
+    schema['node.attr.' + flatted_dict['cluster.routing.allocation.awareness.attributes']] = {'type': 'string'}
     validation_errors = []
     for key in flatted_dict.keys():
         if not key in schema:

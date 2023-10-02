@@ -4,3 +4,9 @@
   ansible.builtin.include_tasks: facts/installation.yml
   listen:
     - _r_elasticsearch_gather_installation_facts
+
+- name: Set restart flag to true
+  ansible.builtin.set_fact:
+    _r_elasticsearch_triggered_restart: true
+  listen:
+    - _r_elasticsearch_configuration_changed

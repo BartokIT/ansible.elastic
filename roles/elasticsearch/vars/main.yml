@@ -220,6 +220,10 @@ _r_elasticsearch_configuration_schema:
     type: float
     secure: false
     reloadable: true
+  cluster.routing.allocation.awareness.attributes:
+    type: string
+    secure: false
+    reloadable: false
   # to be expanded
   # networking
   network.host:

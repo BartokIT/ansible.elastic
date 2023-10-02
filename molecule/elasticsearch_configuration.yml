@@ -7,6 +7,7 @@
 - name: Cluster configuration
   ansible.builtin.set_fact:
     r_elasticsearch_cluster_name: molecule_cluster
+    r_elasticsearch_node_rack: rotating
     r_elasticsearch_cluster_nodes: >-
       {%- filter list -%}
         [{%- for node in groups.cluster -%}
@@ -15,17 +16,13 @@
     r_elasticsearch_keystore_password: 'adfs8NSM2nc.ug'
     r_elasticsearch_keystore:
       keystore.seed: 'J=Z4Y50EUvoAUS?^rQ_@'
-      xpack.security.http.ssl.keystore.secure_password: 'uesl3NAZSCKEZ_Hzfr7CPg'
+      xpack.security.http.ssl.keystore.secure_password: 'XC9sxbnkTzCP9aTEc74LfQ'
       xpack.security.transport.ssl.keystore.secure_password: XC9sxbnkTzCP9aTEc74LfQ
       xpack.security.transport.ssl.truststore.secure_password: XC9sxbnkTzCP9aTEc74LfQ
-      #test.secure.key: passwd1
+      # test.secure.key: passwd1
     r_elasticsearch_configuration_ssl_certificate_authorities: "{{ _converge_ca_certificate.content | b64decode }}"
     r_elasticsearch_configuration:
-      #cluster.routing.allocation.allow_rebalance: pippo
-      indices:
-        breaker:
-          total:
-            limit: '10%'
-      network:
-        tcp:
-          send_buffer_size: 10kb
+      xpack:
+        security:
+          audit:
+            enabled: false

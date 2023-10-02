@@ -7,12 +7,20 @@
 # - upgrade
 # - start
 # - uninstall
+# - restart_on_configuration_change
 r_elasticsearch_actions: []
 
 # more granular configuration actions
-r_elasticsearch_configure_actions: []
+r_elasticsearch_configure_actions:
+  - sysctl
+  - folders
+  - main_files
+  - keystore
+  - ssl
 
-# installation variables
+_r_elasticsearch_triggered_restart: false
+
+# ---- installation variables ----
 r_elasticsearch_version: '8.9.2'
 r_elasticsearch_rpm_name: elasticsearch
 r_elasticsearch_installation_info:
@@ -60,11 +68,21 @@ _r_elasticsearch_configuration:
     port: 9200
   cluster:
     name: '{{ r_elasticsearch_cluster_name }}'
+    initial_master_nodes: "{{ r_elasticsearch_cluster_nodes | selectattr('roles','bartokit.elastic.contains', 'master') | map(attribute='name') | list }}"
+    routing:
+      allocation:
+        awareness:
+          attributes: site_id
   node:
     name: '{{ r_elasticsearch_node_name }}'
     roles: >-
       {{ (r_elasticsearch_cluster_nodes |
       selectattr('host', 'equalto', ansible_fqdn) | first).roles | list }}
+  path:
+    logs: /var/log/elasticsearch
+    data: /var/lib/elasticsearch
+  discovery:
+    seed_hosts: "{{ r_elasticsearch_cluster_nodes | selectattr('roles','bartokit.elastic.contains', 'master') | map(attribute='name') | list }}"
   xpack:
     security:
       enabled: true
