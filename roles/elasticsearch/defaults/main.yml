@@ -9,13 +9,23 @@
 # - uninstall
 # - restart_on_configuration_change
 r_elasticsearch_actions: []
+_r_elasticsearch_actions_allowed:
+ - install
+ - configure
+ - stop
+ - upgrade
+ - start
+ - uninstall
+ - restart_on_configuration_change
 
 # more granular configuration actions
-r_elasticsearch_configure_actions:
+r_elasticsearch_configure_actions: []
+_r_elasticsearch_configure_actions_allowed:
   - sysctl
   - folders
   - main_files
   - keystore
+  - enforce_keystore
   - ssl
 
 _r_elasticsearch_triggered_restart: false

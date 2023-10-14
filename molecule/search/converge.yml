@@ -19,6 +19,7 @@
           - main_files
           - keystore
           - ssl
+          - enforce_keystore
 
     - name: Replace this task with one that validates your content
       ansible.builtin.include_role:

@@ -15,7 +15,7 @@
         state: present
         reload: true
 
-- name: Keystore management
+- name: Folder management
   when: ('folders' in r_elasticsearch_configure_actions)
   block:
     - name: Create needed folders

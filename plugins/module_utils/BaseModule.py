@@ -5,6 +5,7 @@
 import copy
 from ansible.module_utils.basic import AnsibleModule
 from typing import Any
+import logging
 
 
 class BartokITAnsibleModule(AnsibleModule):
@@ -18,7 +19,7 @@ class BartokITAnsibleModule(AnsibleModule):
 
     """
 
-    def __init__(self, mode, module_args, parameter_name_with_keys='keys', supports_check_mode=True):
+    def __init__(self, mode, module_args, parameter_name_with_keys='keys', supports_check_mode=True, log_file=None):
         """
         Initialize the ansible modules.
 
@@ -36,6 +37,8 @@ class BartokITAnsibleModule(AnsibleModule):
         self.__changed = True
         self.__parameter_name_with_keys = parameter_name_with_keys
         self.behaviour = dict()
+        logging.basicConfig(filename='/tmp/' + log_file,
+                            level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
     def settings(self, compare_values=True):
         """Set the module behaviour."""
@@ -138,8 +141,17 @@ class BartokITAnsibleModule(AnsibleModule):
                                  set(self.list_input_keys()))
             diff_before_keys = current_keys
 
+        # log
+        to_be_added and logging.debug(
+            'Keys requested for add are: {}'.format(to_be_added))
+        to_be_removed and logging.debug(
+            'Keys requested for remove are: {}'.format(to_be_removed))
+        to_be_updated and logging.debug(
+            'Keys requested for updated are: {}'.format(to_be_updated))
+
         # pre management hool
-        self.__changed =  True if self.pre_crud() else self.__changed
+        self.__changed = True if self.pre_crud() else self.__changed
+
         # delete keys
         for key in to_be_removed:
             self.delete_key(key, self.read_key(key))
@@ -157,6 +169,7 @@ class BartokITAnsibleModule(AnsibleModule):
             different = self.compare_key(
                 key, self.__keys[key], self.read_key(key))
             if different:
+                logging.debug("Key {} will be updated".format(key))
                 self.__changed = True
                 self.update_key(key, self.__keys[key], self.read_key(key))
 
@@ -178,10 +191,13 @@ class BartokITAnsibleModule(AnsibleModule):
         diff_after_keys = list(diff_after_keys)
         diff_before_keys.sort()
         diff_after_keys.sort()
-        diff_after_output =  copy.deepcopy(self.describe_info_for_output())
-        diff_before_output.update({self.__parameter_name_with_keys: diff_before_keys})
-        diff_after_output.update({self.__parameter_name_with_keys: diff_after_keys})
-        result = {'diff': {'before': diff_before_output, 'after': diff_after_output}, 'changed': self.__changed}
+        diff_after_output = copy.deepcopy(self.describe_info_for_output())
+        diff_before_output.update(
+            {self.__parameter_name_with_keys: diff_before_keys})
+        diff_after_output.update(
+            {self.__parameter_name_with_keys: diff_after_keys})
+        result = {'diff': {'before': diff_before_output,
+                           'after': diff_after_output}, 'changed': self.__changed}
         result.update(diff_after_output)
         self.exit_json(**result)
 
