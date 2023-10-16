@@ -55,7 +55,7 @@ class ElasticManager:
         expect "Enter same password"
         send -- "{}\\n"
         expect eof
-        """.format(self.__keystore_executable, keystore_password,  self.params['password'])
+        """.format(self.__keystore_executable, keystore_password,  keystore_password)
         set_command = ["expect", "-c", expect_command]
         rc, stdout, stderr = self.ansible_module.run_command(
             set_command, check_rc=True)

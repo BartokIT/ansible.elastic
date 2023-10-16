@@ -111,7 +111,7 @@ class BartokITElasticsearchKeystore(BartokITAnsibleModule):
 
         if not self.__password_protected:
             # Protect the keystore with the specified password
-            self.__em.set_keystore_password()
+            self.__em.set_keystore_password(self.params['password'])
             self.__password_protected = self.is_password_protected()
             logging.debug("Changed elasticsearch keystore to password protected")
             return True
