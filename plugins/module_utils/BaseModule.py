@@ -19,7 +19,7 @@ class BartokITAnsibleModule(AnsibleModule):
 
     """
 
-    def __init__(self, mode, module_args, parameter_name_with_keys='keys', supports_check_mode=True, log_file=None):
+    def __init__(self, mode, argument_spec, parameter_name_with_keys='keys', supports_check_mode=True, log_file=None):
         """
         Initialize the ansible modules.
 
@@ -30,7 +30,7 @@ class BartokITAnsibleModule(AnsibleModule):
                         present or not inside the resource
 
         """
-        super().__init__(argument_spec=module_args, supports_check_mode=supports_check_mode)
+        super().__init__(argument_spec=argument_spec, supports_check_mode=supports_check_mode)
         if mode not in ['present', 'absent', 'multiple']:
             raise Exception("Mode %s not know" % mode)
         self.mode = mode

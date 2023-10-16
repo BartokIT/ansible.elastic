@@ -247,7 +247,7 @@ class BartokITElasticsearchKeystore(BartokITAnsibleModule):
 
 def main():
     """Run module execution."""
-    BartokITElasticsearchKeystore(module_args=module_args).run()
+    BartokITElasticsearchKeystore(argument_spec=module_args).run()
 
 
 if __name__ == '__main__':

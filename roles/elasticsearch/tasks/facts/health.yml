@@ -1,0 +1,5 @@
+---
+- name: Gather information
+  bartokit.elastic.elasticsearch_info:
+    user: 'elastic'
+    password: "{{ r_elasticsearch_keystore_password | d(omit) }}"
