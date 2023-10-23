@@ -9,3 +9,4 @@
       - cluster_health
     ssl_verify: false
   register: _r_elasticsearch_status_info
+- fail:

@@ -44,9 +44,9 @@ class BartokITAnsibleModule(AnsibleModule):
         """Set the module behaviour."""
         self.__compare_values = compare_values
 
-    def initialization(self, parameters_argument, parameters):
+    def initialization(self, parameter_name_with_keys, parameters):
         """Initialize the parameters."""
-        return parameters[parameters_argument]
+        return parameters[parameter_name_with_keys]
 
     # CRUD METHOD
     def create_key(self, key: str, new_value: Any):
@@ -64,6 +64,10 @@ class BartokITAnsibleModule(AnsibleModule):
     def delete_key(self, key, current_value):
         """Delete a key."""
         raise Exception("Delete key not implemented")
+
+    def transform_key(self, key, value, type):
+        """Transform a key value input before modify operation."""
+        return value
 
     def pre_run(self):
         """Execute actions before the manage of the keys."""
@@ -153,25 +157,33 @@ class BartokITAnsibleModule(AnsibleModule):
         self.__changed = True if self.pre_crud() else self.__changed
 
         # delete keys
-        for key in to_be_removed:
-            self.delete_key(key, self.read_key(key))
         if len(to_be_removed) > 0:
             self.__changed = True
+            for key in to_be_removed:
+                current_key_value = self.read_key(key)
+                current_key_value = self.transform_key(key, current_key_value, 'current')
+                self.delete_key(key, current_key_value)
 
         # add missing keys
-        for key in to_be_added:
-            self.create_key(key, self.__keys[key])
         if len(to_be_added) > 0:
             self.__changed = True
+            for key in to_be_added:
+                current_key_value = self.read_key(key)
+                current_key_value = self.transform_key(key, current_key_value, 'current')
+                self.create_key(key, current_key_value)
+
 
         # update key only if input value differ from current value
         for key in to_be_updated:
+            current_key_value = self.read_key(key)
+            current_key_value = self.transform_key(key, current_key_value, 'current')
+            input_key_value = self.transform_key(key, self.__keys[key], 'input')
             different = self.compare_key(
-                key, self.__keys[key], self.read_key(key))
+                key, input_key_value, current_key_value)
             if different:
                 logging.debug("Key {} will be updated".format(key))
                 self.__changed = True
-                self.update_key(key, self.__keys[key], self.read_key(key))
+                self.update_key(key, input_key_value, current_key_value)
 
         if self.post_crud():
             self.__changed = True

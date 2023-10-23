@@ -82,7 +82,7 @@ module_args = dict(
     api_endpoint=dict(type='str', required=False,
                       default='https://localhost:9200', no_log=False),
     ssl_verify=dict(type='bool', required=False, default=True, no_log=False),
-    gather_subset=dict(type='list', choiches=['license'], default=[
+    gather_subset=dict(type='list', default=[
     ], required=False, no_log=False, elements='str')
 )
 
@@ -100,11 +100,11 @@ class BartokITElasticsearchInfo(AnsibleModule):
                     ssl_verify=self.params['ssl_verify'])
             gather_subset = self.params['gather_subset']
             not_allowed_parameters = list(
-                set(gather_subset) - set(['all', 'license', 'nodes', 'health', 'cluster_health']))
+                set(gather_subset) - set(['all', 'license', 'nodes', 'health', 'cluster_health','component_templates']))
             if len(not_allowed_parameters):
                 self.fail_json(msg='Gather subset not allowed {}'.format(
                     not_allowed_parameters))
-
+            output_info['component_templates'] = em.get_component_template('template1')
             if 'license' in gather_subset or 'all' in gather_subset:
                 output_info['license'] = em.get_license_info()
             if 'nodes' in gather_subset or 'all' in gather_subset:
@@ -113,7 +113,8 @@ class BartokITElasticsearchInfo(AnsibleModule):
                 output_info['health'] = em.get_health_info()
             if 'cluster_health' in gather_subset or 'all' in gather_subset:
                 output_info['cluster_health'] = em.get_cluster_health_info()
-
+            if 'component_templates' in gather_subset or 'all' in gather_subset:
+                output_info['component_templates'] = em.get_component_templates()
             self.exit_json(**output_info)
         except Exception as e:
             self.fail_json(msg=str(e))

@@ -18,6 +18,6 @@
 - name: Facts | Include installation facts gather
   ansible.builtin.include_tasks: facts/installation.yml
 
-- name: Facts | Include healt facts gather
+- name: Facts | Include health facts gather
   ansible.builtin.include_tasks: facts/health.yml
   when: r_elasticsearch_info.started

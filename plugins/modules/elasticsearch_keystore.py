@@ -89,7 +89,7 @@ class BartokITElasticsearchKeystore(BartokITAnsibleModule):
         """Call the constructor of the parent class."""
         super().__init__(mode='multiple', parameter_name_with_keys='credentials',
                          argument_spec=argument_spec, supports_check_mode=False,
-                         log_file='ansible_elasticsearch_keystore.org')
+                         log_file='ansible_elasticsearch_keystore.log')
         self.__em = ElasticManager(self, 'https://localhost:9200')
         self.__password_protected = False
 
