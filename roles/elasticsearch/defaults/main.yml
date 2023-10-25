@@ -27,6 +27,7 @@ _r_elasticsearch_configure_actions_allowed:
   - keystore
   - enforce_keystore
   - ssl
+  - component_template
 
 _r_elasticsearch_triggered_restart: false
 
@@ -36,6 +37,7 @@ r_elasticsearch_rpm_name: elasticsearch
 r_elasticsearch_info:
   installed: false
   version: ''
+r_elasticsearch_add_repository: true
 
 # start && stop
 _r_elasticsearch_systemd_name: elasticsearch.service

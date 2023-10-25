@@ -37,10 +37,13 @@ class BartokITAnsibleModule(AnsibleModule):
         self.__changed = True
         self.__parameter_name_with_keys = parameter_name_with_keys
         self.behaviour = dict()
+        self._to_be_added = []
+        self._to_be_removed = []
+        self._to_be_updated = []
         logging.basicConfig(filename='/tmp/' + log_file,
                             level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
-    def settings(self, compare_values=True):
+    def settings(self, compare_values=True, keys_to_be_skipped=None):
         """Set the module behaviour."""
         self.__compare_values = compare_values
 
@@ -73,7 +76,7 @@ class BartokITAnsibleModule(AnsibleModule):
         """Execute actions before the manage of the keys."""
         return False
 
-    def pre_crud(self):
+    def pre_crud(self, current_keys):
         """Execute actions before the manage of the keys."""
         return False
 
@@ -108,11 +111,10 @@ class BartokITAnsibleModule(AnsibleModule):
 
     def _run(self):
         """Run the Ansible module."""
-        to_be_added = []
-        to_be_removed = []
         diff_before_output = {}
         diff_after_output = {}
-
+        diff_before_keys = []
+        diff_after_keys = []
         # initialization
         self.__keys = self.initialization(
             self.__parameter_name_with_keys, self.params)
@@ -122,59 +124,56 @@ class BartokITAnsibleModule(AnsibleModule):
 
         # store current keys to avoid get continuosly
         current_keys = self.list_current_keys(self.__keys)
-        to_be_added = []
-        to_be_removed = []
-        to_be_updated = []
-        diff_before_keys = []
-        diff_after_keys = []
+
 
         if self.mode == 'present':
-            to_be_added = self.list_input_keys() - current_keys
-            to_be_updated = list(set(current_keys) &
+            self._to_be_added = self.list_input_keys() - current_keys
+            self._to_be_updated = list(set(current_keys) &
                                  set(self.list_input_keys()))
             diff_before_keys = set(current_keys).intersection(
                 set(self.list_input_keys()))
         elif self.mode == 'absent':
-            to_be_removed = self.list_input_keys()
+            self._to_be_removed = self.list_input_keys()
             diff_before_keys = set(current_keys).intersection(
                 set(self.list_input_keys()))
         else:
-            to_be_added = self.list_input_keys() - current_keys
-            to_be_removed = current_keys - self.list_input_keys()
-            to_be_updated = list(set(current_keys) &
+            self._to_be_added = self.list_input_keys() - current_keys
+            self._to_be_removed = current_keys - self.list_input_keys()
+            self._to_be_updated = list(set(current_keys) &
                                  set(self.list_input_keys()))
             diff_before_keys = current_keys
 
         # log
-        to_be_added and logging.debug(
-            'Keys requested for add are: {}'.format(to_be_added))
-        to_be_removed and logging.debug(
-            'Keys requested for remove are: {}'.format(to_be_removed))
-        to_be_updated and logging.debug(
-            'Keys requested for updated are: {}'.format(to_be_updated))
-
         # pre management hool
-        self.__changed = True if self.pre_crud() else self.__changed
+        self.__changed = True if self.pre_crud(current_keys) else self.__changed
+
+        self._to_be_added and logging.debug(
+            'Keys requested for add are: {}'.format(self._to_be_added))
+        self._to_be_removed and logging.debug(
+            'Keys requested for remove are: {}'.format(self._to_be_removed))
+        self._to_be_updated and logging.debug(
+            'Keys requested for update are: {}'.format(self._to_be_updated))
+
+
 
         # delete keys
-        if len(to_be_removed) > 0:
+        if len(self._to_be_removed) > 0:
             self.__changed = True
-            for key in to_be_removed:
+            for key in self._to_be_removed:
                 current_key_value = self.read_key(key)
                 current_key_value = self.transform_key(key, current_key_value, 'current')
                 self.delete_key(key, current_key_value)
 
         # add missing keys
-        if len(to_be_added) > 0:
+        if len(self._to_be_added) > 0:
             self.__changed = True
-            for key in to_be_added:
-                current_key_value = self.read_key(key)
-                current_key_value = self.transform_key(key, current_key_value, 'current')
-                self.create_key(key, current_key_value)
+            for key in self._to_be_added:
+                input_key_value = self.transform_key(key, self.__keys[key], 'input')
+                self.create_key(key, input_key_value)
 
 
         # update key only if input value differ from current value
-        for key in to_be_updated:
+        for key in self._to_be_updated:
             current_key_value = self.read_key(key)
             current_key_value = self.transform_key(key, current_key_value, 'current')
             input_key_value = self.transform_key(key, self.__keys[key], 'input')

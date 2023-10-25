@@ -2,7 +2,7 @@
 import re
 import requests
 import os
-
+import logging
 
 class ElasticManager:
     def __init__(self,
@@ -19,14 +19,14 @@ class ElasticManager:
         self.__bin_path = '/usr/share/elasticsearch/bin/'
         self.__keystore_executable = os.path.join(
             self.__bin_path, 'elasticsearch-keystore')
-        self.__index_settings = {'static': ['number_of_shards', 'number_of_routing_shards', 'codec', 'routing_partition_size',
-                                            'soft_deletes.enabled', 'soft_deletes.retention_lease.period', 'load_fixed_bitset_filters_eagerly', 'shard.check_on_startup'],
-                                 'dynamic': ['number_of_replicas', 'auto_expand_replicas', 'search.idle.after', 'refresh_interval', 'max_result_window', 'max_inner_result_window',
-                                             'max_rescore_window', 'max_docvalue_fields_search', 'max_script_fields', 'max_ngram_diff', 'max_shingle_diff', 'max_refresh_listeners',
-                                             'analyze.max_token_count', 'highlight.max_analyzed_offset', 'max_terms_count', 'max_regex_length', 'query.default_field',
-                                             'routing.allocation.enable', 'routing.rebalance.enable', 'gc_deletes', 'default_pipeline', 'final_pipeline']}
-        self.__index_alias_properties = [
-            'filter', 'index_routing', 'is_hidden', 'is_write_index', 'routing', 'search_routing']
+        # self.__index_settings = {'static': ['number_of_shards', 'number_of_routing_shards', 'codec', 'routing_partition_size',
+        #                                     'soft_deletes.enabled', 'soft_deletes.retention_lease.period', 'load_fixed_bitset_filters_eagerly', 'shard.check_on_startup'],
+        #                          'dynamic': ['number_of_replicas', 'auto_expand_replicas', 'search.idle.after', 'refresh_interval', 'max_result_window', 'max_inner_result_window',
+        #                                      'max_rescore_window', 'max_docvalue_fields_search', 'max_script_fields', 'max_ngram_diff', 'max_shingle_diff', 'max_refresh_listeners',
+        #                                      'analyze.max_token_count', 'highlight.max_analyzed_offset', 'max_terms_count', 'max_regex_length', 'query.default_field',
+        #                                      'routing.allocation.enable', 'routing.rebalance.enable', 'gc_deletes', 'default_pipeline', 'final_pipeline']}
+        # self.__index_alias_properties = [
+        #     'filter', 'index_routing', 'is_hidden', 'is_write_index', 'routing', 'search_routing']
 
     def _api_call(self, path, method='GET', parameters=None, body=None, ssl_verify=False, json=True):
         ''' Facility to make an API call '''
@@ -39,6 +39,7 @@ class ElasticManager:
         req = requests.request(
             method, api_url, params=parameters, json=body, auth=auth, verify=self._ssl_verify,
             timeout=10)
+        req.raise_for_status()
         if json:
             return req.json()
         else:
@@ -119,6 +120,7 @@ class ElasticManager:
         rc, stdout, stderr = self.ansible_module.run_command(
             add_command, check_rc=True, data=data)
 
+
     def update_keystore_key(self, key, value, keystore_password=None):
         """Overwrite keystore settings."""
         add_command = []
@@ -181,8 +183,7 @@ class ElasticManager:
     def get_component_templates(self):
         """Get all the component templates through APIs."""
         templates_dict = {}
-        templates_list = self._api_call('_component_template')[
-            'component_templates']
+        templates_list = self._api_call('_component_template')['component_templates']
         for template in templates_list:
             templates_dict[template['name']] = template
         return templates_dict
@@ -205,20 +206,8 @@ class ElasticManager:
                 "A component should have at least one between 'settings','mappings' or 'aliases'")
 
         if settings:
-            not_allowed = set(settings.keys(
-            )) - set(self.__index_settings['static'] + self.__index_settings['dynamic'])
-            # if len(list(not_allowed)):
-            #     raise Exception(
-            #         "The following settings are not allowed: {}". format(list(not_allowed)))
-
             body['template']['settings'] = settings
         if aliases:
-            for alias in aliases.keys():
-                not_allowed = set(aliases[alias].keys()) - \
-                    set(self.__index_alias_properties)
-                # if len(list(not_allowed)):
-                #     raise Exception('The following alias properties are not allowed for alias {}: {}'.format(
-                #         alias, list(not_allowed)))
             body['template']['aliases'] = aliases
         if mappings:
             body['template']['mappings'] = mappings
@@ -227,5 +216,10 @@ class ElasticManager:
 
         result = self._api_call('_component_template/{}'.format(name),
                                 method='PUT', body=body, json=False)
-        result.raise_for_status()
+        return result
+
+    def delete_component_templates(self, name):
+        """Delete the component templates through APIs."""
+        result = self._api_call('_component_template/{}'.format(name),
+                                method='DELETE', json=False)
         return result

@@ -1,0 +1,16 @@
+---
+- name: Check that Elasticsearch is started
+  ansible.builtin.assert:
+    that:
+      - r_elasticsearch_info.started
+    msg: "Please start first the product"
+
+- name: Manage component template
+  bartokit.elastic.elasticsearch_component_template:
+    user: 'elastic'
+    password: "{{ r_elasticsearch_users_initial_elastic_password | d(omit) }}"
+    ssl_verify: false
+    components: "{{ r_elasticsearch_component_templates }}"
+
+  run_once: true
+  when: ('component_template' in r_elasticsearch_configure_actions)

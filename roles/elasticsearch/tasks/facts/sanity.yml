@@ -4,7 +4,7 @@
 - name: Check for allowed actions
   assert:
     that:
-      - r_elasticsearch_actions | difference(_r_elasticsearch_actions_allowed) | length < 1
+      - r_elasticsearch_actions | list | difference(_r_elasticsearch_actions_allowed) | length < 1
     msg: >-
       The following actions are not allowed:
       {{ r_elasticsearch_actions | difference(_r_elasticsearch_actions_allowed) }}
@@ -12,7 +12,7 @@
 - name: Check for configuration actions
   assert:
     that:
-      - r_elasticsearch_configure_actions | difference(_r_elasticsearch_configure_actions_allowed) | length < 1
+      - r_elasticsearch_configure_actions | list | difference(_r_elasticsearch_configure_actions_allowed) | length < 1
     msg: >-
       The following configuration actions are not allowed:
       {{ r_elasticsearch_configure_actions | difference(_r_elasticsearch_configure_actions_allowed) }}
@@ -59,12 +59,12 @@
       ansible.builtin.set_fact:
         r_elasticsearch_node_name: "{{ (r_elasticsearch_cluster_nodes | selectattr('host', '==', ansible_fqdn) | first).name }}"
         r_elasticsearch_node_rack: "{{ (r_elasticsearch_cluster_nodes | selectattr('host', '==', ansible_fqdn) | first).rack | d(omit) }}"
-      no_log: "{{ not (__r_elasticsearch_show_nolog | bool) }}"
 
     - name: Facts | Sanity | Combine elasticsearch configurations with defaults
       ansible.builtin.set_fact:
-        r_elasticsearch_keystore: "{{ r_elasticsearch_keystore | combine(_r_elasticsearch_keystore) }}"
+        r_elasticsearch_keystore: "{{ r_elasticsearch_keystore | combine(_r_elasticsearch_keystore, recursive=True) }}"
         r_elasticsearch_configuration: "{{ _r_elasticsearch_configuration | combine(r_elasticsearch_configuration, recursive=True) }}"
+      no_log: "{{ not (__r_elasticsearch_show_nolog | bool) }}"
 
     - name: Facts | Sanity | Combine rack awareness variable
       ansible.builtin.set_fact:

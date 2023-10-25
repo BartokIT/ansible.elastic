@@ -115,6 +115,18 @@ class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
         """Initialize the base class."""
         return parameters[parameter_name_with_keys]
 
+    def pre_crud(self, current_keys):
+        # Remove from the list the key managed by the system
+        for ckey in current_keys.keys():
+            if current_keys[ckey]['component_template']['_meta'].get('managed', False) == True:
+                if ckey in self._to_be_added:
+                    self._to_be_added.remove(ckey)
+                if ckey in self._to_be_removed:
+                    self._to_be_removed.remove(ckey)
+                if ckey in self._to_be_updated:
+                    self._to_be_updated.remove(ckey)
+        return False
+
     def transform_key(self, key, value, type):
         """Perform value sanitization"""
         if type == 'input':
@@ -150,8 +162,12 @@ class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
 
     def delete_key(self, key, current_value):
         """Delete component key."""
-        if key in ['logs-mappings','logs-settings','metrics-mappings','metrics-settings','metrics-tsdb-settings','synthetics-mapping','synthetics-settings']:
+        if current_value['component_template']['_meta'].get('managed', False) == True:
             return
+        if key in ['data-streams-mappings', 'logs-mappings','logs-settings','metrics-mappings','metrics-settings','metrics-tsdb-settings','synthetics-mappings','synthetics-settings', 'ecs@dynamic_templates', '.deprecation-indexing-settings']:
+            return
+        else:
+            self.__em.delete_component_templates(key)
 
     def create_key(self, key, value):
         """Add a component template."""
@@ -161,18 +177,17 @@ class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
         """Update a component template."""
         value_detach = copy.deepcopy(input_value)
         value_detach.pop('name')
-        logging.debug(value_detach)
         if '_meta' in value_detach['component_template']:
             value_detach['component_template']['template']['_meta'] = value_detach['component_template']['_meta']
 
         self.__em.put_component_templates(key, **value_detach['component_template']['template'])
 
     def __find_differences(self, d1, d2, path=""):
-        differences_found = False
         for k in d1:
             if k in d2:
                 if type(d1[k]) is dict:
                     if self.__find_differences(d1[k],d2[k], "%s -> %s" % (path, k) if path else k):
+                        logging.debug("@@@@")
                         return True
                 elif d1[k] != d2[k]:
                     result = [ "%s: " % path, " - %s : %s" % (k, d1[k]) , " + %s : %s" % (k, d2[k])]
@@ -181,18 +196,21 @@ class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
             else:
                 logging.debug("%s%s as key not in d2\n" % ("%s: " % path if path else "", k))
                 return True
-        return differences_found
+
+        return False
 
     def compare_key(self, key, input_value, current_value):
         """ Compare two keys """
 
         difference_found =  self.__find_differences(input_value, current_value)
-        logging.debug("Found differences for key {}".format(key))
+        if difference_found:
+            logging.debug("Found differences for key {}".format(key))
         return difference_found
 
     def list_current_keys(self, input_keys):
         """Return the list of components template actually present."""
-        return self.__em.get_component_templates()
+        components = self.__em.get_component_templates()
+        return components
 
 def main():
     """Run module execution."""

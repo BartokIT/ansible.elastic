@@ -13,6 +13,7 @@
         [{%- for node in groups.cluster -%}
             { 'host': '{{ node }}', 'name': '{{ node }}', 'roles': {{ hostvars[node].roles }} },
       {%- endfor -%}]{%- endfilter -%}
+    r_elasticsearch_users_initial_elastic_password: bA3nb0g.Hyw
     r_elasticsearch_keystore_password: 'adfs8NSM2nc.ug'
     r_elasticsearch_keystore:
       keystore.seed: 'J=Z4Y50EUvoAUS?^rQ_@'
@@ -26,3 +27,15 @@
         security:
           audit:
             enabled: false
+    r_elasticsearch_component_templates:
+      template1:
+        _meta:
+          author: 'BartokIT'
+        template:
+          mappings:
+            properties:
+              order_date:
+                type: 'date'
+                format: 'dd-MM-yyyy'
+          settings:
+            number_of_shards: 1

@@ -1,30 +1,11 @@
 ---
-- name: Gather information
-  bartokit.elastic.elasticsearch_component_template:
-    user: 'elastic'
-    password: "{{ r_elasticsearch_users_initial_elastic_password | d(omit) }}"
-    ssl_verify: false
-    components:
-      template1:
-        _meta:
-          author: 'BartokITA'
-        template:
-          mappings:
-            properties:
-              order_date:
-                type: 'date'
-                format: 'dd-MM-yyyy'
-          settings:
-            number_of_shards: 1
-
-- fail:
 # tasks file for elasticsearch
 - name: Gather fact and sanity checks
   ansible.builtin.include_tasks: facts/main.yml
 
 - name: Install Elasticsearch
   ansible.builtin.include_tasks: install/main.yml
-  when: ('install' in r_elasticsearch_actions)
+  when: ('install' in r_elasticsearch_actions | list )
 
 - name: Configure static files
   ansible.builtin.include_tasks: configure/static.yml

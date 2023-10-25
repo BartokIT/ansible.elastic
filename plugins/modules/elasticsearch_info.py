@@ -6,7 +6,6 @@
 from __future__ import (absolute_import, division, print_function)
 from ansible.module_utils.basic import AnsibleModule
 from ..module_utils.ElasticManager import ElasticManager
-import os.path
 import logging
 __metaclass__ = type
 
@@ -104,7 +103,7 @@ class BartokITElasticsearchInfo(AnsibleModule):
             if len(not_allowed_parameters):
                 self.fail_json(msg='Gather subset not allowed {}'.format(
                     not_allowed_parameters))
-            output_info['component_templates'] = em.get_component_template('template1')
+
             if 'license' in gather_subset or 'all' in gather_subset:
                 output_info['license'] = em.get_license_info()
             if 'nodes' in gather_subset or 'all' in gather_subset:
