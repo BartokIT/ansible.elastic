@@ -13,7 +13,7 @@ version: 0.0.1
 # The path to the Markdown (.md) readme file. This path is relative to the root of the collection
 readme: README.md
 
-# A list of the collection's content authors. Can be just the name or in the format 'Full Name <email> (url)
+# A lansiist of the collection's content authors. Can be just the name or in the format 'Full Name <email> (url)
 # @nicks:irc/im.site#channel'
 authors:
 - BartoktIT <bartok4it@gmail.com>

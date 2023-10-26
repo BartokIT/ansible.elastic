@@ -32,7 +32,6 @@ class BartokITAnsibleModule(AnsibleModule):
         """
         super().__init__(argument_spec=argument_spec, supports_check_mode=supports_check_mode)
 
-
         self.__changed = True
         self.__parameter_name_with_mode = parameter_name_with_mode
         self.__parameter_name_with_keys = parameter_name_with_keys
@@ -131,11 +130,10 @@ class BartokITAnsibleModule(AnsibleModule):
         # store current keys to avoid get continuosly
         current_keys = self.list_current_keys(self.__keys)
 
-
         if self.mode == 'present':
             self._to_be_added = self.list_input_keys() - current_keys
             self._to_be_updated = list(set(current_keys) &
-                                 set(self.list_input_keys()))
+                                       set(self.list_input_keys()))
             diff_before_keys = set(current_keys).intersection(
                 set(self.list_input_keys()))
         elif self.mode == 'absent':
@@ -146,7 +144,7 @@ class BartokITAnsibleModule(AnsibleModule):
             self._to_be_added = self.list_input_keys() - current_keys
             self._to_be_removed = current_keys - self.list_input_keys()
             self._to_be_updated = list(set(current_keys) &
-                                 set(self.list_input_keys()))
+                                       set(self.list_input_keys()))
             diff_before_keys = current_keys
 
         # log
@@ -159,8 +157,6 @@ class BartokITAnsibleModule(AnsibleModule):
             'Keys requested for remove are: {}'.format(self._to_be_removed))
         self._to_be_updated and logging.debug(
             'Keys requested for update are: {}'.format(self._to_be_updated))
-
-
 
         # delete keys
         if len(self._to_be_removed) > 0:
@@ -176,7 +172,6 @@ class BartokITAnsibleModule(AnsibleModule):
             for key in self._to_be_added:
                 input_key_value = self.transform_key(key, self.__keys[key], 'input')
                 self.create_key(key, input_key_value)
-
 
         # update key only if input value differ from current value
         for key in self._to_be_updated:

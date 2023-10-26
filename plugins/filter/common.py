@@ -14,6 +14,7 @@ def dictoflist2flatlist(items, keyname='key'):
             result.append(item)
     return result
 
+
 def sort(items, sample_list=[]):
     """Sort element of a list like another list."""
     return [element for element in sample_list if element in items]

@@ -4,6 +4,7 @@ import requests
 import os
 import logging
 
+
 class ElasticManager:
     def __init__(self,
                  ansible_module,
@@ -19,14 +20,6 @@ class ElasticManager:
         self.__bin_path = '/usr/share/elasticsearch/bin/'
         self.__keystore_executable = os.path.join(
             self.__bin_path, 'elasticsearch-keystore')
-        # self.__index_settings = {'static': ['number_of_shards', 'number_of_routing_shards', 'codec', 'routing_partition_size',
-        #                                     'soft_deletes.enabled', 'soft_deletes.retention_lease.period', 'load_fixed_bitset_filters_eagerly', 'shard.check_on_startup'],
-        #                          'dynamic': ['number_of_replicas', 'auto_expand_replicas', 'search.idle.after', 'refresh_interval', 'max_result_window', 'max_inner_result_window',
-        #                                      'max_rescore_window', 'max_docvalue_fields_search', 'max_script_fields', 'max_ngram_diff', 'max_shingle_diff', 'max_refresh_listeners',
-        #                                      'analyze.max_token_count', 'highlight.max_analyzed_offset', 'max_terms_count', 'max_regex_length', 'query.default_field',
-        #                                      'routing.allocation.enable', 'routing.rebalance.enable', 'gc_deletes', 'default_pipeline', 'final_pipeline']}
-        # self.__index_alias_properties = [
-        #     'filter', 'index_routing', 'is_hidden', 'is_write_index', 'routing', 'search_routing']
 
     def _api_call(self, path, method='GET', parameters=None, body=None, ssl_verify=False, json=True):
         ''' Facility to make an API call '''
@@ -65,7 +58,7 @@ class ElasticManager:
         expect "Enter same password"
         send -- "{}\\n"
         expect eof
-        """.format(self.__keystore_executable, keystore_password,  keystore_password)
+        """.format(self.__keystore_executable, keystore_password, keystore_password)
         set_command = ["expect", "-c", expect_command]
         rc, stdout, stderr = self.ansible_module.run_command(
             set_command, check_rc=True)
@@ -119,7 +112,6 @@ class ElasticManager:
             add_command = [self.__keystore_executable, "add", "--stdin", key]
         rc, stdout, stderr = self.ansible_module.run_command(
             add_command, check_rc=True, data=data)
-
 
     def update_keystore_key(self, key, value, keystore_password=None):
         """Overwrite keystore settings."""

@@ -4,15 +4,12 @@
 """Elasticsearch Component Templates Ansible module."""
 
 from __future__ import (absolute_import, division, print_function)
-import copy
-from ..module_utils.BaseModule import BartokITAnsibleModule
-from ..module_utils.ElasticManager import ElasticManager
-import logging
+
 __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: bartokit.elastic.elasticsearch_component_template
+module: elasticsearch_component_template
 
 short_description: This module allow to manage component templates of an Elasticsearch installation
 
@@ -87,6 +84,10 @@ components:
     returned: always
 '''
 
+import copy
+from ..module_utils.BaseModule import BartokITAnsibleModule
+from ..module_utils.ElasticManager import ElasticManager
+import logging
 
 # module's parameter
 module_args = dict(
@@ -99,7 +100,6 @@ module_args = dict(
 )
 
 
-
 class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
     """A class for an Ansible module that manage Elasticsearch Keystore."""
 
@@ -108,12 +108,11 @@ class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
         super().__init__(parameter_name_with_mode='mode', parameter_name_with_keys='components',
                          argument_spec=argument_spec, supports_check_mode=False,
                          log_file='ansible_elasticsearch_component_template.log')
-        self.__em = ElasticManager(
-                self,
-                rest_api_endpoint=self.params['api_endpoint'],
-                    api_username=self.params['user'],
-                    api_password=self.params['password'],
-                    ssl_verify=self.params['ssl_verify'])
+        self.__em = ElasticManager(self,
+                                   rest_api_endpoint=self.params['api_endpoint'],
+                                   api_username=self.params['user'],
+                                   api_password=self.params['password'],
+                                   ssl_verify=self.params['ssl_verify'])
 
     def initialization(self, parameters_argument, parameters):
         """
@@ -131,7 +130,7 @@ class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
     def pre_crud(self, current_keys):
         # Remove from the list the key managed by the system
         for ckey in current_keys.keys():
-            if current_keys[ckey]['component_template']['_meta'].get('managed', False) == True:
+            if current_keys[ckey]['component_template']['_meta'].get('managed', False) is True:
                 if ckey in self._to_be_added:
                     self._to_be_added.remove(ckey)
                 if ckey in self._to_be_removed:
@@ -144,7 +143,7 @@ class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
         """Perform value sanitization"""
         if type == 'input':
             value_copy = copy.deepcopy(value)
-            value_copy['component_template']= {'template':value_copy.pop('template')}
+            value_copy['component_template'] = {'template': value_copy.pop('template')}
             if 'settings' in value['template']:
                 # initialize the settings index dictionary
                 if 'index' not in value['template']['settings']:
@@ -154,14 +153,14 @@ class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
                     # add all properties to index subkey
                     if setting.startswith('index.'):
                         setting_value = value_copy['component_template']['template']['settings'].pop(setting)
-                        value_copy['component_template']['template']['settings']['index'][setting.replace('index.','')] = setting_value
+                        value_copy['component_template']['template']['settings']['index'][setting.replace('index.', '')] = setting_value
                     elif setting == 'index':
                         continue
                     else:
                         setting_value = "%s" % value_copy['component_template']['template']['settings'].pop(setting)
                         value_copy['component_template']['template']['settings']['index'][setting] = setting_value
 
-            value_copy['name']=key
+            value_copy['name'] = key
             if '_meta' in value_copy:
                 value_copy['component_template']['_meta'] = value_copy.pop('_meta')
             return value_copy
@@ -170,17 +169,12 @@ class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
 
     def read_key(self, key):
         """Get a component template."""
-        value =  self.__em.get_component_template(key)
+        value = self.__em.get_component_template(key)
         return value
 
     def delete_key(self, key, current_value):
         """Delete component key."""
-        if current_value['component_template']['_meta'].get('managed', False) == True:
-            return
-        if key in ['data-streams-mappings', 'logs-mappings','logs-settings','metrics-mappings','metrics-settings','metrics-tsdb-settings','synthetics-mappings','synthetics-settings', 'ecs@dynamic_templates', '.deprecation-indexing-settings']:
-            return
-        else:
-            self.__em.delete_component_templates(key)
+        self.__em.delete_component_templates(key)
 
     def create_key(self, key, value):
         """Add a component template."""
@@ -198,12 +192,12 @@ class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
     def __find_differences(self, d1, d2, path=""):
         for k in d1:
             if k in d2:
-                if type(d1[k]) is dict:
-                    if self.__find_differences(d1[k],d2[k], "%s -> %s" % (path, k) if path else k):
+                if isinstance(type(d1[k]), dict):
+                    if self.__find_differences(d1[k], d2[k], "%s -> %s" % (path, k) if path else k):
                         logging.debug("@@@@")
                         return True
                 elif d1[k] != d2[k]:
-                    result = [ "%s: " % path, " - %s : %s" % (k, d1[k]) , " + %s : %s" % (k, d2[k])]
+                    result = ["%s: " % path, " - %s : %s" % (k, d1[k]) , " + %s : %s" % (k, d2[k])]
                     logging.debug("\n".join(result))
                     return True
             else:
@@ -215,7 +209,7 @@ class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
     def compare_key(self, key, input_value, current_value):
         """ Compare two keys """
 
-        difference_found =  self.__find_differences(input_value, current_value)
+        difference_found = self.__find_differences(input_value, current_value)
         if difference_found:
             logging.debug("Found differences for key {}".format(key))
         return difference_found
@@ -224,6 +218,7 @@ class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
         """Return the list of components template actually present."""
         components = self.__em.get_component_templates()
         return components
+
 
 def main():
     """Run module execution."""

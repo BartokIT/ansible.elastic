@@ -4,14 +4,12 @@
 """Elasticsearch Info Ansible module."""
 
 from __future__ import (absolute_import, division, print_function)
-from ansible.module_utils.basic import AnsibleModule
-from ..module_utils.ElasticManager import ElasticManager
-import logging
+
 __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: bartokit.elastic.elasticsearch_info
+module: elasticsearch_info
 
 short_description: This module extract informations from an elasticsearch installation
 
@@ -91,6 +89,9 @@ component_templates:
     returned: success
 '''
 
+from ansible.module_utils.basic import AnsibleModule
+from ..module_utils.ElasticManager import ElasticManager
+
 # module's parameter
 module_args = dict(
     user=dict(type='str', required=False, default='elastic', no_log=False),
@@ -108,15 +109,14 @@ class BartokITElasticsearchInfo(AnsibleModule):
         """Catch all the running errors to fail gracefully."""
         try:
             output_info = {}
-            em = ElasticManager(
-                self,
-                rest_api_endpoint=self.params['api_endpoint'],
-                    api_username=self.params['user'],
-                    api_password=self.params['password'],
-                    ssl_verify=self.params['ssl_verify'])
+            em = ElasticManager(self,
+                                rest_api_endpoint=self.params['api_endpoint'],
+                                api_username=self.params['user'],
+                                api_password=self.params['password'],
+                                ssl_verify=self.params['ssl_verify'])
             gather_subset = self.params['gather_subset']
             not_allowed_parameters = list(
-                set(gather_subset) - set(['all', 'license', 'nodes', 'health', 'cluster_health','component_templates']))
+                set(gather_subset) - set(['all', 'license', 'nodes', 'health', 'cluster_health', 'component_templates']))
             if len(not_allowed_parameters):
                 self.fail_json(msg='Gather subset not allowed {}'.format(
                     not_allowed_parameters))

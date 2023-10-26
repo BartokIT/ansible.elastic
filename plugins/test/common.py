@@ -7,7 +7,8 @@ import re
 from collections.abc import MutableMapping
 from ansible import errors
 
-def flatten_dict(d: MutableMapping, parent_key: str = '', sep: str ='.') -> MutableMapping:
+
+def flatten_dict(d: MutableMapping, parent_key: str = '', sep: str = '.') -> MutableMapping:
     items = []
     for k, v in d.items():
         new_key = parent_key + sep + k if parent_key else k
@@ -35,17 +36,18 @@ def contains(items, element):
     """Verify it an element is inside a list."""
     return element in items
 
+
 def validate_configuration(configuration, schema):
     flatted_dict = flatten_dict(configuration)
     # added attribute for routing awareness
     schema['node.attr.' + flatted_dict['cluster.routing.allocation.awareness.attributes']] = {'type': 'string'}
     validation_errors = []
     for key in flatted_dict.keys():
-        if not key in schema:
+        if key not in schema:
             validation_errors += ["The key %s is not allowed" % key]
         else:
             if schema[key]['type'] == 'bool':
-                if type(flatted_dict[key]) != type(True):
+                if isinstance(flatted_dict[key], bool):
                     validation_errors += ["The key {} must be boolean (found {})".format(key, type(flatted_dict[key]))]
             if schema[key]['type'] == 'int':
                 try:
@@ -61,11 +63,12 @@ def validate_configuration(configuration, schema):
             elif schema[key]['type'] == 'string':
                 if 'choices' in schema[key]:
                     if flatted_dict[key] not in schema[key]['choices']:
-                        validation_errors += ["The key {} must be one of {} ({} found)".format(key, "%s" %  schema[key]['choices'], flatted_dict[key])]
+                        validation_errors += ["The key {} must be one of {} ({} found)".format(key, "%s" % schema[key]['choices'], flatted_dict[key])]
     if validation_errors:
         raise errors.AnsibleFilterError(validation_errors)
 
     return True
+
 
 class TestModule(object):
     """Exported tests."""

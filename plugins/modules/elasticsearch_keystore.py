@@ -2,16 +2,12 @@
 # Copyright: (c) 2023, BartoktIT
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 """Elasticsearch Keystore Ansible module."""
-
 from __future__ import (absolute_import, division, print_function)
-from ..module_utils.BaseModule import BartokITAnsibleModule
-from ..module_utils.ElasticManager import ElasticManager
-import logging
 __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: bartokit.elastic.elasticsearch_keystore
+module: elasticsearch_keystore
 
 short_description: This module allow to manage the elasticsearch keystore.
 
@@ -84,6 +80,10 @@ protected:
 '''
 
 
+from ..module_utils.BaseModule import BartokITAnsibleModule
+from ..module_utils.ElasticManager import ElasticManager
+import logging
+
 # module's parameter
 module_args = dict(
     password=dict(type='str', required=False, default='', no_log=True),
@@ -155,7 +155,6 @@ class BartokITElasticsearchKeystore(BartokITAnsibleModule):
         else:
             return self.__em.add_keystore_key(key, value)
 
-
     def update_key(self, key, input_value, current_value):
         """Overwrite keystore settings."""
         logging.debug("Updating key {}".format(key))
@@ -163,7 +162,6 @@ class BartokITElasticsearchKeystore(BartokITAnsibleModule):
             return self.__em.update_keystore_key(key, input_value, self.params['password'])
         else:
             return self.__em.update_keystore_key(key, input_value)
-
 
     def describe_info_for_output(self):
         """Return information to print"""
