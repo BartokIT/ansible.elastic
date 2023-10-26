@@ -1,11 +1,12 @@
-#!/usr/bin/python
 # Copyright: (c) 2022, BartokIT <bartokit@tutanota.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 """A module containing base Ansible module class."""
+from __future__ import (absolute_import, division, print_function)
 import copy
 from ansible.module_utils.basic import AnsibleModule
 from typing import Any
 import logging
+__metaclass__ = type
 
 
 class BartokITAnsibleModule(AnsibleModule):
@@ -152,11 +153,11 @@ class BartokITAnsibleModule(AnsibleModule):
         self.__changed = True if self.pre_crud(current_keys) else self.__changed
 
         self._to_be_added and logging.debug(
-            'Keys requested for add are: {}'.format(self._to_be_added))
+            'Keys requested for add are: %s' % self._to_be_added)
         self._to_be_removed and logging.debug(
-            'Keys requested for remove are: {}'.format(self._to_be_removed))
+            'Keys requested for remove are: : %s' % self._to_be_removed)
         self._to_be_updated and logging.debug(
-            'Keys requested for update are: {}'.format(self._to_be_updated))
+            'Keys requested for update are: %s' % self._to_be_updated)
 
         # delete keys
         if len(self._to_be_removed) > 0:

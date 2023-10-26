@@ -15,7 +15,9 @@ def dictoflist2flatlist(items, keyname='key'):
     return result
 
 
-def sort(items, sample_list=[]):
+def sort(items, sample_list=None):
+    if sample_list is None:
+        sample_list = []
     """Sort element of a list like another list."""
     return [element for element in sample_list if element in items]
 

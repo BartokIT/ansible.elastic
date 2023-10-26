@@ -192,7 +192,7 @@ class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
     def __find_differences(self, d1, d2, path=""):
         for k in d1:
             if k in d2:
-                if isinstance(type(d1[k]), dict):
+                if isinstance(d1[k], dict):
                     if self.__find_differences(d1[k], d2[k], "%s -> %s" % (path, k) if path else k):
                         logging.debug("@@@@")
                         return True

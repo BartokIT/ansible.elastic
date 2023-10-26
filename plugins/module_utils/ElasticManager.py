@@ -1,8 +1,7 @@
 #!/usr/bin/env python
-import re
+from __future__ import (absolute_import, division, print_function)
 import requests
 import os
-import logging
 
 
 class ElasticManager:

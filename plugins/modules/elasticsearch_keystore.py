@@ -141,7 +141,7 @@ class BartokITElasticsearchKeystore(BartokITAnsibleModule):
 
     def delete_key(self, key, current_value):
         """Delete keystore key."""
-        logging.debug("Deleting key {}".format(key))
+        logging.debug("Deleting key %s" % key)
         if self.__password_protected:
             return self.__em.delete_keystore_key(key, self.params['password'])
         else:
@@ -149,7 +149,7 @@ class BartokITElasticsearchKeystore(BartokITAnsibleModule):
 
     def create_key(self, key, value):
         """Add keystore settings."""
-        logging.debug("Adding key {}".format(key))
+        logging.debug("Adding key %s" % key)
         if self.__password_protected:
             return self.__em.add_keystore_key(key, value, self.params['password'])
         else:
@@ -157,7 +157,7 @@ class BartokITElasticsearchKeystore(BartokITAnsibleModule):
 
     def update_key(self, key, input_value, current_value):
         """Overwrite keystore settings."""
-        logging.debug("Updating key {}".format(key))
+        logging.debug("Updating key %s" % key)
         if self.__password_protected:
             return self.__em.update_keystore_key(key, input_value, self.params['password'])
         else:
