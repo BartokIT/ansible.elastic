@@ -17,10 +17,6 @@
     (_r_elasticsearch_triggered_restart and
     'restart_on_configuration_change' in r_elasticsearch_actions)
 
-- name: Configure static files
-  ansible.builtin.include_tasks: configure/dynamic.yml
-  when: ('configure' in r_elasticsearch_actions)
-
 - name: Stop Elasticsearch
   ansible.builtin.include_tasks: restart/stop.yml
   when: ('stop' in r_elasticsearch_actions)
@@ -28,3 +24,7 @@
 - name: Start Elasticsearch
   ansible.builtin.include_tasks: restart/start.yml
   when: ('start' in r_elasticsearch_actions)
+
+- name: Configure static files
+  ansible.builtin.include_tasks: configure/dynamic.yml
+  when: ('configure' in r_elasticsearch_actions)

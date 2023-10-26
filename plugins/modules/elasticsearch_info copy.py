@@ -49,7 +49,7 @@ options:
     gather_subset:
         description:
           - Which information the module have got to extract
-          - 'The allowed item for the parameter are: I(all), I(license), I(nodes), I(health), I(cluster_health), I(component_templates)'
+          - The allowed item for the parameter are: 'all', 'license', 'nodes', 'health', 'cluster_health', 'component_templates'
         type: list
         elements: str
         default: []

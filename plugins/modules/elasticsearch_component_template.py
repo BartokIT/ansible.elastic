@@ -1,7 +1,7 @@
 #!/usr/bin/python
-# Copyright: (c) 2018, Terry Jones <terry.jones@example.org>
+# Copyright: (c) 2023, BartoktIT
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-"""Elasticsearch Keystore Ansible module."""
+"""Elasticsearch Component Templates Ansible module."""
 
 from __future__ import (absolute_import, division, print_function)
 import copy
@@ -12,76 +12,89 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: elasticsearch_keystore
+module: bartokit.elastic.elasticsearch_component_template
 
-short_description: This is my test module
+short_description: This module allow to manage component templates of an Elasticsearch installation
 
 # If this is part of a collection, you need to use semantic versioning,
 # i.e. the version is of the form "2.5.0" and not "2.4".
 version_added: "0.0.1"
 
-description: This is my longer description explaining my test module.
+description: This module allow to manage component templates of an Elasticsearch installation
 
 options:
-    name:
-        description: This is the message to send to the test module.
-        required: true
-        type: str
-    new:
+    user:
         description:
-            - Control to demo if the result of this module is changed or not.
-            - Parameter description can be a list as well.
+          - The user used to connect with elasticsearch service
+        required: false
+        type: str
+        default: elastic
+    password:
+        description:
+          - The password used to connect with elasticsearch service
+        required: false
+        default: ''
+        type: str
+
+    api_endpoint:
+        description:
+          - The url used to connect with elasticsearch service
+        required: false
+        type: str
+        default: 'https://localhost:9200'
+    ssl_verify:
+        description:
+          - Choose to verify the ssl certificate or not
         required: false
         type: bool
-# Specify this value according to your collection
-# in format of namespace.collection.doc_fragment_name
-extends_documentation_fragment:
-    - my_namespace.my_collection.my_doc_fragment_name
-
+        default: true
+    components:
+        description:
+          - This is a key value dictionary containing as key the name of the component template and as value the specifications
+          - 'The allowed keys for the subdictionary are: I(_meta) and/or I(template).'
+          - 'The template key allow only three keys: I(settings), I(mapping) and I(aliases).'
+        required: true
+        type: dict
 author:
-    - Your Name (@yourGitHubHandle)
+    - BartoktIT (@BartokIT)
 '''
 
 EXAMPLES = r'''
-# Pass in a message
-- name: Test with a message
-  my_namespace.my_collection.my_test:
-    name: hello world
+# Ensure that the only component present in the cluster are the specified
+- name: Ensure that the only key present is the bootstrap.password with an unprotected keystore
+  bartokit.elastic.elasticsearch_component_template:
+  components:
+    template1:
+        _meta:
+            author: 'BartokIT'
+    template2:
+        template:
+            mappings:
+                properties:
+                order_date:
+                    type: 'date'
+                    format: 'dd-MM-yyyy'
+            settings:
+                number_of_shards: 1
 
-# pass in a message and have changed true
-- name: Test with a message and changed output
-  my_namespace.my_collection.my_test:
-    name: hello world
-    new: true
-
-# fail the module
-- name: Test failure of the module
-  my_namespace.my_collection.my_test:
-    name: fail me
 '''
 
 RETURN = r'''
 # These are examples of possible return values, and in general should use other names for return values.
-original_message:
-    description: The original name param that was passed in.
-    type: str
+components:
+    description: The list of the components present in the cluster
+    type: list
     returned: always
-    sample: 'hello world'
-message:
-    description: The output message that the test module generates.
-    type: str
-    returned: always
-    sample: 'goodbye'
 '''
 
 
 # module's parameter
 module_args = dict(
-    user=dict(type='str', required=False, default='elastic', no_log=False),
+    user=dict(type='str', required=False, default='elastic'),
     password=dict(type='str', required=False, default='', no_log=True),
-    api_endpoint=dict(type='str', required=False,
-                      default='https://localhost:9200', no_log=False),
-    ssl_verify=dict(type='bool', required=False, default=True, no_log=False),
+    mode=dict(type='str', required=False, choiches=['multiple', 'present', 'absent'], default='multiple'),
+    api_endpoint=dict(type='str', required=False, default='https://localhost:9200'),
+    ssl_verify=dict(type='bool', required=False, default=True),
     components=dict(type='dict', required=True)
 )
 
@@ -92,7 +105,7 @@ class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
 
     def __init__(self, argument_spec):
         """Call the constructor of the parent class."""
-        super().__init__(mode='multiple', parameter_name_with_keys='components',
+        super().__init__(parameter_name_with_mode='mode', parameter_name_with_keys='components',
                          argument_spec=argument_spec, supports_check_mode=False,
                          log_file='ansible_elasticsearch_component_template.log')
         self.__em = ElasticManager(
