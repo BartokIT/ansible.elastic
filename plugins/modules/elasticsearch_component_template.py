@@ -85,8 +85,8 @@ components:
 '''
 
 import copy
-from ..module_utils.BaseModule import BartokITAnsibleModule
-from ..module_utils.ElasticManager import ElasticManager
+from ..module_utils.base_module import BartokITAnsibleModule
+from ..module_utils.elastic_manager import ElasticManager
 import logging
 
 # module's parameter
@@ -201,7 +201,7 @@ class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
                     logging.debug("\n".join(result))
                     return True
             else:
-                logging.debug("%s%s as key not in d2\n" % ("%s: " % path if path else "", k))
+                logging.debug("%s%s as key not in d2\n" ,("%s: " % path if path else "", k))
                 return True
 
         return False
@@ -211,7 +211,7 @@ class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
 
         difference_found = self.__find_differences(input_value, current_value)
         if difference_found:
-            logging.debug("Found differences for key {}".format(key))
+            logging.debug("Found differences for key %s", key)
         return difference_found
 
     def list_current_keys(self, input_keys):

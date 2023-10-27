@@ -152,12 +152,9 @@ class BartokITAnsibleModule(AnsibleModule):
         # pre management hool
         self.__changed = True if self.pre_crud(current_keys) else self.__changed
 
-        self._to_be_added and logging.debug(
-            'Keys requested for add are: %s' % self._to_be_added)
-        self._to_be_removed and logging.debug(
-            'Keys requested for remove are: : %s' % self._to_be_removed)
-        self._to_be_updated and logging.debug(
-            'Keys requested for update are: %s' % self._to_be_updated)
+        self._to_be_added and logging.debug('Keys requested for add are: %s', self._to_be_added)
+        self._to_be_removed and logging.debug('Keys requested for remove are: %s', self._to_be_removed)
+        self._to_be_updated and logging.debug('Keys requested for update are: %s', self._to_be_updated)
 
         # delete keys
         if len(self._to_be_removed) > 0:
@@ -182,7 +179,7 @@ class BartokITAnsibleModule(AnsibleModule):
             different = self.compare_key(
                 key, input_key_value, current_key_value)
             if different:
-                logging.debug("Key {} will be updated".format(key))
+                logging.debug("Key %s will be updated", key)
                 self.__changed = True
                 self.update_key(key, input_key_value, current_key_value)
 

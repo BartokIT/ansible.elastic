@@ -51,13 +51,13 @@ class ElasticManager:
 
     def set_keystore_password(self, keystore_password):
         expect_command = """
-        spawn  {} passwd
+        spawn  {exec} passwd
         expect "Enter new password"
-        send -- "{}\\n"
+        send -- "{passfirst}\\n"
         expect "Enter same password"
-        send -- "{}\\n"
+        send -- "{passconfirm}\\n"
         expect eof
-        """.format(self.__keystore_executable, keystore_password, keystore_password)
+        """.format(exec=self.__keystore_executable, passfirst=keystore_password, passconfirm=keystore_password)
         set_command = ["expect", "-c", expect_command]
         rc, stdout, stderr = self.ansible_module.run_command(
             set_command, check_rc=True)

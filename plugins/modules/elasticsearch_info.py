@@ -2,7 +2,6 @@
 # Copyright: (c) 2023, BartoktIT
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 """Elasticsearch Info Ansible module."""
-
 from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
@@ -90,7 +89,7 @@ component_templates:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ..module_utils.ElasticManager import ElasticManager
+from ..module_utils.elastic_manager import ElasticManager
 
 # module's parameter
 module_args = dict(
