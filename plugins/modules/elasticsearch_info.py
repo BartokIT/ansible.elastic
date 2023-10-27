@@ -19,30 +19,6 @@ version_added: "0.0.1"
 description: This module extract informations from an elasticsearch installation
 
 options:
-    user:
-        description:
-          - The user used to connect with elasticsearch service
-        required: false
-        type: str
-        default: elastic
-    password:
-        description:
-          - The password used to connect with elasticsearch service
-        required: false
-        default: ''
-        type: str
-    api_endpoint:
-        description:
-          - The url used to connect with elasticsearch service
-        required: false
-        type: str
-        default: 'https://localhost:9200'
-    ssl_verify:
-        description:
-          - Choose to verify the ssl certificate or not
-        required: false
-        type: bool
-        default: true
     gather_subset:
         description:
           - Which information the module have got to extract
@@ -50,6 +26,8 @@ options:
         type: list
         elements: str
         default: []
+extends_documentation_fragment:
+  - bartokit.elastic.login_options
 author:
     - BartoktIT (@BartokIT)
 '''
@@ -61,7 +39,6 @@ EXAMPLES = r'''
   gather_subset:
     - license
     - health
-
 '''
 
 RETURN = r'''

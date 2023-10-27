@@ -17,34 +17,12 @@ short_description: This module allow to manage component templates of an Elastic
 # i.e. the version is of the form "2.5.0" and not "2.4".
 version_added: "0.0.1"
 
+author:
+    - BartoktIT (@BartokIT)
+
 description: This module allow to manage component templates of an Elasticsearch installation
 
 options:
-    user:
-        description:
-          - The user used to connect with elasticsearch service
-        required: false
-        type: str
-        default: elastic
-    password:
-        description:
-          - The password used to connect with elasticsearch service
-        required: false
-        default: ''
-        type: str
-
-    api_endpoint:
-        description:
-          - The url used to connect with elasticsearch service
-        required: false
-        type: str
-        default: 'https://localhost:9200'
-    ssl_verify:
-        description:
-          - Choose to verify the ssl certificate or not
-        required: false
-        type: bool
-        default: true
     components:
         description:
           - This is a key value dictionary containing as key the name of the component template and as value the specifications
@@ -52,8 +30,8 @@ options:
           - 'The template key allow only three keys: I(settings), I(mapping) and I(aliases).'
         required: true
         type: dict
-author:
-    - BartoktIT (@BartokIT)
+extends_documentation_fragment:
+  - bartokit.elastic.login_options
 '''
 
 EXAMPLES = r'''
@@ -93,9 +71,9 @@ import logging
 module_args = dict(
     user=dict(type='str', required=False, default='elastic'),
     password=dict(type='str', required=False, default='', no_log=True),
-    mode=dict(type='str', required=False, choiches=['multiple', 'present', 'absent'], default='multiple'),
     api_endpoint=dict(type='str', required=False, default='https://localhost:9200'),
     ssl_verify=dict(type='bool', required=False, default=True),
+    mode=dict(type='str', required=False, choiches=['multiple', 'present', 'absent'], default='multiple'),
     components=dict(type='dict', required=True)
 )
 
