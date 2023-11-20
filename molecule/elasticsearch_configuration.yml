@@ -39,3 +39,12 @@
                 format: 'dd-MM-yyyy'
           settings:
             number_of_shards: 1
+    r_elasticsearch_index_templates:
+      template1:
+        index_patterns:
+          - custom*
+        template:
+          settings:
+            number_of_shards: 3
+        _meta:
+          author: 'BartokIT'

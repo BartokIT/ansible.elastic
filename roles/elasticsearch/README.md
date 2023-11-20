@@ -1,38 +1,76 @@
-Role Name
+elasticsearch
 =========
 
-A brief description of the role goes here.
+A role to manage Elasticsearch cluster for Red Hat-like machines
 
-Requirements
-------------
-
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+This role use a main variable to globally define the behaviour of the role.
 
-Dependencies
-------------
+This variable allow to specify a list of actions within the following:
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+```yaml
+r_elasticsearch_actions:
+ - install
+ - configure
+ - stop
+ - upgrade
+ - start
+ - uninstall
+ - restart_on_configuration_change
+```
+
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+This example install and configure an Elasticsearch cluster:
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+    - name: Install and configure Elasticsearch
+      hosts: all
+      gather_facts: false
+      tasks:
+
+        - name: Read configurations
+          ansible.builtin.set_fact:
+            r_elasticsearch_cluster_name: cluster
+            r_elasticsearch_node_rack: simple
+            r_elasticsearch_cluster_nodes:
+              host: master1
+              name: master1
+              roles:
+               - master
+              host: master2
+              name: master2
+              roles:
+               - master
+              host: master3
+              name: master3
+              roles:
+               - master
+
+        - name: Call Elasticsearch role
+          ansible.builtin.include_role:
+            name: bartokit.elastic.elasticsearch
+          vars:
+            r_elasticsearch_actions:
+              - install
+              - configure
+              - start
+              - restart_on_configuration_change
+            r_elasticsearch_configure_actions:
+              - folders
+              - main_files
+              - keystore
+              - ssl
+              - enforce_keystore
+              - component_template
+
+
 
 License
 -------
 
-BSD
-
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+GLP3

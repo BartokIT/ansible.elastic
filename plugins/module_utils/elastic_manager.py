@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import (absolute_import, division, print_function)
+import logging
 import requests
 import os
 
@@ -37,6 +38,7 @@ class ElasticManager:
         else:
             return req
 
+    # Keystore methods
     def is_keystore_password_protected(self):
         """Check if the keystore is password protected."""
         read_command = "{} has-passwd".format(
@@ -171,6 +173,7 @@ class ElasticManager:
         info = self._api_call('_cluster/health')
         return info
 
+    # Component templates methods
     def get_component_templates(self):
         """Get all the component templates through APIs."""
         templates_dict = {}
@@ -189,7 +192,7 @@ class ElasticManager:
         raise Exception(
             "Impossible to find the '{}' template requrested".format(name))
 
-    def put_component_templates(self, name, create=True, settings=None, mappings=None, aliases=None, _meta=None, allow_auto_create=False, version=None):
+    def put_component_templates(self, name, create=False, settings=None, mappings=None, aliases=None, _meta=None, allow_auto_create=False, version=None):
         """Get all the component templates through APIs."""
         body = {'template': {}}
         if not (settings or mappings or aliases):
@@ -206,11 +209,64 @@ class ElasticManager:
             body['_meta'] = _meta
 
         result = self._api_call('_component_template/{}'.format(name),
-                                method='PUT', body=body, json=False)
+                                method='PUT', parameters=create, body=body, json=False)
         return result
 
     def delete_component_templates(self, name):
         """Delete the component templates through APIs."""
         result = self._api_call('_component_template/{}'.format(name),
+                                method='DELETE', json=False)
+        return result
+
+    # Index templates methods
+    def get_index_templates(self, hidden=False):
+        """Get all the component templates through APIs."""
+        templates_dict = {}
+        templates_list = self._api_call('_index_template')['index_templates']
+
+        for template in templates_list:
+            if not template['name'].startswith('.') or hidden:
+                templates_dict[template['name']] = template
+
+
+        return templates_dict
+
+    def get_index_template(self, name):
+        template_info = []
+        templates_list = self._api_call('_index_template/{}'.format(name))
+        if 'index_templates' in templates_list:
+
+            for template in templates_list['index_templates']:
+                if template['name'] == name:
+                    return template
+        raise Exception(
+            "Impossible to find the '{}' template requested".format(name))
+
+    def put_index_templates(self, name, index_patterns, composed_of=None, data_stream=None, template=None, _meta=None, priority=None, version=None, create=False):
+        """Get all the component templates through APIs."""
+        body = {'index_patterns': index_patterns}
+
+        if composed_of:
+            body['composed_of'] = composed_of
+        if data_stream:
+            body['data_stream'] = data_stream
+        if template:
+            body['template'] = template
+        if _meta:
+            body['_meta'] = _meta
+        if version:
+            body['version'] = version
+        if priority:
+            body['priority'] = priority
+        if version:
+            body['version'] = version
+
+        result = self._api_call('_index_template/{}'.format(name),
+                                method='PUT', parameters=create, body=body, json=False)
+        return result
+
+    def delete_index_templates(self, name):
+        """Delete the component templates through APIs."""
+        result = self._api_call('_index_template/{}'.format(name),
                                 method='DELETE', json=False)
         return result
