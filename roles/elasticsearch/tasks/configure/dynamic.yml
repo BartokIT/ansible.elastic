@@ -5,6 +5,16 @@
       - r_elasticsearch_info.started
     msg: "Please start first the product"
 
+- name: Manage ILM polices
+  bartokit.elastic.elasticsearch_index_lifecycle_policy:
+    user: 'elastic'
+    password: "{{ r_elasticsearch_users_initial_elastic_password | d(omit) }}"
+    ssl_verify: false
+    policies: "{{ r_elasticsearch_ilm_policies }}"
+  run_once: true
+  when: ('ilm_policies' in r_elasticsearch_configure_actions)
+
+
 - name: Manage component template
   bartokit.elastic.elasticsearch_component_template:
     user: 'elastic'
