@@ -20,6 +20,7 @@ class ElasticManager:
         self.__bin_path = '/usr/share/elasticsearch/bin/'
         self.__keystore_executable = os.path.join(
             self.__bin_path, 'elasticsearch-keystore')
+        logging.debug("----- Manager initializated ---------")
 
     def _api_call(self, path, method='GET', parameters=None, body=None, ssl_verify=False, json=True):
         ''' Facility to make an API call '''
@@ -32,7 +33,11 @@ class ElasticManager:
         req = requests.request(
             method, api_url, params=parameters, json=body, auth=auth, verify=self._ssl_verify,
             timeout=10)
-        req.raise_for_status()
+        try:
+            req.raise_for_status()
+        except Exception as e:
+            logging.error("%s" % req.text)
+            raise Exception(e)
         if json:
             return req.json()
         else:
@@ -268,5 +273,49 @@ class ElasticManager:
     def delete_index_templates(self, name):
         """Delete the component templates through APIs."""
         result = self._api_call('_index_template/{}'.format(name),
+                                method='DELETE', json=False)
+        return result
+
+
+    # Index management policy methods
+    def get_ilm_policies(self, hidden=False, managed=False):
+        """Get all the _ilm policies  templates through APIs."""
+        ilm_policies_output = {}
+        ilm_policies = self._api_call('_ilm/policy')
+
+        for policy_name in ilm_policies.keys():
+
+            if policy_name.startswith('.'):
+                if hidden:
+                    ilm_policies_output[policy_name] = ilm_policies[policy_name]
+            elif ilm_policies[policy_name]['policy'].get('_meta',{}).get('managed', False):
+                if managed:
+                    ilm_policies_output[policy_name] = ilm_policies[policy_name]
+            else:
+                ilm_policies_output[policy_name] = ilm_policies[policy_name]
+
+        return ilm_policies_output
+
+    def get_ilm_policy(self, name):
+        """ _ilm/policy"""
+        ilm_policy = self._api_call('_ilm/policy/{}'.format(name))
+
+        for policy_name in ilm_policy.keys():
+                if policy_name == name:
+                    return ilm_policy[policy_name]
+        raise Exception(
+            "Impossible to find the '{}' ILM policy requested".format(name))
+
+    def put_ilm_policy(self, name, policy):
+        """Create a ILM policy through APIs."""
+        body =  {'policy': policy}
+        logging.debug("Body: %s" % body)
+        result = self._api_call('_ilm/policy/{}'.format(name),
+                                method='PUT', body=body, json=False)
+        return result
+
+    def delete_ilm_policy(self, name):
+        """Delete the ILM policy through APIs."""
+        result = self._api_call('_ilm/policy/{}'.format(name),
                                 method='DELETE', json=False)
         return result

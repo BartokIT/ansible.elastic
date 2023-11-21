@@ -28,7 +28,8 @@ _r_elasticsearch_configure_actions_allowed:
   - enforce_keystore
   - ssl
   - component_template
-
+  - index_template
+  - ilm_policies
 _r_elasticsearch_triggered_restart: false
 
 # ---- installation variables ----

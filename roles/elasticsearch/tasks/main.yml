@@ -3,6 +3,16 @@
 - name: Gather fact and sanity checks
   ansible.builtin.include_tasks: facts/main.yml
 
+- name: Manage ILM polices
+  bartokit.elastic.elasticsearch_index_lifecycle_policy:
+    user: 'elastic'
+    password: "{{ r_elasticsearch_users_initial_elastic_password | d(omit) }}"
+    ssl_verify: false
+    policies: "{{ r_elasticsearch_ilm_policies }}"
+  run_once: true
+  when: ('ilm_policies' in r_elasticsearch_configure_actions)
+- fail:
+
 - name: Install Elasticsearch
   ansible.builtin.include_tasks: install/main.yml
   when: ('install' in r_elasticsearch_actions | list )
