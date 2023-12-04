@@ -1,0 +1,142 @@
+---
+- name: Search | Prepare | Import repository
+  hosts: all
+  tasks:
+    - name: Import a key from a url
+      ansible.builtin.rpm_key:
+        state: present
+        key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+    - name: Add multiple repositories into the same file (2/2)
+      ansible.builtin.yum_repository:
+        name: elastic8
+        description: Elasticsearch repository for 8.x packages
+        file: elasticsearch
+        baseurl: https://artifacts.elastic.co/packages/8.x/yum
+        enabled: true
+        gpgcheck: false
+
+- name: Search | Prepare | Create prepare_certificates
+  hosts: all[0]
+  vars:
+    prepare_ca_privatekey: /etc/pki/tls/private/ca-certificate.key
+    prepare_ca_certificate: /etc/pki/tls/certs/ca-certificate.pem
+    prepare_secret_ca_passphrase: sJF93ncso
+    prepare_certificates:
+      standalone:
+        - name: standalone
+          certificate_path: /etc/pki/tls/certs/standalone.pem
+          privatekey_path: /etc/pki/tls/private/standalone.key
+          subject_alt_name:
+            - "DNS:standalone"
+
+  tasks:
+    - name: Install python cryptography
+      ansible.builtin.dnf:
+        name:
+          - python3-cryptography
+        state: present
+
+    # ------------   Create a CA ----------------------
+    - name: Create private key with password protection
+      community.crypto.openssl_privatekey:
+        path: "{{ prepare_ca_privatekey }}"
+        passphrase: "{{ prepare_secret_ca_passphrase }}"
+        cipher: auto
+
+    - name: Create certificate signing request (CSR) for CA certificate
+      community.crypto.openssl_csr_pipe:
+        privatekey_path: "{{ prepare_ca_privatekey }}"
+        privatekey_passphrase: "{{ prepare_secret_ca_passphrase }}"
+        common_name: Ansible CA
+        use_common_name_for_san: false  # since we do not specify SANs, don't use CN as a SAN
+        basic_constraints:
+          - 'CA:TRUE'
+        basic_constraints_critical: true
+        key_usage:
+          - keyCertSign
+        key_usage_critical: true
+      register: _prepare_ca_csr
+
+    - name: Create self-signed CA certificate from CSR
+      community.crypto.x509_certificate:
+        path: "{{ prepare_ca_certificate }}"
+        csr_content: "{{ _prepare_ca_csr.csr }}"
+        privatekey_path: "{{ prepare_ca_privatekey }}"
+        privatekey_passphrase: "{{ prepare_secret_ca_passphrase }}"
+        provider: selfsigned
+
+    # ------------  Distribute CA ----------------------------------------
+    - name: Slurp CA certificate
+      ansible.builtin.slurp:
+        path: "{{ prepare_ca_certificate }}"
+      register: _prepare_ca_certificate_content
+
+    - name: Write CA certificate file
+      ansible.builtin.copy:
+        dest: "{{ prepare_ca_certificate }}"
+        content: "{{ _prepare_ca_certificate_content.content | b64decode }}"
+        mode: '644'
+        owner: root
+      loop: "{{ prepare_certificates | dict2items }}"
+      when: inventory_hostname != item.key
+      delegate_to: "{{ item.key }}"
+
+    # ------------   Generate requested certificates ----------------------
+    - name: Create private key for new certificate
+      community.crypto.openssl_privatekey:
+        path: "/tmp/{{ item.key }}_{{ item.name }}.key"
+        cipher: auto
+        passphrase: omit
+      loop: "{{ prepare_certificates | bartokit.elastic.dictoflist2flatlist }}"
+
+    - name: Slurp private key
+      ansible.builtin.slurp:
+        path: "/tmp/{{ item.key }}_{{ item.name }}.key"
+      register: _prepare_private_key
+      loop: "{{ prepare_certificates | bartokit.elastic.dictoflist2flatlist }}"
+
+    - name: Create certificate signing request (CSR) for new certificate
+      community.crypto.openssl_csr_pipe:
+        common_name: "{{ item.name }}"
+        privatekey_path: "/tmp/{{ item.key }}_{{ item.name }}.key"
+        subject_alt_name: "{{ item.subject_alt_name }}"
+        privatekey_passphrase: omit
+      loop: "{{ prepare_certificates | dictoflist2flatlist }}"
+      register: _prepare_certificates_csr
+
+    - name: Sign certificate with our CA
+      community.crypto.x509_certificate_pipe:
+        csr_content: "{{ _prepare_certificates_csr.results[i].csr }}"
+        provider: ownca
+        ownca_path: "{{ prepare_ca_certificate }}"
+        ownca_privatekey_path: "{{ prepare_ca_privatekey }}"
+        ownca_privatekey_passphrase: "{{ prepare_secret_ca_passphrase }}"
+        ownca_not_after: +365d  # valid for one year
+        ownca_not_before: "-1d"  # valid since yesterday
+      register: _prepare_certificates
+      loop: "{{ prepare_certificates | dictoflist2flatlist }}"
+      loop_control:
+        index_var: i
+
+    - name: Write certificate file
+      ansible.builtin.copy:
+        dest: "{{ item.certificate_path }}"
+        content: "{{ _prepare_certificates.results[i].certificate }}"
+        mode: '644'
+        owner: root
+      loop: "{{ prepare_certificates | dictoflist2flatlist }}"
+      delegate_to: "{{ item.key }}"
+      loop_control:
+        index_var: i
+
+    - name: Write private key file
+      ansible.builtin.copy:
+        dest: "{{ item.privatekey_path }}"
+        content: "{{ _prepare_private_key.results[i].content | b64decode }}"
+        mode: '600'
+        owner: root
+      loop: "{{ prepare_certificates | dictoflist2flatlist }}"
+      delegate_to: "{{ item.key }}"
+      loop_control:
+        index_var: i

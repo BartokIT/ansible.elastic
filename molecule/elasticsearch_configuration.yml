@@ -22,6 +22,7 @@
       xpack.security.transport.ssl.truststore.secure_password: XC9sxbnkTzCP9aTEc74LfQ
       # test.secure.key: passwd1
     r_elasticsearch_configuration_ssl_certificate_authorities: "{{ _converge_ca_certificate.content | b64decode }}"
+    r_elasticsearch_api_password: 'ansiblepassword'
     r_elasticsearch_configuration:
       xpack:
         security:
@@ -68,3 +69,7 @@
             min_age: "735d"
             actions:
               delete: {}
+    r_elasticsearch_users:
+      mytestuser:
+        password: unknown.1234
+        roles:

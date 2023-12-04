@@ -30,6 +30,7 @@ _r_elasticsearch_configure_actions_allowed:
   - component_template
   - index_template
   - ilm_policies
+  - users
 _r_elasticsearch_triggered_restart: false
 
 # ---- installation variables ----
@@ -61,6 +62,8 @@ _r_elasticsearch_password_specialchars: '!._@#'
 _r_elasticsearch_username: elasticsearch
 _r_elasticsearch_group: elasticsearch
 
+
+
 ## elasticsearch.yml configurations
 r_elasticsearch_node_name: ''
 r_elasticsearch_node_rack: ''
@@ -70,8 +73,6 @@ r_elasticsearch_cluster_nodes:
     roles:
       - master
 r_elasticsearch_cluster_name: 'es_cluster'
-
-
 
 _r_elasticsearch_configuration:
   network:
@@ -130,5 +131,14 @@ _r_elasticsearch_keystore:
 r_elasticsearch_jvm_initial_heap: 1g
 r_elasticsearch_jvm_maximum_heap: 1g
 
-# reloadable configuration
+# admin user and password
 r_elasticsearch_users_initial_elastic_password: bA3nb0g.Hyw
+r_elasticsearch_api_password:
+r_elasticsearch_users: {}
+_r_elasticsearch_api_user:
+  ansible:
+    password: "{{ r_elasticsearch_api_password }}"
+    metadata:
+      reserved_to_automation: true
+    roles:
+      - superuser

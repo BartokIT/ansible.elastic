@@ -27,6 +27,11 @@
           - "{{ ansible_fqdn in (r_elasticsearch_cluster_nodes | map(attribute='host') | list) }}"
           - (r_elasticsearch_cluster_nodes | selectattr('host', '==', ansible_fqdn) | first).name | d(false, true)
         msg: Current host ({{ ansible_fqdn }}) is not present inside the cluster nodes list
+    - name: Facts | Sanity | Assertion about api user password
+      ansible.builtin.assert:
+        that:
+          - r_elasticsearch_api_password | d(false, true)
+        msg: "Please set the api user password to be used during automation"
 
     - name: Facts | Sanity | Assertion about keystore password quality
       ansible.builtin.assert:
@@ -55,7 +60,7 @@
           - "Password must at least of {{ _r_elasticsearch_password_minspecialchars }} special chars choosed from {{ _r_elasticsearch_password_specialchars }}"
       when: r_elasticsearch_keystore_password | d(false, true)
 
-    - name: Facts | Sanity | Set elatic node
+    - name: Facts | Sanity | Set elastic node
       ansible.builtin.set_fact:
         r_elasticsearch_node_name: "{{ (r_elasticsearch_cluster_nodes | selectattr('host', '==', ansible_fqdn) | first).name }}"
         r_elasticsearch_node_rack: "{{ (r_elasticsearch_cluster_nodes | selectattr('host', '==', ansible_fqdn) | first).rack | d(omit) }}"
@@ -64,6 +69,7 @@
       ansible.builtin.set_fact:
         r_elasticsearch_keystore: "{{ r_elasticsearch_keystore | combine(_r_elasticsearch_keystore, recursive=True) }}"
         r_elasticsearch_configuration: "{{ _r_elasticsearch_configuration | combine(r_elasticsearch_configuration, recursive=True) }}"
+        r_elasticsearch_users: "{{ r_elasticsearch_users | combine(_r_elasticsearch_api_user, recursive=True) }}"
       no_log: "{{ not (__r_elasticsearch_show_nolog | bool) }}"
 
     - name: Facts | Sanity | Combine rack awareness variable

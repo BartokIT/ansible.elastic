@@ -5,10 +5,29 @@
       - r_elasticsearch_info.started
     msg: "Please start first the product"
 
-- name: Manage ILM polices
-  bartokit.elastic.elasticsearch_index_lifecycle_policy:
+- name: Create automation user
+  bartokit.elastic.elasticsearch_users:
     user: 'elastic'
     password: "{{ r_elasticsearch_users_initial_elastic_password | d(omit) }}"
+    ssl_verify: false
+    users: "{{ _r_elasticsearch_api_user }}"
+    mode: present
+  run_once: true
+  when: ('users' in r_elasticsearch_configure_actions)
+
+- name: Manage users
+  bartokit.elastic.elasticsearch_users:
+    user: 'elastic'
+    password: "{{ r_elasticsearch_users_initial_elastic_password | d(omit) }}"
+    ssl_verify: false
+    users: "{{ r_elasticsearch_users }}"
+  run_once: true
+  when: ('users' in r_elasticsearch_configure_actions)
+
+- name: Manage ILM polices
+  bartokit.elastic.elasticsearch_index_lifecycle_policies:
+    user: '{{ _r_elasticsearch_api_user.keys() | first }}'
+    password: "{{ r_elasticsearch_api_password }}"
     ssl_verify: false
     policies: "{{ r_elasticsearch_ilm_policies }}"
   run_once: true
@@ -16,18 +35,18 @@
 
 
 - name: Manage component template
-  bartokit.elastic.elasticsearch_component_template:
-    user: 'elastic'
-    password: "{{ r_elasticsearch_users_initial_elastic_password | d(omit) }}"
+  bartokit.elastic.elasticsearch_component_templates:
+    user: '{{ _r_elasticsearch_api_user.keys() | first }}'
+    password: "{{ r_elasticsearch_api_password }}"
     ssl_verify: false
     component_templates: "{{ r_elasticsearch_component_templates }}"
   run_once: true
   when: ('component_template' in r_elasticsearch_configure_actions)
 
 - name: Manage index template
-  bartokit.elastic.elasticsearch_index_template:
-    user: 'elastic'
-    password: "{{ r_elasticsearch_users_initial_elastic_password | d(omit) }}"
+  bartokit.elastic.elasticsearch_index_templates:
+    user: '{{ _r_elasticsearch_api_user.keys() | first }}'
+    password: "{{ r_elasticsearch_api_password }}"
     ssl_verify: false
     templates: "{{ r_elasticsearch_index_templates }}"
   run_once: true

@@ -1,0 +1,30 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: false
+  tasks:
+
+    - name: Read configurations
+      ansible.builtin.include_tasks: ../elasticsearch_configuration.yml
+
+    - name: Test the installation, configuration and product start
+      ansible.builtin.set_fact:
+        r_elasticsearch_actions:
+          - install
+          - configure
+          - start
+          - restart_on_configuration_change
+        r_elasticsearch_configure_actions:
+          - folders
+          - main_files
+          - keystore
+          - ssl
+          - enforce_keystore
+          - component_template
+          - index_template
+          - ilm_policies
+          - users
+
+    - name: Replace this task with one that validates your content
+      ansible.builtin.include_role:
+        name: bartokit.elastic.elasticsearch

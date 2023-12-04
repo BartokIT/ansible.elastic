@@ -319,3 +319,47 @@ class ElasticManager:
         result = self._api_call('_ilm/policy/{}'.format(name),
                                 method='DELETE', json=False)
         return result
+
+    # Users method
+    def get_users(self, managed=False):
+        """Get all the users through APIs."""
+        users_output = {}
+        users = self._api_call('_security/user')
+        for user in users.keys():
+            if users[user].get('metadata',{}).get('_reserved', False):
+                if managed:
+                    users_output[user] = users[user]
+            else:
+                users_output[user] = users[user]
+
+        return users_output
+
+    def get_user(self, name):
+        """ _security/usery"""
+        ilm_policy = self._api_call('_security/user/{}'.format(name))
+
+        for policy_name in ilm_policy.keys():
+                if policy_name == name:
+                    return ilm_policy[policy_name]
+        raise Exception(
+            "Impossible to find the '{}' ILM policy requested".format(name))
+
+    def put_user(self, username, **kwargs):
+        """Create a user through APIs."""
+        body =  {}
+        if set(kwargs.keys()) - set(['enabled', 'email', 'full_name', 'password', 'metadata', 'roles']):
+            raise Exception("Not valid user paramteres")
+        body=kwargs
+        if 'roles' not in body or body['roles'] is None:
+            body['roles'] = []
+
+        logging.debug("Body: %s" % body)
+        result = self._api_call('_security/user/{}'.format(username),
+                                method='PUT', body=body, json=False)
+        return result
+
+    def delete_user(self, name):
+        """Delete a user through APIs."""
+        result = self._api_call('_security/user/{}'.format(name),
+                                method='DELETE', json=False)
+        return result
