@@ -1,0 +1,350 @@
+---
+# vars file for elasticsearch
+_r_beat_configuration_schema:
+  path.data:
+    type: string
+    secure: false
+    reloadable: false
+  path.logs:
+    type: string
+    secure: false
+    reloadable: false
+  cluster.name:
+    type: string
+    secure: false
+    reloadable: false
+  node.name:
+    type: string
+    secure: false
+    reloadable: false
+  discovery.seed_hosts:
+    type: list
+    secure: false
+    reloadable: false
+  cluster.initial_master_nodes:
+    type: list
+    secure: false
+    reloadable: false
+  # NODE
+  node.roles:
+    type: list
+    secure: false
+    reloadable: false
+  # AUDIT
+  xpack.security.audit.enabled:
+    type: bool
+    secure: false
+    reloadable: false
+  xpack.security.audit.logfile.events.include:
+    type: list
+    secure: false
+    reloadable: true
+  xpack.security.audit.logfile.events.exclude:
+    type: list
+    secure: false
+    reloadable: true
+  xpack.security.audit.logfile.events.emit_request_body:
+    type: bool
+    secure: false
+    reloadable: true
+  xpack.security.audit.logfile.emit_node_name:
+    type: bool
+    secure: false
+    reloadable: true
+  xpack.security.audit.logfile.emit_node_host_address:
+    type: bool
+    secure: false
+    reloadable: true
+  xpack.security.audit.logfile.emit_node_host_name:
+    type: bool
+    secure: false
+    reloadable: true
+  xpack.security.audit.logfile.emit_node_id:
+    type: bool
+    secure: false
+    reloadable: true
+  # circuit breaker
+  indices.breaker.total.use_real_memory:
+    type: bool
+    secure: false
+    reloadable: false
+  indices.breaker.total.limit:
+    type: percentual
+    secure: false
+    reloadable: true
+  indices.breaker.fielddata.overhead:
+    type: percentual
+    secure: false
+    reloadable: true
+  indices.breaker.request.limit:
+    type: percentual
+    secure: false
+    reloadable: true
+  indices.breaker.request.overhead:
+    type: int
+    secure: false
+    reloadable: true
+  network.breaker.inflight_requests.limit:
+    type: percentual
+    secure: false
+    reloadable: true
+  network.breaker.inflight_requests.overhead:
+    type: percentual
+    secure: false
+    reloadable: true
+  indices.breaker.accounting.limit:
+    type: percentual
+    secure: false
+    reloadable: true
+  script.max_compilations_rate:
+    type: string
+    secure: false
+    reloadable: true
+  script.painless.regex.enabled:
+    type: string
+    secure: false
+    reloadable: false
+    choices:
+      - limited
+      - true
+      - false
+  script.painless.regex.limit-factor:
+    type: string
+    secure: false
+    reloadable: false
+  breaker.eql_sequence.limit:
+    type: percentual
+    secure: false
+    reloadable: true
+  breaker.eql_sequence.overhead:
+    type: int
+    secure: false
+    reloadable: true
+  breaker.eql_sequence.type:
+    type: string
+    secure: false
+    reloadable: false
+    choices:
+      - memory
+      - noop
+  breaker.model_inference.limit:
+    type: percentual
+    secure: false
+    reloadable: true
+  breaker.model_inference.overhead:
+    type: int
+    secure: false
+    reloadable: true
+  breaker.model_inference.type:
+    type: string
+    secure: false
+    reloadable: false
+    choices:
+      - memory
+      - noop
+  # cluster level shard allocation
+  cluster.routing.allocation.enable:
+    type: string
+    secure: false
+    reloadable: true
+    choices:
+      - all
+      - primaries
+      - new_primaries
+      - none
+  cluster.routing.allocation.node_concurrent_incoming_recoveries:
+    type: int
+    secure: false
+    reloadable: true
+  cluster.routing.allocation.node_concurrent_outgoing_recoveries:
+    type: int
+    secure: false
+    reloadable: true
+  cluster.routing.allocation.node_concurrent_recoveries:
+    type: int
+    secure: false
+    reloadable: true
+  cluster.routing.allocation.node_initial_primaries_recoveries:
+    type: int
+    secure: false
+    reloadable: true
+  cluster.routing.allocation.same_shard.host:
+    type: int
+    secure: false
+    reloadable: true
+  cluster.routing.rebalance.enable:
+    type: string
+    secure: false
+    reloadable: true
+    choices:
+      - all
+      - primaries
+      - replicas
+      - none
+  cluster.routing.allocation.allow_rebalance:
+    type: string
+    secure: false
+    reloadable: true
+    choices:
+      - always
+      - indices_primaries_active
+      - indices_all_active
+  cluster.routing.allocation.cluster_concurrent_rebalance:
+    type: int
+    secure: false
+    reloadable: true
+  cluster.routing.allocation.type:
+    type: string
+    secure: false
+    reloadable: true
+    choices:
+      - desired_balance
+      - balanced
+  cluster.routing.allocation.balance.shard:
+    type: float
+    secure: false
+    reloadable: true
+  cluster.routing.allocation.balance.index:
+    type: float
+    secure: false
+    reloadable: true
+  cluster.routing.allocation.balance.disk_usage:
+    type: float
+    secure: false
+    reloadable: true
+  cluster.routing.allocation.balance.write_load:
+    type: float
+    secure: false
+    reloadable: true
+  cluster.routing.allocation.balance.threshold:
+    type: float
+    secure: false
+    reloadable: true
+  cluster.routing.allocation.awareness.attributes:
+    type: string
+    secure: false
+    reloadable: false
+  # to be expanded
+  # networking
+  network.host:
+    type: string
+    secure: false
+    reloadable: false
+  http.port:
+    type: int
+    secure: false
+    reloadable: false
+  transport.port:
+    type: int
+    secure: false
+    reloadable: false
+  remote_cluster.port:
+    type: int
+    secure: false
+    reloadable: false
+  network.bind_host:
+    type: string
+    secure: false
+    reloadable: false
+  network.publish_host:
+    type: string
+    secure: false
+    reloadable: false
+  network.tcp.keep_alive:
+    type: bool
+    secure: false
+    reloadable: false
+  network.tcp.keep_idle:
+    type: int
+    secure: false
+    reloadable: false
+  network.tcp.keep_interval:
+    type: int
+    secure: false
+    reloadable: false
+  network.tcp.keep_count:
+    type: int
+    secure: false
+    reloadable: false
+  network.tcp.no_delay:
+    type: bool
+    secure: false
+    reloadable: false
+  network.tcp.reuse_address:
+    type: bool
+    secure: false
+    reloadable: false
+  network.tcp.send_buffer_size:
+    type: byte
+    secure: false
+    reloadable: false
+  network.tcp.receive_buffer_size:
+    type: byte
+    secure: false
+    reloadable: false
+  http.host:
+    type: string
+    secure: false
+    reloadable: false
+  # to be expanded
+  # security
+  xpack.security.enabled:
+    type: bool
+    secure: false
+    reloadable: false
+  xpack.security.autoconfiguration.enabled:
+    type: bool
+    secure: false
+    reloadable: false
+  xpack.security.enrollment.enabled:
+    type: bool
+    secure: false
+    reloadable: false
+  xpack.security.hide_settings:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.fips_mode.enabled:
+    type: bool
+    secure: false
+    reloadable: false
+  xpack.security.http.ssl.enabled:
+    type: bool
+    secure: false
+    reloadable: false
+  xpack.security.transport.ssl.enabled:
+    type: bool
+    secure: false
+    reloadable: false
+  xpack.security.http.ssl.keystore.path:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.transport.ssl.keystore.path:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.http.ssl.verification_mode:
+    type: string
+    secure: false
+    reloadable: false
+    choices:
+      - full
+      - certificate
+      - none
+  xpack.security.transport.ssl.verification_mode:
+    type: string
+    secure: false
+    reloadable: false
+    choices:
+      - full
+      - certificate
+      - none
+  xpack.security.transport.ssl.certificate_authorities:
+    type: list
+    secure: false
+    reloadable: false
+  xpack.security.http.ssl.certificate_authorities:
+    type: list
+    secure: false
+    reloadable: false

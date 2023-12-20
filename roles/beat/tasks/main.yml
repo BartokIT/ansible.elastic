@@ -1,0 +1,30 @@
+---
+# tasks file for elasticsearch
+- name: Gather fact and sanity checks
+  ansible.builtin.include_tasks: facts/main.yml
+
+- name: Install Beat
+  ansible.builtin.include_tasks: install/main.yml
+  when: ('install' in r_beat_actions | list )
+
+- name: Configure static files
+  ansible.builtin.include_tasks: configure/static.yml
+  when: ('configure' in r_beat_actions)
+
+- name: Restart Beat (for reconfiguration)
+  ansible.builtin.include_tasks: restart/restart.yml
+  when: >-
+    (_r_beat_triggered_restart and
+    'restart_on_configuration_change' in r_beat_actions)
+
+- name: Stop Beat
+  ansible.builtin.include_tasks: restart/stop.yml
+  when: ('stop' in r_beat_actions)
+
+- name: Start Beat
+  ansible.builtin.include_tasks: restart/start.yml
+  when: ('start' in r_beat_actions)
+
+- name: Configure static files
+  ansible.builtin.include_tasks: configure/dynamic.yml
+  when: ('configure' in r_beat_actions)

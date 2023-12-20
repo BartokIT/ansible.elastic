@@ -1,0 +1,38 @@
+---
+
+- name: Install the product
+  when: not r_kibana_info.installed
+  block:
+    - name: Add the public repository
+      when: r_kibana_add_repository | bool
+      block:
+        - name: Import the repository key
+          ansible.builtin.rpm_key:
+            state: present
+            key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+        - name: Add the repository
+          ansible.builtin.yum_repository:
+            name: elastic8
+            description: Elasticsearch repository for 8.x packages
+            file: elasticsearch
+            baseurl: https://artifacts.elastic.co/packages/8.x/yum
+            enabled: true
+            gpgcheck: false
+
+    - name: Install | Install expect and python modules
+      ansible.builtin.dnf:
+        name:
+          - python3-cryptography
+          - expect
+        state: present
+
+    - name: Install | Install Kibana
+      ansible.builtin.dnf:
+        name: '{{ r_kibana_rpm_name }} == {{ r_kibana_version }}'
+        state: present
+      notify:
+        - _r_kibana_gather_installation_facts
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

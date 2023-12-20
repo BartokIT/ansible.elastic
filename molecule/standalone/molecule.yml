@@ -10,27 +10,39 @@ lint: |
   yamllint .
   ansible-lint
 platforms:
-  - name: standalone
+  - name: elastic
     image: registry.access.redhat.com/ubi8/ubi-init
     groups:
       - cluster
-    network: molecule-elastic-search-test
+    network: molecule-elastic-standalone-test
     volume_mounts:
       - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
     command: "/usr/sbin/init"
     tmpfs:
       - /run
     pre_build_image: true
-
+  - name: kibana
+    image: registry.access.redhat.com/ubi8/ubi-init
+    groups:
+      - kibana
+    network: molecule-elastic-standalone-test
+    volume_mounts:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    command: "/usr/sbin/init"
+    tmpfs:
+      - /run
+    pre_build_image: true
 provisioner:
   name: ansible
   options:
     diff: true
   inventory:
     host_vars:
-      standalone:
-        ansible_host: standalone
-        node: standalone
+      elastic:
+        ansible_host: elastic
+        node: elastic
         roles:
           - master
           - data
+      kibana:
+        ansible_host: kibana

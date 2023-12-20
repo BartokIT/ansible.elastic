@@ -1,0 +1,13 @@
+---
+# handlers file for elasticsearch
+- name: Get installation informations
+  ansible.builtin.include_tasks: facts/installation.yml
+  listen:
+    - _r_beat_gather_installation_facts
+
+
+- name: Set restart flag to true
+  ansible.builtin.set_fact:
+    _r_beat_triggered_restart: true
+  listen:
+    - _r_beat_configuration_changed

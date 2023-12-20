@@ -23,13 +23,18 @@
     prepare_ca_certificate: /etc/pki/tls/certs/ca-certificate.pem
     prepare_secret_ca_passphrase: sJF93ncso
     prepare_certificates:
-      standalone:
-        - name: standalone
-          certificate_path: /etc/pki/tls/certs/standalone.pem
-          privatekey_path: /etc/pki/tls/private/standalone.key
+      elastic:
+        - name: elastic
+          certificate_path: /etc/pki/tls/certs/elastic.pem
+          privatekey_path: /etc/pki/tls/private/elastic.key
           subject_alt_name:
-            - "DNS:standalone"
-
+            - "DNS:elastic"
+      kibana:
+        - name: kibana
+          certificate_path: /etc/pki/tls/certs/kibana.pem
+          privatekey_path: /etc/pki/tls/private/kibana.key
+          subject_alt_name:
+            - "DNS:kibana"
   tasks:
     - name: Install python cryptography
       ansible.builtin.dnf:

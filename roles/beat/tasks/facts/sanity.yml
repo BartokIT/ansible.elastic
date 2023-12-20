@@ -1,0 +1,107 @@
+---
+# action assert
+
+- name: Check for allowed actions
+  assert:
+    that:
+      - r_beat_actions | list | difference(_r_beat_actions_allowed) | length < 1
+    msg: >-
+      The following actions are not allowed:
+      {{ r_beat_actions | difference(_r_beat_actions_allowed) }}
+
+- name: Check for configuration actions
+  assert:
+    that:
+      - r_beat_configure_actions | list | difference(_r_beat_configure_actions_allowed) | length < 1
+    msg: >-
+      The following configuration actions are not allowed:
+      {{ r_beat_configure_actions | difference(_r_beat_configure_actions_allowed) }}
+
+# configuration assert
+- name: Sanity check configuration variables
+  when: ('configure' in r_beat_actions)
+  block:
+    - name: Facts | Sanity | Assertion about node name
+      ansible.builtin.assert:
+        that:
+          - "{{ ansible_fqdn in (r_beat_cluster_nodes | map(attribute='host') | list) }}"
+          - (r_beat_cluster_nodes | selectattr('host', '==', ansible_fqdn) | first).name | d(false, true)
+        msg: Current host ({{ ansible_fqdn }}) is not present inside the cluster nodes list
+
+    - name: Facts | Sanity | Assertion about api user password
+      ansible.builtin.assert:
+        that:
+          - r_beat_api_password | d(false, true)
+        msg: "Please set the api user password to be used during automation"
+
+    - name: Facts | Sanity | Assertion about keystore password quality
+      ansible.builtin.assert:
+        that:
+          - >-
+            r_beat_keystore_password | length >=
+            _r_beat_password_minlength
+          - >-
+            r_beat_keystore_password is
+            regex("([a-z].*){" ~ _r_beat_password_minlowercase ~ "}")
+          - >-
+            r_beat_keystore_password is
+            regex("([A-Z].*){" ~ _r_beat_password_minuppercase ~ "}")
+          - >-
+            r_beat_keystore_password is
+            regex("([0-9].*){" ~ _r_beat_password_mindigits ~ "}")
+          - >-
+            r_beat_keystore_password is
+            regex("([" ~ _r_beat_password_specialchars ~ ".*]){" ~ _r_beat_password_minspecialchars ~ "}")
+        msg:
+          - "Please set the keystore password and ensure correct strength"
+          - "Password must have minimum length of {{ _r_beat_password_minlength }}"
+          - "Password must at least of {{ _r_beat_password_minlowercase }} lower case chars"
+          - "Password must at least of {{ _r_beat_password_minuppercase }} upper case chars"
+          - "Password must at least of {{ _r_beat_password_mindigits }} digits"
+          - "Password must at least of {{ _r_beat_password_minspecialchars }} special chars choosed from {{ _r_beat_password_specialchars }}"
+      when: r_beat_keystore_password | d(false, true)
+
+    - name: Facts | Sanity | Set elastic node
+      ansible.builtin.set_fact:
+        r_beat_node_name: "{{ (r_beat_cluster_nodes | selectattr('host', '==', ansible_fqdn) | first).name }}"
+        r_beat_node_rack: "{{ (r_beat_cluster_nodes | selectattr('host', '==', ansible_fqdn) | first).rack | d(omit) }}"
+
+    - name: Facts | Sanity | Combine elasticsearch configurations with defaults
+      ansible.builtin.set_fact:
+        r_beat_keystore: "{{ r_beat_keystore | combine(_r_beat_keystore, recursive=True) }}"
+        r_beat_configuration: "{{ _r_beat_configuration | combine(r_beat_configuration, recursive=True) }}"
+        r_beat_users: "{{ r_beat_users | combine(_r_beat_api_user, recursive=True) }}"
+      no_log: "{{ not (__r_beat_show_nolog | bool) }}"
+
+    - name: Facts | Sanity | Combine rack awareness variable
+      ansible.builtin.set_fact:
+        r_beat_configuration: "{{ r_beat_configuration | combine({ 'node': { 'attr': { r_beat_configuration.cluster.routing.allocation.awareness.attributes: r_beat_node_rack }}}, recursive=True) }}"
+      when: r_beat_node_rack
+
+    - name: Facts | Sanity | Ensure SSL configuration correctness
+      ansible.builtin.assert:
+        that:
+          - >-
+            r_beat_configuration.xpack.security.http.ssl.keystore.path ==
+            r_beat_configuration.xpack.security.transport.ssl.keystore.path
+          - >-
+
+      when:
+        - r_beat_configuration.xpack.security.enabled | bool
+        - r_beat_configuration.xpack.security.http.ssl.enabled | bool or
+          r_beat_configuration.xpack.security.transport.ssl.enabled | bool
+
+# validation of the configuration
+- name: Include variables
+  ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ r_beat_version | regex_replace('^([0-9])\\.([0-9]*).*', '\\1.\\2') }}.yml"
+        - main.yml
+      paths:
+        - "vars"
+
+- name: Check the validity of the configuration
+  assert:
+    that: "{{ r_beat_configuration is bartokit.elastic.validate_configuration(_r_beat_configuration_schema) }}"

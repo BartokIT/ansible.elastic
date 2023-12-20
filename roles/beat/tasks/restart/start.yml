@@ -1,0 +1,8 @@
+- name: Start the elasticsearch service
+  systemd:
+    name: elasticsearch
+    state: started
+  notify: _r_beat_gather_installation_facts
+
+- name: Flush handlers
+  meta: flush_handlers

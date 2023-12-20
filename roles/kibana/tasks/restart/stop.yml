@@ -1,0 +1,4 @@
+- name: Stop the elasticsearch service
+  systemd:
+    name: elasticsearch
+    state: stopped

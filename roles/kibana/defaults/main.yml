@@ -1,0 +1,134 @@
+---
+# ---- run behaviour modification ----
+# action allowed in r_kibana_actions
+# - install
+# - configure
+# - stop
+# - upgrade
+# - start
+# - uninstall
+# - restart_on_configuration_change
+r_kibana_actions: []
+_r_kibana_actions_allowed:
+ - install
+ - configure
+ - stop
+ - upgrade
+ - start
+ - uninstall
+ - restart_on_configuration_change
+
+# more granular configuration actions
+r_kibana_configure_actions: []
+_r_kibana_configure_actions_allowed: []
+_r_kibana_triggered_restart: false
+
+# ---- installation variables ----
+r_kibana_version: '8.11.2'
+r_kibana_rpm_name: kibana
+r_kibana_info:
+  installed: false
+  version: ''
+r_kibana_add_repository: true
+
+# start && stop
+_r_kibana_systemd_name: kibana.service
+
+# generic configuration
+__r_kibana_show_nolog: false   # only for debug purpose
+
+
+# static configuration
+_r_kibana_config_folder: /etc/elasticsearch
+## password quality settings
+_r_kibana_password_minlength: 12
+_r_kibana_password_minuppercase: 3
+_r_kibana_password_minlowercase: 3
+_r_kibana_password_mindigits: 2
+_r_kibana_password_minspecialchars: 1
+_r_kibana_password_specialchars: '!._@#'
+
+## linux username and password
+_r_kibana_username: elasticsearch
+_r_kibana_group: elasticsearch
+
+
+
+## elasticsearch.yml configurations
+r_kibana_node_name: ''
+r_kibana_node_rack: ''
+r_kibana_cluster_nodes:
+  - host: '{{ ansible_fqdn }}'
+    name: '{{ ansible_fqdn }}'
+    roles:
+      - master
+r_kibana_cluster_name: 'es_cluster'
+
+_r_kibana_configuration:
+  network:
+    host: "0.0.0.0"
+  http:
+    host: "0.0.0.0"
+    port: 9200
+  cluster:
+    name: '{{ r_kibana_cluster_name }}'
+    initial_master_nodes: "{{ r_kibana_cluster_nodes | selectattr('roles','bartokit.elastic.contains', 'master') | map(attribute='name') | list }}"
+    routing:
+      allocation:
+        awareness:
+          attributes: site_id
+  node:
+    name: '{{ r_kibana_node_name }}'
+    roles: >-
+      {{ (r_kibana_cluster_nodes |
+      selectattr('host', 'equalto', ansible_fqdn) | first).roles | list }}
+  path:
+    logs: /var/log/elasticsearch
+    data: /var/lib/elasticsearch
+  discovery:
+    seed_hosts: "{{ r_kibana_cluster_nodes | selectattr('roles','bartokit.elastic.contains', 'master') | map(attribute='name') | list }}"
+  xpack:
+    security:
+      enabled: true
+      enrollment:
+        enabled: true
+      http:
+        ssl:
+          enabled: true
+          verification_mode: certificate
+          keystore:
+            path: certs/elastic.p12
+          certificate_authorities: certs/ca.crt
+      transport:
+        ssl:
+          enabled: true
+          verification_mode: certificate
+          keystore:
+            path: certs/elastic.p12
+          certificate_authorities: certs/ca.crt
+
+r_kibana_configuration_ssl_certificate_authorities: ''
+r_kibana_configuration: {}
+
+## keystore settings
+r_kibana_keystore_password:
+r_kibana_keystore_password_file: "{{ _r_kibana_config_folder }}/keystore.password"
+r_kibana_keystore:
+_r_kibana_keystore:
+  "bootstrap.password": "{{ r_kibana_users_initial_elastic_password }}"
+
+## jvm setting
+r_kibana_jvm_initial_heap: 1g
+r_kibana_jvm_maximum_heap: 1g
+
+# admin user and password
+r_kibana_users_initial_elastic_password: bA3nb0g.Hyw
+r_kibana_api_password:
+r_kibana_users: {}
+_r_kibana_api_user:
+  ansible:
+    password: "{{ r_kibana_api_password }}"
+    metadata:
+      reserved_to_automation: true
+    roles:
+      - superuser

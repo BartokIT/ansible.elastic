@@ -1,0 +1,6 @@
+---
+- name: Check that Elasticsearch is started
+  ansible.builtin.assert:
+    that:
+      - r_kibana_info.started
+    msg: "Please start first the product"
