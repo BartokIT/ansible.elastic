@@ -25,14 +25,8 @@
       ansible.builtin.assert:
         that:
           - "{{ ansible_fqdn in (r_kibana_cluster_nodes | map(attribute='host') | list) }}"
-          - (r_kibana_cluster_nodes | selectattr('host', '==', ansible_fqdn) | first).name | d(false, true)
         msg: Current host ({{ ansible_fqdn }}) is not present inside the cluster nodes list
 
-    - name: Facts | Sanity | Assertion about api user password
-      ansible.builtin.assert:
-        that:
-          - r_kibana_api_password | d(false, true)
-        msg: "Please set the api user password to be used during automation"
 
     - name: Facts | Sanity | Assertion about keystore password quality
       ansible.builtin.assert:
@@ -73,23 +67,6 @@
         r_kibana_users: "{{ r_kibana_users | combine(_r_kibana_api_user, recursive=True) }}"
       no_log: "{{ not (__r_kibana_show_nolog | bool) }}"
 
-    - name: Facts | Sanity | Combine rack awareness variable
-      ansible.builtin.set_fact:
-        r_kibana_configuration: "{{ r_kibana_configuration | combine({ 'node': { 'attr': { r_kibana_configuration.cluster.routing.allocation.awareness.attributes: r_kibana_node_rack }}}, recursive=True) }}"
-      when: r_kibana_node_rack
-
-    - name: Facts | Sanity | Ensure SSL configuration correctness
-      ansible.builtin.assert:
-        that:
-          - >-
-            r_kibana_configuration.xpack.security.http.ssl.keystore.path ==
-            r_kibana_configuration.xpack.security.transport.ssl.keystore.path
-          - >-
-
-      when:
-        - r_kibana_configuration.xpack.security.enabled | bool
-        - r_kibana_configuration.xpack.security.http.ssl.enabled | bool or
-          r_kibana_configuration.xpack.security.transport.ssl.enabled | bool
 
 # validation of the configuration
 - name: Include variables

@@ -1,0 +1,9 @@
+---
+- name: Beat configuration
+  ansible.builtin.set_fact:
+    filebeat_configuration:
+      filebeat.inputs:
+        - type: filestream
+          id: dnf
+          paths:
+          - "/var/log/dnf.log"

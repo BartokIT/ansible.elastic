@@ -86,10 +86,9 @@ import logging
 
 # module's parameter
 module_args = dict(
-    type=dict(type='str', required=False, choices=['file','metric','audit','heart'], no_log=True),
-    password=dict(type='str', required=False, default='', no_log=True),
+    type=dict(type='str', required=False, choices=['file','metric','audit','heart']),
     force=dict(type='bool', required=False, default=False),
-    credentials=dict(type='dict', required=True),
+    credentials=dict(type='dict', required=True, no_log=True),
     mode=dict(type='str', required=False, choiches=['multiple', 'present', 'absent'], default='multiple')
 )
 
@@ -101,9 +100,8 @@ class BartokITElasticsearchBeatKeystore(BartokITAnsibleModule):
         """Call the constructor of the parent class."""
         super().__init__(parameter_name_with_mode='mode', parameter_name_with_keys='credentials',
                          argument_spec=argument_spec, supports_check_mode=False,
-                         log_file='ansible_elasticsearch_keystore.log')
+                         log_file='ansible_beat_keystore.log')
         self.__em = ElasticManager(self, 'https://localhost:9200')
-        self.__password_protected = False
 
     def initialization(self, parameters_argument, parameters):
         """
@@ -137,7 +135,7 @@ class BartokITElasticsearchBeatKeystore(BartokITAnsibleModule):
 
     def describe_info_for_output(self):
         """Return information to print"""
-        return {'protected': self.__password_protected}
+        return {}
 
     def list_current_keys(self, input_keys):
         """Return the list of keys actually present."""

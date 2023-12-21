@@ -1,0 +1,98 @@
+---
+# vars file for elasticsearch
+_r_beat_configuration_schema:
+  filebeat.inputs:
+    type: list
+  filebeat.registry.path:
+    type: string
+  filebeat.registry.file_permissions:
+    type: int
+  filebeat.registry.flush:
+    type: string
+  filebeat.registry.migrate_file:
+    type: string
+  filebeat.config_dir:
+    type: string
+  filebeat.shutdown_timeout:
+    type: string
+  name:
+    type: string
+  tags:
+    type: list
+  fields:
+    type: dict
+  fields_under_root:
+    type: bool
+  processors:
+    type: list
+  max_procs:
+    type: int
+  timestamp.precision:
+    type: string
+    choices:
+      - millisecond
+      - microsecond
+      - nanosecond
+  path.home:
+    type: string
+  path.config:
+    type: string
+  path.data:
+    type: string
+  path.logs:
+    type: string
+  filebeat.config.inputs.enabled:
+    type: bool
+  filebeat.config.inputs.path:
+    type: string
+  filebeat.config.inputs.reload.enabled:
+    type: bool
+  filebeat.config.inputs.reload.period:
+    type: string
+  filebeat.config.modules.enabled:
+    type: bool
+  filebeat.config.modules.path:
+    type: string
+  # OUTPUT
+  output.elasticsearch:
+    type: dict
+  output.logstash:
+    type: dict
+  output.kafka:
+    type: dict
+  output.redis:
+    type: dict
+  output.file:
+    type: dict
+  output.console:
+    type: dict
+  setup.ilm.enabled:
+    type: bool
+  setup.ilm.policy_name:
+    type: string
+  setup.ilm.policy_file:
+    type: string
+  setup.ilm.check_exists:
+    type: string
+  setup.ilm.overwrite:
+    type: string
+  setup.template.name:
+    type: string
+  setup.template.fields:
+    type: string
+  setup.template.overwrite:
+    type: bool
+  setup.template.settings:
+    type: dict
+  setup.template.append_fields:
+    type: list
+  setup.template.json.enabled:
+    type: bool
+  setup.template.json.path:
+    type: string
+  setup.template.json.name:
+    type: string
+  setup.template.json.data_stream:
+    type: bool
+  filebeat.autodiscover.providers:
+    type: dict

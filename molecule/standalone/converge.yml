@@ -1,4 +1,37 @@
 ---
+- name: Converge beats
+  hosts: beats
+  gather_facts: false
+  tasks:
+    - name: Read configurations
+      ansible.builtin.include_tasks: ../elasticsearch_configuration.yml
+
+    - name: Read configurations
+      ansible.builtin.include_tasks: ../beats_configuration.yml
+
+
+    - name: Test the installation, configuration and product start
+      ansible.builtin.set_fact:
+        r_beat_actions:
+          - install
+          - configure
+          - start
+        r_beat_configure_actions:
+          - main_files
+          - keystore
+          - folders
+
+    - name: Test metric beat
+      ansible.builtin.include_role:
+        name: bartokit.elastic.beat
+      vars:
+        r_beat_type: file
+        __r_beat_show_nolog: true
+        r_beat_configuration: "{{ filebeat_configuration }}"
+        r_beat_keystore:
+          elastic_user: elastic
+          elastic_password: "{{ r_elasticsearch_users_initial_elastic_password }}"
+
 - name: Converge
   hosts: cluster
   gather_facts: false
@@ -29,11 +62,11 @@
       ansible.builtin.include_role:
         name: bartokit.elastic.elasticsearch
 
-- name: Converge
-  hosts: kibana
+
+- name: Converge Kibana
+  hosts: kibanas
   gather_facts: false
   tasks:
-
     - name: Read configurations
       ansible.builtin.include_tasks: ../elasticsearch_configuration.yml
 
@@ -41,8 +74,8 @@
       ansible.builtin.set_fact:
         r_kibana_actions:
           - install
-          # - configure
-          # - start
+          - configure
+          - start
           # - restart_on_configuration_change
         # r_kibana_configure_actions:
         #   - folders

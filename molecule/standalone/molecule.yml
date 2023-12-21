@@ -21,10 +21,29 @@ platforms:
     tmpfs:
       - /run
     pre_build_image: true
+    exposed_ports:
+      - 9200/tcp
+    published_ports:
+      - 0.0.0.0:9200:9200/tcp
   - name: kibana
     image: registry.access.redhat.com/ubi8/ubi-init
     groups:
-      - kibana
+      - kibanas
+    network: molecule-elastic-standalone-test
+    exposed_ports:
+      - 5601/tcp
+    published_ports:
+      - 0.0.0.0:5601:5601/tcp
+    volume_mounts:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    command: "/usr/sbin/init"
+    tmpfs:
+      - /run
+    pre_build_image: true
+  - name: beat
+    image: registry.access.redhat.com/ubi8/ubi-init
+    groups:
+      - beats
     network: molecule-elastic-standalone-test
     volume_mounts:
       - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
@@ -46,3 +65,5 @@ provisioner:
           - data
       kibana:
         ansible_host: kibana
+      beats:
+        ansible_host: beats

@@ -1,350 +1,257 @@
 ---
 # vars file for elasticsearch
 _r_kibana_configuration_schema:
+  console.ui.enabled:
+    type: bool
+  csp.script_src:
+    type: string
+  csp.disableUnsafeEval:
+    type: bool
+  csp.worker_src:
+    type: string
+  csp.style_src:
+    type: string
+  csp.connect_src:
+    type: string
+  csp.default_src:
+    type: string
+  csp.font_src:
+    type: string
+  csp.frame_src:
+    type: string
+  csp.img_src:
+    type: string
+  csp.frame_ancestors:
+    type: string
+  csp.report_uri:
+    type: string
+  csp.report_to:
+    type: string
+  csp.strict:
+    type: bool
+  csp.warnLegacyBrowsers:
+    type: bool
+  elasticsearch.maxSockets:
+    type: string
+  elasticsearch.maxIdleSockets:
+    type: int
+  elasticsearch.idleSocketTimeout:
+    type: string
+  elasticsearch.customHeaders:
+    type: dict
+  elasticsearch.hosts:
+    type: list
+  elasticsearch.pingTimeout:
+    type: string
+  elasticsearch.requestHeadersWhitelist:
+    type: list
+  elasticsearch.requestTimeout:
+    type: int
+  elasticsearch.shardTimeout:
+    type: int
+  elasticsearch.compression:
+    type: bool
+  elasticsearch.sniffInterval:
+    type: bool
+  elasticsearch.sniffOnStart:
+    type: bool
+  elasticsearch.sniffOnConnectionFault:
+    type: bool
+  elasticsearch.ssl.alwaysPresentCertificate:
+    type: bool
+  elasticsearch.ssl.certificate:
+    type: string
+  elasticsearch.ssl.key:
+    type: string
+  elasticsearch.ssl.certificateAuthorities:
+    type: list
+  elasticsearch.ssl.keyPassphrase:
+    type: string
+  elasticsearch.ssl.keystore.path:
+    type: string
+  elasticsearch.ssl.keystore.password:
+    type: string
+  elasticsearch.ssl.truststore.path:
+    type: string
+  elasticsearch.ssl.truststore.password:
+    type: string
+  elasticsearch.ssl.verificationMode:
+    type: string
+    choices:
+      - full
+      - certificate
+      - none
+  elasticsearch.username:
+    type: string
+  elasticsearch.password:
+    type: string
+  elasticsearch.serviceAccountToken:
+    type: string
+  unifiedSearch.autocomplete.valueSuggestions.timeout:
+    type: int
+  unifiedSearch.autocomplete.valueSuggestions.terminateAfter:
+    type: int
+  logging.root:
+    type: string
+  logging.root.appenders:
+    type: string
+  logging.root.level:
+    type: string
+  logging.loggers:
+    type: dict
+  logging.appenders:
+    type: dict
+  map.includeElasticMapsService:
+    type: bool
+  map.emsUrl:
+    type: string
+  map.tilemap.options.attribution:
+    type: string
+  map.tilemap.options.maxZoom:
+    type: int
+  map.tilemap.options.minZoom:
+    type: int
+  map.tilemap.options.subdomains:
+    type: string
+  map.tilemap.url:
+    type: string
+  migrations.batchSize:
+    type: int
+  migrations.maxBatchSizeBytes:
+    type: byte
+  migrations.retryAttempts:
+    type: int
+  newsfeed.enabled:
+    type: bool
+  node.roles:
+    type: string
+    choices:
+      - background_tasks
+      - ui
+      - '*'
+  notifications.connectors.default.email:
+    type: string
   path.data:
     type: string
-    secure: false
-    reloadable: false
-  path.logs:
+  pid.file:
     type: string
-    secure: false
-    reloadable: false
-  cluster.name:
-    type: string
-    secure: false
-    reloadable: false
-  node.name:
-    type: string
-    secure: false
-    reloadable: false
-  discovery.seed_hosts:
-    type: list
-    secure: false
-    reloadable: false
-  cluster.initial_master_nodes:
-    type: list
-    secure: false
-    reloadable: false
-  # NODE
-  node.roles:
-    type: list
-    secure: false
-    reloadable: false
-  # AUDIT
-  xpack.security.audit.enabled:
-    type: bool
-    secure: false
-    reloadable: false
-  xpack.security.audit.logfile.events.include:
-    type: list
-    secure: false
-    reloadable: true
-  xpack.security.audit.logfile.events.exclude:
-    type: list
-    secure: false
-    reloadable: true
-  xpack.security.audit.logfile.events.emit_request_body:
-    type: bool
-    secure: false
-    reloadable: true
-  xpack.security.audit.logfile.emit_node_name:
-    type: bool
-    secure: false
-    reloadable: true
-  xpack.security.audit.logfile.emit_node_host_address:
-    type: bool
-    secure: false
-    reloadable: true
-  xpack.security.audit.logfile.emit_node_host_name:
-    type: bool
-    secure: false
-    reloadable: true
-  xpack.security.audit.logfile.emit_node_id:
-    type: bool
-    secure: false
-    reloadable: true
-  # circuit breaker
-  indices.breaker.total.use_real_memory:
-    type: bool
-    secure: false
-    reloadable: false
-  indices.breaker.total.limit:
-    type: percentual
-    secure: false
-    reloadable: true
-  indices.breaker.fielddata.overhead:
-    type: percentual
-    secure: false
-    reloadable: true
-  indices.breaker.request.limit:
-    type: percentual
-    secure: false
-    reloadable: true
-  indices.breaker.request.overhead:
+  ops.interval:
     type: int
-    secure: false
-    reloadable: true
-  network.breaker.inflight_requests.limit:
-    type: percentual
-    secure: false
-    reloadable: true
-  network.breaker.inflight_requests.overhead:
-    type: percentual
-    secure: false
-    reloadable: true
-  indices.breaker.accounting.limit:
-    type: percentual
-    secure: false
-    reloadable: true
-  script.max_compilations_rate:
+  ops.cGroupOverrides.cpuPath:
     type: string
-    secure: false
-    reloadable: true
-  script.painless.regex.enabled:
+  ops.cGroupOverrides.cpuAcctPath:
     type: string
-    secure: false
-    reloadable: false
-    choices:
-      - limited
-      - true
-      - false
-  script.painless.regex.limit-factor:
-    type: string
-    secure: false
-    reloadable: false
-  breaker.eql_sequence.limit:
-    type: percentual
-    secure: false
-    reloadable: true
-  breaker.eql_sequence.overhead:
+  savedObjects.maxImportExportSize:
     type: int
-    secure: false
-    reloadable: true
-  breaker.eql_sequence.type:
-    type: string
-    secure: false
-    reloadable: false
-    choices:
-      - memory
-      - noop
-  breaker.model_inference.limit:
-    type: percentual
-    secure: false
-    reloadable: true
-  breaker.model_inference.overhead:
+  savedObjects.maxImportPayloadBytes:
     type: int
-    secure: false
-    reloadable: true
-  breaker.model_inference.type:
+  server.basePath:
     type: string
-    secure: false
-    reloadable: false
-    choices:
-      - memory
-      - noop
-  # cluster level shard allocation
-  cluster.routing.allocation.enable:
+  server.publicBaseUrl:
     type: string
-    secure: false
-    reloadable: true
+  server.compression.enabled:
+    type: bool
+  server.cors.enabled:
+    type: bool
+  server.cors.allowCredentials:
+    type: bool
+  server.cors.allowOrigin:
+    type: string
+  server.compression.referrerWhitelist:
+    type: string
+  server.compression.brotli.enabled:
+    type: bool
+  server.securityResponseHeaders.strictTransportSecurity:
+    type: string
+  server.securityResponseHeaders.xContentTypeOptions:
+    type: string
+  server.securityResponseHeaders.referrerPolicy:
+    type: string
+  server.securityResponseHeaders.permissionsPolicy:
+    type: string
+  server.securityResponseHeaders.disableEmbedding:
+    type: bool
+  server.securityResponseHeaders.crossOriginOpenerPolicy:
+    type: string
+  server.customResponseHeaders:
+    type: dict
+  server.shutdownTimeout:
+    type: string
+  server.host:
+    type: string
+  server.keepaliveTimeout:
+    type: int
+  server.maxPayload:
+    type: int
+  server.name:
+    type: string
+  server.port:
+    type: string
+  server.requestId.allowFromAnyIp:
+    type: bool
+  server.rewriteBasePath:
+    type: string
+  server.socketTimeout:
+    type: int
+  server.ssl.certificate and server.ssl.key:
+    type: string
+  server.ssl.certificateAuthorities:
+    type: string
+  server.ssl.cipherSuites:
+    type: string
+  server.ssl.clientAuthentication:
+    type: string
     choices:
-      - all
-      - primaries
-      - new_primaries
+      - required
+      - optional
       - none
-  cluster.routing.allocation.node_concurrent_incoming_recoveries:
-    type: int
-    secure: false
-    reloadable: true
-  cluster.routing.allocation.node_concurrent_outgoing_recoveries:
-    type: int
-    secure: false
-    reloadable: true
-  cluster.routing.allocation.node_concurrent_recoveries:
-    type: int
-    secure: false
-    reloadable: true
-  cluster.routing.allocation.node_initial_primaries_recoveries:
-    type: int
-    secure: false
-    reloadable: true
-  cluster.routing.allocation.same_shard.host:
-    type: int
-    secure: false
-    reloadable: true
-  cluster.routing.rebalance.enable:
-    type: string
-    secure: false
-    reloadable: true
-    choices:
-      - all
-      - primaries
-      - replicas
-      - none
-  cluster.routing.allocation.allow_rebalance:
-    type: string
-    secure: false
-    reloadable: true
-    choices:
-      - always
-      - indices_primaries_active
-      - indices_all_active
-  cluster.routing.allocation.cluster_concurrent_rebalance:
-    type: int
-    secure: false
-    reloadable: true
-  cluster.routing.allocation.type:
-    type: string
-    secure: false
-    reloadable: true
-    choices:
-      - desired_balance
-      - balanced
-  cluster.routing.allocation.balance.shard:
-    type: float
-    secure: false
-    reloadable: true
-  cluster.routing.allocation.balance.index:
-    type: float
-    secure: false
-    reloadable: true
-  cluster.routing.allocation.balance.disk_usage:
-    type: float
-    secure: false
-    reloadable: true
-  cluster.routing.allocation.balance.write_load:
-    type: float
-    secure: false
-    reloadable: true
-  cluster.routing.allocation.balance.threshold:
-    type: float
-    secure: false
-    reloadable: true
-  cluster.routing.allocation.awareness.attributes:
-    type: string
-    secure: false
-    reloadable: false
-  # to be expanded
-  # networking
-  network.host:
-    type: string
-    secure: false
-    reloadable: false
-  http.port:
-    type: int
-    secure: false
-    reloadable: false
-  transport.port:
-    type: int
-    secure: false
-    reloadable: false
-  remote_cluster.port:
-    type: int
-    secure: false
-    reloadable: false
-  network.bind_host:
-    type: string
-    secure: false
-    reloadable: false
-  network.publish_host:
-    type: string
-    secure: false
-    reloadable: false
-  network.tcp.keep_alive:
+  server.ssl.enabled:
     type: bool
-    secure: false
-    reloadable: false
-  network.tcp.keep_idle:
-    type: int
-    secure: false
-    reloadable: false
-  network.tcp.keep_interval:
-    type: int
-    secure: false
-    reloadable: false
-  network.tcp.keep_count:
-    type: int
-    secure: false
-    reloadable: false
-  network.tcp.no_delay:
-    type: bool
-    secure: false
-    reloadable: false
-  network.tcp.reuse_address:
-    type: bool
-    secure: false
-    reloadable: false
-  network.tcp.send_buffer_size:
-    type: byte
-    secure: false
-    reloadable: false
-  network.tcp.receive_buffer_size:
-    type: byte
-    secure: false
-    reloadable: false
-  http.host:
+  server.ssl.keyPassphrase:
     type: string
-    secure: false
-    reloadable: false
-  # to be expanded
-  # security
-  xpack.security.enabled:
-    type: bool
-    secure: false
-    reloadable: false
-  xpack.security.autoconfiguration.enabled:
-    type: bool
-    secure: false
-    reloadable: false
-  xpack.security.enrollment.enabled:
-    type: bool
-    secure: false
-    reloadable: false
-  xpack.security.hide_settings:
+  server.ssl.keystore.password:
     type: string
-    secure: false
-    reloadable: false
-  xpack.security.fips_mode.enabled:
+  server.ssl.truststore.path:
+    type: string
+  server.ssl.truststore.password:
+    type: string
+  server.ssl.redirectHttpFromPort:
+    type: string
+  server.ssl.supportedProtocols:
+    type: string
+  server.uuid:
+    type: string
+  server.xsrf.allowlist:
+    type: string
+  server.xsrf.disableProtection:
     type: bool
-    secure: false
-    reloadable: false
-  xpack.security.http.ssl.enabled:
+  status.allowAnonymous:
     type: bool
-    secure: false
-    reloadable: false
-  xpack.security.transport.ssl.enabled:
+  telemetry.allowChangingOptInStatus:
     type: bool
-    secure: false
-    reloadable: false
-  xpack.security.http.ssl.keystore.path:
+  telemetry.optIn:
+    type: bool
+  vis_type_vega.enableExternalUrls:
+    type: bool
+  xpack.ccr.ui.enabled:
+    type: bool
+  xpack.discoverEnhanced.actions.exploreDataInContextMenu.enabled:
+    type: bool
+  xpack.discoverEnhanced.actions.exploreDataInChart.enabled:
+    type: bool
+  xpack.ilm.ui.enabled:
+    type: bool
+  xpack.index_management.ui.enabled:
+    type: bool
+  xpack.license_management.ui.enabled:
+    type: bool
+  xpack.remote_clusters.ui.enabled:
+    type: bool
+  xpack.rollup.ui.enabled:
+    type: bool
+  xpack.snapshot_restore.ui.enabled:
+    type: bool
+  xpack.upgrade_assistant.ui.enabled:
+    type: bool
+  i18n.locale:
     type: string
-    secure: false
-    reloadable: false
-  xpack.security.transport.ssl.keystore.path:
-    type: string
-    secure: false
-    reloadable: false
-  xpack.security.http.ssl.verification_mode:
-    type: string
-    secure: false
-    reloadable: false
-    choices:
-      - full
-      - certificate
-      - none
-  xpack.security.transport.ssl.verification_mode:
-    type: string
-    secure: false
-    reloadable: false
-    choices:
-      - full
-      - certificate
-      - none
-  xpack.security.transport.ssl.certificate_authorities:
-    type: list
-    secure: false
-    reloadable: false
-  xpack.security.http.ssl.certificate_authorities:
-    type: list
-    secure: false
-    reloadable: false

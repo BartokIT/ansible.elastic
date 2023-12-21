@@ -1,6 +1,6 @@
 - name: Start the elasticsearch service
   systemd:
-    name: elasticsearch
+    name: "{{ _r_beat_systemd_name }}"
     state: started
   notify: _r_beat_gather_installation_facts
 

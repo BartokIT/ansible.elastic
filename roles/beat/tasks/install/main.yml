@@ -24,7 +24,6 @@
       ansible.builtin.dnf:
         name:
           - python3-cryptography
-          - expect
         state: present
 
     - name: Install | Install Beat

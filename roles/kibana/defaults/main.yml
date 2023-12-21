@@ -39,18 +39,11 @@ __r_kibana_show_nolog: false   # only for debug purpose
 
 
 # static configuration
-_r_kibana_config_folder: /etc/elasticsearch
-## password quality settings
-_r_kibana_password_minlength: 12
-_r_kibana_password_minuppercase: 3
-_r_kibana_password_minlowercase: 3
-_r_kibana_password_mindigits: 2
-_r_kibana_password_minspecialchars: 1
-_r_kibana_password_specialchars: '!._@#'
+_r_kibana_config_folder: /etc/kibana
 
 ## linux username and password
-_r_kibana_username: elasticsearch
-_r_kibana_group: elasticsearch
+_r_kibana_username: kibana
+_r_kibana_group: kibana
 
 
 
@@ -65,47 +58,27 @@ r_kibana_cluster_nodes:
 r_kibana_cluster_name: 'es_cluster'
 
 _r_kibana_configuration:
-  network:
-    host: "0.0.0.0"
-  http:
-    host: "0.0.0.0"
-    port: 9200
-  cluster:
-    name: '{{ r_kibana_cluster_name }}'
-    initial_master_nodes: "{{ r_kibana_cluster_nodes | selectattr('roles','bartokit.elastic.contains', 'master') | map(attribute='name') | list }}"
-    routing:
-      allocation:
-        awareness:
-          attributes: site_id
-  node:
+  elasticsearch:
+    hosts: "{{ r_kibana_elasticsearch_nodes }}"
+  server:
     name: '{{ r_kibana_node_name }}'
-    roles: >-
-      {{ (r_kibana_cluster_nodes |
-      selectattr('host', 'equalto', ansible_fqdn) | first).roles | list }}
+    host: '{{ r_kibana_node_name }}'
   path:
     logs: /var/log/elasticsearch
     data: /var/lib/elasticsearch
-  discovery:
-    seed_hosts: "{{ r_kibana_cluster_nodes | selectattr('roles','bartokit.elastic.contains', 'master') | map(attribute='name') | list }}"
-  xpack:
-    security:
-      enabled: true
-      enrollment:
-        enabled: true
-      http:
-        ssl:
-          enabled: true
-          verification_mode: certificate
-          keystore:
-            path: certs/elastic.p12
-          certificate_authorities: certs/ca.crt
-      transport:
-        ssl:
-          enabled: true
-          verification_mode: certificate
-          keystore:
-            path: certs/elastic.p12
-          certificate_authorities: certs/ca.crt
+  logging:
+    root:
+      appenders:
+        - kibana
+    appenders:
+      kibana:
+        type: file
+        fileName: /var/log/kibana/kibana.log
+        layout:
+          type: pattern
+
+
+
 
 r_kibana_configuration_ssl_certificate_authorities: ''
 r_kibana_configuration: {}

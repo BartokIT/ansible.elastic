@@ -46,23 +46,25 @@ class ElasticManager:
             return req
 
     def get_beat_keystore_path(self, beattype):
-        return os.path.join("/var/lib/{}beat/".format(beattype), "{}.keystore".format(beattype))
+        return os.path.join("/var/lib/{}beat/".format(beattype), "{}beat.keystore".format(beattype))
 
-    def is_beat_keystore_present(self, beattype, keystore_path=None):
+    def is_beat_keystore_present(self, beattype):
         ''' Check for presence of beat keystore '''
-        if keystore_path is None:
-            keystore_path = self.get_beat_keystore_path(beattype)
+        keystore_path = self.get_beat_keystore_path(beattype)
 
         if beattype not in ['heart', 'file', 'metric','audit']:
             raise Exception("Unsupported beat type")
         result = os.path.isfile(keystore_path)
         if not result:
             logging.debug("Keystore %s is not present".format(keystore_path))
+            return False
 
-    def get_beat_keystore_stat(self, beattype, keystore_path=None):
+        return True
+
+    def get_beat_keystore_stat(self, beattype):
         ''' Get information on keystore file'''
-        if keystore_path is None:
-            keystore_path = self.get_beat_keystore_path(beattype)
+
+        keystore_path = self.get_beat_keystore_path(beattype)
         if self.is_beat_keystore_present(beattype):
             keystore_stat = os.stat(keystore_path)
             return {
@@ -76,12 +78,10 @@ class ElasticManager:
                 'exists': False
             }
 
-    def create_beat_keystore(self, beattype, keystore_path=None):
+    def create_beat_keystore(self, beattype):
         '''Create an empty beat keystore'''
-        keystore_executable = "{}beat".format(beattype)
+        keystore_executable = "{}beat keystore".format(beattype)
         create_command = keystore_executable
-        if keystore_path:
-            create_command += " --path-settings {}".format(keystore_path)
         create_command += " create"
 
         # Run the command to create a keystore
@@ -92,16 +92,12 @@ class ElasticManager:
             logging.error("Impossible to create the keystore RC {} | STDOUT {} | STDERR {}".format(rc, stdout, stderr))
             raise Exception("Impossible to create the keystore")
 
-    def add_beat_keystore_key(self, beattype, key, value, keystore_path=None):
+    def add_beat_keystore_key(self, beattype, key, value):
         ''' Add key to beat keystore'''
-        if not self.is_beat_keystore_present(beattype, keystore_path):
-            self.create_beat_keystore(beattype, keystore_path)
+        if not self.is_beat_keystore_present(beattype):
+            self.create_beat_keystore(beattype)
 
-        keystore_executable = "{}beat".format(beattype)
-        add_command = keystore_executable
-        if keystore_path:
-            add_command += " --path-settings {}".format(keystore_path)
-        add_command += " add --stdin {} --force".format(key)
+        add_command = "{}beat keystore add --stdin {} --force".format(beattype, key)
 
         # Run the command to aad a key to keystore
         rc, stdout, stderr = self.ansible_module.run_command(
@@ -110,16 +106,10 @@ class ElasticManager:
         if 'keystore not found' in stdout.lower():
             raise Exception("Keystore not found")
 
-    def delete_beat_keystore_key(self, beattype, key, keystore_path=None):
+    def delete_beat_keystore_key(self, beattype, key):
         ''' Add key to beat keystore'''
-        if not self.is_beat_keystore_present(beattype, keystore_path):
-            self.create_beat_keystore(beattype, keystore_path)
 
-        keystore_executable = "{}beat".format(beattype)
-        remove_command = keystore_executable
-        if keystore_path:
-            remove_command += " --path-settings {}".format(keystore_path)
-        remove_command += " remove {}".format(key)
+        remove_command = "{}beat keystore remove {}".format(beattype, key)
 
         # Run the command to aad a key to keystore
         rc, stdout, stderr = self.ansible_module.run_command(
@@ -128,24 +118,20 @@ class ElasticManager:
         if 'keystore not found' in stdout.lower():
             raise Exception("Keystore not found")
 
-    def list_beat_keystore_keys(self, beattype, keystore_path=None):
+    def list_beat_keystore_keys(self, beattype):
         ''' List keys of keystore'''
         if self.is_beat_keystore_present(beattype):
             return []
 
-        keystore_executable = "{}beat".format(beattype)
-        list_command = keystore_executable
-        if keystore_path is None:
-            list_command += " --path.settings {}".format(keystore_path)
         data = []
-        list_command += " list"
+        list_command =  "{}beat keystore list".format(beattype)
 
         rc, stdout, stderr = self.ansible_module.run_command(
             list_command, check_rc=True)
         logging.debug("List command output RC {} | STDOUT {} | STDERR {}".format(rc,stdout,stderr))
 
         consider_line = False
-        for line in stdout.splitline():
+        for line in stdout.splitlines():
             if line.strip() == '':
                 consider_line = True
             elif consider_line:

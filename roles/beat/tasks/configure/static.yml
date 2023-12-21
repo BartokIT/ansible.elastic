@@ -1,19 +1,9 @@
 ---
-- name: Check that Elasticsearch is installed
+- name: Check that Beat is installed
   ansible.builtin.assert:
     that:
       - r_beat_info.installed
     msg: "Please install first the product"
-
-- name: Kernel parameters
-  when: ('sysctl' in r_beat_configure_actions)
-  block:
-    - ansible.posix.sysctl:
-        name: vm.max_map_count
-        value: '262144'
-        sysctl_set: true
-        state: present
-        reload: true
 
 - name: Folder management
   when: ('folders' in r_beat_configure_actions)
@@ -22,13 +12,13 @@
       ansible.builtin.file:
         state: directory
         path: "{{ _r_beat_loop_folders.path }}"
-        owner: "{{ _r_beat_username }}"
-        group: "{{ _r_beat_group }}"
+        owner: "root"
+        group: "root"
         mode: "{{ _r_beat_loop_folders.mode }}"
       loop:
-        - path: "{{ r_beat_configuration.path.logs }}"
+        - path: "{{ r_beat_input_path }}"
           mode: '755'
-        - path: "{{ r_beat_configuration.path.data }}"
+        - path: "{{ r_beat_modules_path }}"
           mode: '755'
       loop_control:
         loop_var: _r_beat_loop_folders
@@ -36,93 +26,24 @@
 - name: Main configuration files
   when: ('main_files' in r_beat_configure_actions )
   block:
-    - name: Configure jvm heap settings
-      ansible.builtin.copy:
-        content: |-
-          -Xms{{ r_beat_jvm_initial_heap }}
-          -Xmx{{ r_beat_jvm_maximum_heap }}
-        dest: "{{ _r_beat_config_folder }}/jvm.options.d/heap.options"
-        mode: 0660
-        owner: root
-        group: "{{ _r_beat_group }}"
-      notify:
-        _r_beat_configuration_changed
-    - name: Write elasticsearch.yml configuration file
+    - name: Write configuration file
       ansible.builtin.template:
-        src: elasticsearch.yml.j2
-        dest: "{{ _r_beat_config_folder }}/elasticsearch.yml"
-        mode: 0660
+        src: beat.yml.j2
+        dest: "{{ _r_beat_config_folder }}/{{ r_beat_type }}beat.yml"
+        mode: 0600
         owner: root
-        group: "{{ _r_beat_group }}"
+        group: root
       notify:
         _r_beat_configuration_changed
 
-- name: Keystore management
+- name: Manage keystore
+  bartokit.elastic.beat_keystore:
+    force: "{{  'enforce_keystore' in r_beat_configure_actions }}"
+    credentials: "{{ r_beat_keystore }}"
+    type: "{{ r_beat_type }}"
   when:
-    - r_beat_keystore_password | d(false, true)
     - ('keystore' in r_beat_configure_actions)
-  block:
-    - name: Manage keystore
-      bartokit.elastic.elasticsearch_keystore:
-        force: "{{  'enforce_keystore' in r_beat_configure_actions }}"
-        credentials: "{{ r_beat_keystore }}"
-        password: "{{ r_beat_keystore_password | d(omit) }}"
 
-    - name: Put keystore password in a file
-      ansible.builtin.copy:
-        content: "{{ r_beat_keystore_password }}"
-        dest: "{{ r_beat_keystore_password_file }}"
-        owner: elasticsearch
-        group: root
-        mode: 0600
-
-    - name: Create dropin service folder
-      ansible.builtin.file:
-        state: directory
-        path: /etc/systemd/system/{{ _r_beat_systemd_name }}.d
-        group: root
-        owner: root
-        mode: 0775
-
-    - name: Set environment variable for keystore password
-      ansible.builtin.copy:
-        content: |-
-          [Service]
-          Environment="ES_KEYSTORE_PASSPHRASE_FILE={{ r_beat_keystore_password_file }}"
-        dest: /etc/systemd/system/{{ _r_beat_systemd_name }}.d/keystore.conf
-        group: root
-        owner: root
-        mode: 0644
-
-- name: SSL/TLS keystore management
-  when:
-    - ('ssl' in r_beat_configure_actions)
-    - r_beat_configuration.xpack.security.enabled | bool
-    - r_beat_configuration.xpack.security.http.ssl.enabled | bool or
-      r_beat_configuration.xpack.security.transport.ssl.enabled | bool
-  block:
-    - name: Create the PKCS12 http file
-      community.crypto.openssl_pkcs12:
-        action: export
-        path: "{{ _r_beat_config_folder }}/{{ r_beat_configuration.xpack.security.http.ssl.keystore.path }}"
-        friendly_name: elastic
-        privatekey_path: /etc/pki/tls/private/{{ ansible_fqdn }}.key
-        certificate_path: /etc/pki/tls/certs/{{ ansible_fqdn }}.pem
-        other_certificates: /etc/pki/tls/certs/ca-certificate.pem
-        privatekey_passphrase: omit
-        passphrase: "{{ r_beat_keystore['xpack.security.http.ssl.keystore.secure_password'] }}"
-        state: present
-        owner: root
-        group: "{{ _r_beat_group }}"
-        mode: '0660'
-
-    - name: Write the CA certificate
-      ansible.builtin.copy:
-        content: "{{ r_beat_configuration_ssl_certificate_authorities }}"
-        dest: "{{ _r_beat_config_folder }}/{{ r_beat_configuration.xpack.security.transport.ssl.certificate_authorities }}"
-        owner: root
-        group: "{{ _r_beat_group }}"
-        mode: '0660'
 
 - name: Flush handlers
   meta: flush_handlers
