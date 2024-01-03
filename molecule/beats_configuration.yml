@@ -6,4 +6,9 @@
         - type: filestream
           id: dnf
           paths:
-          - "/var/log/dnf.log"
+            - "/var/log/dnf.log"
+      output.elasticsearch:
+        hosts:
+          - "https://elastic:9200"
+        username: "${elastic_user}"
+        password: "${elastic_password}"

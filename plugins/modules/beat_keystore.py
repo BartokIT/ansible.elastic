@@ -139,7 +139,9 @@ class BartokITElasticsearchBeatKeystore(BartokITAnsibleModule):
 
     def list_current_keys(self, input_keys):
         """Return the list of keys actually present."""
-        return self.__em.list_beat_keystore_keys(self.__beat_type)
+        current_keys = self.__em.list_beat_keystore_keys(self.__beat_type)
+        logging.debug("Keys present are: {}".format(current_keys))
+        return current_keys
 
 
 def main():

@@ -23,12 +23,10 @@
   block:
     - name: Facts | Sanity | Combine elasticsearch configurations with defaults
       ansible.builtin.set_fact:
-        r_beat_keystore: "{{ r_beat_keystore | combine(_r_beat_keystore, recursive=True) }}"
+        r_beat_keystore_complete: "{{ r_beat_keystore | combine(_r_beat_keystore, recursive=True) }}"
         r_beat_configuration_complete: "{{ _r_beat_configuration[r_beat_type] | combine(r_beat_configuration, recursive=True) }}"
       no_log: "{{ not (__r_beat_show_nolog | bool) }}"
 
-- ansible.builtin.debug:
-    msg: "{{ r_beat_configuration_complete }}"
 # validation of the configuration
 - name: Include variables
   ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
@@ -43,3 +41,9 @@
 - name: Check the validity of the configuration
   assert:
     that: "{{ r_beat_configuration is bartokit.elastic.validate_configuration(_r_beat_configuration_schema) }}"
+
+- name: Check that at least one output is set
+  ansible.builtin.assert:
+    that:
+      - r_beat_configuration_complete | dict2items | selectattr('key','match', 'output\..*') | length > 0
+    msg: At least an output key must be defined

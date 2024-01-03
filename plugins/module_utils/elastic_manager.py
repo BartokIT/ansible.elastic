@@ -56,7 +56,7 @@ class ElasticManager:
             raise Exception("Unsupported beat type")
         result = os.path.isfile(keystore_path)
         if not result:
-            logging.debug("Keystore %s is not present".format(keystore_path))
+            logging.debug("Keystore {} is not present".format(keystore_path))
             return False
 
         return True
@@ -120,22 +120,17 @@ class ElasticManager:
 
     def list_beat_keystore_keys(self, beattype):
         ''' List keys of keystore'''
-        if self.is_beat_keystore_present(beattype):
+        if not self.is_beat_keystore_present(beattype):
             return []
 
         data = []
         list_command =  "{}beat keystore list".format(beattype)
-
         rc, stdout, stderr = self.ansible_module.run_command(
             list_command, check_rc=True)
-        logging.debug("List command output RC {} | STDOUT {} | STDERR {}".format(rc,stdout,stderr))
+        logging.debug("List command output RC {} | STDOUT {} | STDERR {}".format(rc, stdout.replace("\n","\\n"), stderr.replace("\n","\\n")))
 
-        consider_line = False
         for line in stdout.splitlines():
-            if line.strip() == '':
-                consider_line = True
-            elif consider_line:
-                data.append(line)
+            data.append(line)
         return data
 
     # Keystore methods

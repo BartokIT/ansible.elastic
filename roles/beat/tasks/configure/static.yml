@@ -39,7 +39,7 @@
 - name: Manage keystore
   bartokit.elastic.beat_keystore:
     force: "{{  'enforce_keystore' in r_beat_configure_actions }}"
-    credentials: "{{ r_beat_keystore }}"
+    credentials: "{{ r_beat_keystore_complete }}"
     type: "{{ r_beat_type }}"
   when:
     - ('keystore' in r_beat_configure_actions)

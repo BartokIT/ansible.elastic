@@ -1,4 +1,4 @@
-- name: Start the elasticsearch service
+- name: Start the beat service
   systemd:
     name: "{{ _r_beat_systemd_name }}"
     state: started

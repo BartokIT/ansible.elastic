@@ -8,12 +8,14 @@ from collections.abc import MutableMapping
 from ansible import errors
 
 
-def flatten_dict(d: MutableMapping, parent_key: str = '', sep: str = '.') -> MutableMapping:
+def flatten_dict(d: MutableMapping, schema: MutableMapping = {}, parent_key: str = '', sep: str = '.' ) -> MutableMapping:
     items = []
     for k, v in d.items():
         new_key = parent_key + sep + k if parent_key else k
-        if isinstance(v, MutableMapping):
-            items.extend(flatten_dict(v, new_key, sep=sep).items())
+        if new_key in schema:
+            items.append((new_key, v))
+        elif isinstance(v, MutableMapping):
+            items.extend(flatten_dict(v, schema, new_key, sep=sep).items())
         else:
             items.append((new_key, v))
     return dict(items)
@@ -38,33 +40,38 @@ def contains(items, element):
 
 
 def validate_configuration(configuration, schema):
-    flatted_dict = flatten_dict(configuration)
+    flatted_dict = flatten_dict(configuration, schema)
+
     # added attribute for routing awareness
     if 'cluster.routing.allocation.awareness.attributes' in flatted_dict:
         schema['node.attr.' + flatted_dict['cluster.routing.allocation.awareness.attributes']] = {'type': 'string'}
     validation_errors = []
     for key in flatted_dict.keys():
+        found_schema_key = key
+
         if key not in schema:
             validation_errors += ["The key %s is not allowed" % key]
-        else:
-            if schema[key]['type'] == 'bool':
+
+        if found_schema_key:
+            if schema[found_schema_key]['type'] == 'bool':
                 if not isinstance(flatted_dict[key], bool):
-                    validation_errors += ["The key {} must be boolean (found {})".format(key, type(flatted_dict[key]))]
-            if schema[key]['type'] == 'int':
+                    validation_errors += ["The key {} must be boolean (found {})".format(found_schema_key, type(flatted_dict[key]))]
+            if schema[found_schema_key]['type'] == 'int':
                 try:
                     int(flatted_dict[key])
                 except ValueError:
-                    validation_errors += ["The key {} must be int (found {})".format(key, flatted_dict[key])]
-            elif schema[key]['type'] == 'percentual':
+                    validation_errors += ["The key {} must be int (found {})".format(found_schema_key, flatted_dict[key])]
+            elif schema[found_schema_key]['type'] == 'percentual':
                 if not re.match("[0-9]+%", flatted_dict[key]):
-                    validation_errors += ["The key {} must be a percentual (found {})".format(key, flatted_dict[key])]
-            elif schema[key]['type'] == 'byte':
+                    validation_errors += ["The key {} must be a percentual (found {})".format(found_schema_key, flatted_dict[key])]
+            elif schema[found_schema_key]['type'] == 'byte':
                 if not re.match("[0-9]+(b|kb|mb|gb|tb|pb)", flatted_dict[key]):
-                    validation_errors += ["The key {} must be a byte multiple (found {})".format(key, flatted_dict[key])]
-            elif schema[key]['type'] == 'string':
-                if 'choices' in schema[key]:
-                    if flatted_dict[key] not in schema[key]['choices']:
-                        validation_errors += ["The key {} must be one of {} ({} found)".format(key, "%s" % schema[key]['choices'], flatted_dict[key])]
+                    validation_errors += ["The key {} must be a byte multiple (found {})".format(found_schema_key, flatted_dict[key])]
+            elif schema[found_schema_key]['type'] == 'string':
+                if 'choices' in schema[found_schema_key]:
+                    if flatted_dict[key] not in schema[found_schema_key]['choices']:
+                        validation_errors += ["The key {} must be one of {} ({} found)".format(found_schema_key, "%s" % schema[found_schema_key]['choices'], flatted_dict[key])]
+
     if validation_errors:
         raise errors.AnsibleFilterError(validation_errors)
 

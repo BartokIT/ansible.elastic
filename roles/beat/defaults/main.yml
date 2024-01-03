@@ -53,8 +53,8 @@ _r_beat_password_minspecialchars: 1
 _r_beat_password_specialchars: '!._@#'
 
 ## beat.yml configurations
-r_beat_input_path: "{{ _r_beat_config_folder }}/inputs.d/*.yml"
-r_beat_modules_path: "{{ _r_beat_config_folder }}/modules.d/*.yml"
+r_beat_input_path: "{{ _r_beat_config_folder }}/inputs.d"
+r_beat_modules_path: "{{ _r_beat_config_folder }}/modules.d"
 
 # variable with inputs
 r_beat_inputs: []
@@ -63,17 +63,17 @@ r_beat_modules: []
 _r_beat_configuration:
   file:
     filebeat:
-      inputs: "{{ r_beat_input_path | to_nice_yaml | trim }}"
+      inputs: "{{ r_beat_inputs | to_nice_yaml | trim }}"
       config:
         inputs:
           enabled: true
-          path: "{{ r_beat_input_path }}"
+          path: "{{ r_beat_input_path }}/*.yml"
           reload:
             enabled: true
             period: 60s
         modules:
           enabled: true
-          path: "{{ r_beat_modules_path }}"
+          path: "{{ r_beat_modules_path }}/*.yml"
           reload:
             enabled: true
             period: 60s
