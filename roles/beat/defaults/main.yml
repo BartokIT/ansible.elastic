@@ -63,7 +63,7 @@ r_beat_modules: []
 _r_beat_configuration:
   file:
     filebeat:
-      inputs: "{{ r_beat_inputs | to_nice_yaml | trim }}"
+      inputs: "{{ r_beat_inputs }}"
       config:
         inputs:
           enabled: true

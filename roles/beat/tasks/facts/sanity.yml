@@ -27,23 +27,30 @@
         r_beat_configuration_complete: "{{ _r_beat_configuration[r_beat_type] | combine(r_beat_configuration, recursive=True) }}"
       no_log: "{{ not (__r_beat_show_nolog | bool) }}"
 
-# validation of the configuration
-- name: Include variables
-  ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
-  vars:
-    params:
-      files:
-        - "{{ r_beat_type }}beat_{{ r_beat_version | regex_replace('^([0-9])\\.([0-9]*).*', '\\1.\\2') }}.yml"
-        - "{{ r_beat_type }}beat.yml"
-      paths:
-        - "vars"
+    # validation of the configuration
+    - name: Include variables
+      ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
+      vars:
+        params:
+          files:
+            - "{{ r_beat_type }}beat_{{ r_beat_version | regex_replace('^([0-9])\\.([0-9]*).*', '\\1.\\2') }}.yml"
+            - "{{ r_beat_type }}beat.yml"
+          paths:
+            - "vars"
 
-- name: Check the validity of the configuration
-  assert:
-    that: "{{ r_beat_configuration is bartokit.elastic.validate_configuration(_r_beat_configuration_schema) }}"
+    - name: Check the validity of the configuration
+      assert:
+        that: "{{ r_beat_configuration is bartokit.elastic.validate_configuration(_r_beat_configuration_schema) }}"
 
-- name: Check that at least one output is set
-  ansible.builtin.assert:
-    that:
-      - r_beat_configuration_complete | dict2items | selectattr('key','match', 'output\..*') | length > 0
-    msg: At least an output key must be defined
+    - name: Check that at least one output is set
+      ansible.builtin.assert:
+        that:
+          - r_beat_configuration_complete | dict2items | selectattr('key','match', 'output\..*') | length > 0
+        msg: At least an output key must be defined
+
+    - name: Check that inputs are with the correct key
+      ansible.builtin.assert:
+        that:
+          - ('filebeat.inputs' not in r_beat_configuration_complete)
+        msg: Filebeat inputs need to be inserted using the variable r_beat_inputs
+      when: r_beat_type == 'file'

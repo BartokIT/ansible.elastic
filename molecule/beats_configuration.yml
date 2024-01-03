@@ -1,12 +1,13 @@
 ---
 - name: Beat configuration
   ansible.builtin.set_fact:
+    r_beat_inputs:
+      - type: filestream
+        id: dnf
+        paths:
+          - "/var/log/dnf.log"
+        index: beattest
     filebeat_configuration:
-      filebeat.inputs:
-        - type: filestream
-          id: dnf
-          paths:
-            - "/var/log/dnf.log"
       output.elasticsearch:
         hosts:
           - "https://elastic:9200"

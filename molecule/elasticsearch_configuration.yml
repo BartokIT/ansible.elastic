@@ -40,6 +40,12 @@
                 format: 'dd-MM-yyyy'
           settings:
             number_of_shards: 1
+      beattest-ct:
+        _meta:
+          author: 'BartokIT'
+        template:
+          settings:
+            index.lifecycle.name: beattest-ilm
     r_elasticsearch_index_templates:
       template1:
         index_patterns:
@@ -49,7 +55,20 @@
             number_of_shards: 3
         _meta:
           author: 'BartokIT'
+      beattest:
+        index_patterns:
+          - beattest*
+        composed_of:
+          - beattest-ct
     r_elasticsearch_ilm_policies:
+      beattest-ilm:
+        phases:
+          hot:
+            min_age: "0ms"
+            actions:
+              rollover:
+                max_age: "30d"
+                max_primary_shard_size: "50gb"
       policy1:
         _meta:
           author: 'BartokIT'
