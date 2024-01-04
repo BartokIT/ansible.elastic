@@ -7,22 +7,22 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: beat_keystore
+module: beat_modules
 
-short_description: This module allow to manage the beats keystore.
+short_description: This module allow to manage the beat modules.
 
 # If this is part of a collection, you need to use semantic versioning,
 # i.e. the version is of the form "2.5.0" and not "2.4".
 version_added: "0.0.1"
 
-description: This module allow to manage the beats keystore.
+description: This module allow to manage the elasticsearch keystore.
 
 options:
     force:
         description: Force the overwrite of a key if it already exists.
         required: false
         type: bool
-    credentials:
+    modules:
         description:
           - This is a key value dictionary containing the key of the keystore and the corresponde value.
         required: true
@@ -46,16 +46,18 @@ author:
 EXAMPLES = r'''
 # Ensure that the only key present is the bootstrap.password with an unprotected keystore
 - name: Ensure that the only key present is the bootstrap.password with an unprotected keystore
-  bartokit.elastic.beat_keystore:
-  credentials:
-    elastic_password: p4SSw0rd.1nIti4l
-
+  bartokit.elastic.beat_modules:
+  modules:
+    auditd:
+      - module: auditd
+        log:
+            enabled: false
 '''
 
 RETURN = r'''
 # These are examples of possible return values, and in general should use other names for return values.
-credentials:
-    description: The list of the key present in the keystore
+modules:
+    description: The list of the modules
     type: list
     returned: success
 '''
@@ -69,7 +71,7 @@ import logging
 module_args = dict(
     type=dict(type='str', required=False, choices=['file','metric','audit','heart']),
     force=dict(type='bool', required=False, default=False),
-    credentials=dict(type='dict', required=True, no_log=True),
+    modules=dict(type='dict', required=True, no_log=True),
     mode=dict(type='str', required=False, choiches=['multiple', 'present', 'absent'], default='multiple')
 )
 
@@ -79,9 +81,9 @@ class BartokITElasticsearchBeatKeystore(BartokITAnsibleModule):
 
     def __init__(self, argument_spec):
         """Call the constructor of the parent class."""
-        super().__init__(parameter_name_with_mode='mode', parameter_name_with_keys='credentials',
+        super().__init__(parameter_name_with_mode='mode', parameter_name_with_keys='modules',
                          argument_spec=argument_spec, supports_check_mode=False,
-                         log_file='ansible_beat_keystore.log')
+                         log_file='ansible_beat_modules.log')
         self.__em = ElasticManager(self, 'https://localhost:9200')
 
     def initialization(self, parameters_argument, parameters):
@@ -100,19 +102,18 @@ class BartokITElasticsearchBeatKeystore(BartokITAnsibleModule):
         return 'UNKNOWN'
 
     def delete_key(self, key, current_value):
-        """Delete keystore key."""
-        logging.debug("Deleting key %s", key)
-        return self.__em.delete_beat_keystore_key(self.__beat_type, key)
+        """Disable a module."""
+        logging.debug("Disabling key %s", key)
+        return self.__em.disable_beat_module(self.__beat_type, key)
 
     def create_key(self, key, value):
-        """Add keystore settings."""
-        logging.debug("Adding key %s", key)
-        return self.__em.add_beat_keystore_key(self.__beat_type, key, value,)
+        """Enable a module."""
+        logging.debug("Enabling key %s", key)
+        self.__em.enable_beat_module(self.__beat_type, key)
 
     def update_key(self, key, input_value, current_value):
-        """Overwrite keystore settings."""
-        logging.debug("Updating key %s", key)
-        self.create_key(key, input_value)
+        """Do nothing"""
+        pass
 
     def describe_info_for_output(self):
         """Return information to print"""
@@ -120,8 +121,8 @@ class BartokITElasticsearchBeatKeystore(BartokITAnsibleModule):
 
     def list_current_keys(self, input_keys):
         """Return the list of keys actually present."""
-        current_keys = self.__em.list_beat_keystore_keys(self.__beat_type)
-        logging.debug("Keys present are: {}".format(current_keys))
+        current_keys = self.__em.list_beat_modules(self.__beat_type)
+        logging.debug("Modules present are: {}".format(current_keys))
         return current_keys
 
 

@@ -24,6 +24,7 @@ _r_beat_configure_actions_allowed:
   - main_files
   - keystore
   - folders
+  - modules
 _r_beat_triggered_restart: false
 
 # ---- installation variables ----
@@ -58,7 +59,7 @@ r_beat_modules_path: "{{ _r_beat_config_folder }}/modules.d"
 
 # variable with inputs
 r_beat_inputs: []
-r_beat_modules: []
+r_beat_modules: {}
 # default piece of configuration
 _r_beat_configuration:
   file:

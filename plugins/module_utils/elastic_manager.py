@@ -45,6 +45,7 @@ class ElasticManager:
         else:
             return req
 
+    # BEATS
     def get_beat_keystore_path(self, beattype):
         return os.path.join("/var/lib/{}beat/".format(beattype), "{}beat.keystore".format(beattype))
 
@@ -132,6 +133,47 @@ class ElasticManager:
         for line in stdout.splitlines():
             data.append(line)
         return data
+
+    def list_beat_modules(self, beattype):
+        ''' List enabled beat modules'''
+
+        remove_command = "{}beat modules list".format(beattype)
+
+        # Run the command to aad a key to keystore
+        rc, stdout, stderr = self.ansible_module.run_command(
+            remove_command, check_rc=True)
+
+        enabled_modules= []
+        for line in stdout.splitlines():
+            if line.strip() == 'Enabled:':
+                continue
+            elif line.strip() == 'Disabled:':
+                break
+            elif line.strip() == '':
+                continue
+            else:
+                enabled_modules.append(line)
+
+        return enabled_modules
+
+    def enable_beat_module(self, beattype, module):
+        ''' Enable beat modules'''
+
+        remove_command = "{}beat modules enable {}".format(beattype, module)
+
+        # Run the command to aad a key to keystore
+        rc, stdout, stderr = self.ansible_module.run_command(
+            remove_command, check_rc=True)
+
+    def disable_beat_module(self, beattype, module):
+        ''' Enable beat modules'''
+
+        remove_command = "{}beat modules disable {}".format(beattype, module)
+
+        # Run the command to aad a key to keystore
+        rc, stdout, stderr = self.ansible_module.run_command(
+            remove_command, check_rc=True)
+
 
     # Keystore methods
     def is_keystore_password_protected(self):

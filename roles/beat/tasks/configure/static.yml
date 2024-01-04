@@ -23,6 +23,14 @@
       loop_control:
         loop_var: _r_beat_loop_folders
 
+- name: Manage keystore
+  bartokit.elastic.beat_keystore:
+    force: "{{  'enforce_keystore' in r_beat_configure_actions }}"
+    credentials: "{{ r_beat_keystore_complete }}"
+    type: "{{ r_beat_type }}"
+  when:
+    - ('keystore' in r_beat_configure_actions)
+
 - name: Main configuration files
   when: ('main_files' in r_beat_configure_actions )
   block:
@@ -36,13 +44,12 @@
       notify:
         _r_beat_configuration_changed
 
-- name: Manage keystore
-  bartokit.elastic.beat_keystore:
-    force: "{{  'enforce_keystore' in r_beat_configure_actions }}"
-    credentials: "{{ r_beat_keystore_complete }}"
+- name: Manage modules
+  bartokit.elastic.beat_modules:
+    modules: "{{ r_beat_modules }}"
     type: "{{ r_beat_type }}"
   when:
-    - ('keystore' in r_beat_configure_actions)
+    - ('modules' in r_beat_configure_actions)
 
 
 - name: Flush handlers

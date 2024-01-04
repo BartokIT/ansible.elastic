@@ -1,6 +1,9 @@
 ---
 - name: Beat configuration
   ansible.builtin.set_fact:
+    r_beat_modules:
+      auditd:
+      zookeeper:
     r_beat_inputs:
       - type: filestream
         id: dnf
