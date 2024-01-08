@@ -44,12 +44,26 @@
       notify:
         _r_beat_configuration_changed
 
-- name: Manage modules
-  bartokit.elastic.beat_modules:
-    modules: "{{ r_beat_modules }}"
-    type: "{{ r_beat_type }}"
-  when:
-    - ('modules' in r_beat_configure_actions)
+- name: Main configuration files
+  when: ('modules' in r_beat_configure_actions )
+  block:
+    - name: Manage modules
+      bartokit.elastic.beat_modules:
+        modules: "{{ r_beat_modules }}"
+        type: "{{ r_beat_type }}"
+
+    - name: Manage modules configuration
+      copy:
+        content: |
+          # Ansible managed
+          # Module: {{ _r_beat_module_item.key }}
+          {{ _r_beat_module_item.value | to_nice_yaml | trim }}
+        dest: "{{ r_beat_modules_path }}/{{ _r_beat_module_item.key }}.yml"
+      when:
+        - _r_beat_module_item.value | d(false, true)
+      loop: "{{ r_beat_modules | dict2items }}"
+      loop_control:
+        loop_var: _r_beat_module_item
 
 
 - name: Flush handlers

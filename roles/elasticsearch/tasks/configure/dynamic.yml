@@ -8,17 +8,17 @@
 - name: Create automation user
   bartokit.elastic.elasticsearch_users:
     user: 'elastic'
-    password: "{{ r_elasticsearch_users_initial_elastic_password | d(omit) }}"
+    password: "xxxxxx"
     ssl_verify: false
     users: "{{ _r_elasticsearch_api_user }}"
     mode: present
   run_once: true
-  when: ('users' in r_elasticsearch_configure_actions)
+  when: ('initial' in r_elasticsearch_configure_actions)
 
 - name: Manage users
   bartokit.elastic.elasticsearch_users:
-    user: 'elastic'
-    password: "{{ r_elasticsearch_users_initial_elastic_password | d(omit) }}"
+    user: '{{ _r_elasticsearch_api_user.keys() | first }}'
+    password: "{{ r_elasticsearch_api_password }}"
     ssl_verify: false
     users: "{{ r_elasticsearch_users }}"
   run_once: true

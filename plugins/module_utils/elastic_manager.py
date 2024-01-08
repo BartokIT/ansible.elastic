@@ -3,6 +3,7 @@ from __future__ import (absolute_import, division, print_function)
 from grp import getgrgid
 import logging
 from pwd import getpwuid
+import re
 import requests
 import os
 
@@ -31,15 +32,24 @@ class ElasticManager:
 
         api_url = "{endpoint}{path}".format(
             endpoint=self._rest_api_endpoint, path=path)
+
         auth = (self.__api_username, self.__api_password)
         req = requests.request(
             method, api_url, params=parameters, json=body, auth=auth, verify=self._ssl_verify,
             timeout=10)
+
         try:
+            if req.status_code == 401:
+                # try to guess elastic password and resubmit password
+                password = self.guess_elastic_default_password()
+                auth = ('elastic', password)
+                req = requests.request(
+                        method, api_url, params=parameters, json=body, auth=auth, verify=self._ssl_verify,
+                        timeout=10)
             req.raise_for_status()
-        except Exception as e:
-            logging.error("%s" % req.text)
-            raise Exception(e)
+        except Exception as exc:
+            logging.error("{}".format(exc))
+            raise
         if json:
             return req.json()
         else:
@@ -175,7 +185,26 @@ class ElasticManager:
             remove_command, check_rc=True)
 
 
-    # Keystore methods
+    # ------------------ Elasticsearch keystore methods------------------------
+    def guess_keystore_password(self):
+        systemd_envfile = '/etc/systemd/system/elasticsearch.service.d/keystore.conf'
+        with open(systemd_envfile,'r') as f:
+            envfile_content = f.readlines()
+        for line in envfile_content:
+            if 'ES_KEYSTORE_PASSPHRASE_FILE' in line:
+                # search the keystore file
+                m = re.search(".*ES_KEYSTORE_PASSPHRASE_FILE=(.*)\"", line)
+                if m:
+                    password_file = m.group(1)
+                    with open(password_file,'r') as f:
+                        keystore_password = f.read()
+                        return keystore_password
+        raise Exception("Impossible to guess elastic password")
+
+    def guess_elastic_default_password(self):
+        keystore_password = self.guess_keystore_password()
+        return self.get_keystore_key('bootstrap.password', keystore_password)
+
     def is_keystore_password_protected(self):
         """Check if the keystore is password protected."""
         read_command = "{} has-passwd".format(
@@ -294,6 +323,8 @@ class ElasticManager:
         rc, stdout, stderr = self.ansible_module.run_command(
             delete_command, check_rc=True)
 
+    # ------------------ Get info methods------------------------
+
     def get_license_info(self):
         """Call API to get license info."""
         return self._api_call('_license')
@@ -311,7 +342,7 @@ class ElasticManager:
         info = self._api_call('_cluster/health')
         return info
 
-    # Component templates methods
+    # ------------------ Component template methods------------------------
     def get_component_templates(self):
         """Get all the component templates through APIs."""
         templates_dict = {}
@@ -356,7 +387,7 @@ class ElasticManager:
                                 method='DELETE', json=False)
         return result
 
-    # Index templates methods
+    # ------------------ Index template methods------------------------
     def get_index_templates(self, hidden=False):
         """Get all the component templates through APIs."""
         templates_dict = {}
@@ -409,8 +440,7 @@ class ElasticManager:
                                 method='DELETE', json=False)
         return result
 
-
-    # Index management policy methods
+    # ------------------Index management policy methods------------------------
     def get_ilm_policies(self, hidden=False, managed=False):
         """Get all the _ilm policies  templates through APIs."""
         ilm_policies_output = {}
@@ -453,7 +483,7 @@ class ElasticManager:
                                 method='DELETE', json=False)
         return result
 
-    # Users method
+    # --------------------- Users method --------------------------------------
     def get_users(self, managed=False):
         """Get all the users through APIs."""
         users_output = {}

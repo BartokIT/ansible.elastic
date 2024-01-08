@@ -1,0 +1,142 @@
+---
+# vars file for elasticsearch
+_r_beat_configuration_schema:
+  filebeat.registry.path:
+    type: string
+  filebeat.registry.file_permissions:
+    type: int
+  filebeat.registry.flush:
+    type: string
+  filebeat.registry.migrate_file:
+    type: string
+  filebeat.config_dir:
+    type: string
+  filebeat.shutdown_timeout:
+    type: string
+  name:
+    type: string
+  tags:
+    type: list
+  fields:
+    type: dict
+  fields_under_root:
+    type: bool
+  processors:
+    type: list
+  max_procs:
+    type: int
+  timestamp.precision:
+    type: string
+    choices:
+      - millisecond
+      - microsecond
+      - nanosecond
+
+
+
+
+# checked
+  path.home:
+    type: string
+  path.config:
+    type: string
+  path.data:
+    type: string
+  path.logs:
+    type: string
+
+  auditbeat.config.modules.reload.enabled:
+    type: bool
+  auditbeat.config.modules.reload.period:
+    type: string
+  auditbeat.config.modules.enabled:
+    type: bool
+  auditbeat.config.modules.path:
+    type: string
+
+  # OUTPUT
+  output.elasticsearch:
+    type: dict
+  output.logstash:
+    type: dict
+  output.kafka:
+    type: dict
+  output.redis:
+    type: dict
+  output.file:
+    type: dict
+  output.console:
+    type: dict
+  setup.kibana.host:
+    type: string
+  setup.kibana.protocol:
+    type: string
+  setup.kibana.path:
+    type: string
+  setup.kibana.space.id:
+    type: string
+  setup.kibana.headers:
+    type: dict
+  setup.kibana.ssl.enabled:
+    type: bool
+  setup.kibana.ssl.certificate_authorities:
+    type: list
+  setup.kibana.ssl.certificate:
+    type: string
+  setup.kibana.ssl.key:
+    type: string
+  setup.kibana.ssl.supported_protocol:
+    type: list
+  setup.kibana.ssl.cipher_suites:
+    type: list
+  setup.kibana.ssl.curve_types:
+    type: string
+  setup.kibana.ssl.ca_sha256:
+    type: string
+  setup.ilm.enabled:
+    type: bool
+  setup.ilm.policy_name:
+    type: string
+  setup.ilm.policy_file:
+    type: string
+  setup.ilm.check_exists:
+    type: string
+  setup.ilm.overwrite:
+    type: string
+  setup.template.name:
+    type: string
+  setup.template.fields:
+    type: string
+  setup.template.overwrite:
+    type: bool
+  setup.template.settings:
+    type: dict
+  setup.template.append_fields:
+    type: list
+  setup.template.json.enabled:
+    type: bool
+  setup.template.json.path:
+    type: string
+  setup.template.json.name:
+    type: string
+  setup.template.json.data_stream:
+    type: bool
+  setup.dashboards.enabled:
+    type: bool
+  # queue
+  queue.mem.events:
+    type: int
+  queue.mem.flush.min_events:
+    type: int
+  queue.mem.flush.timeout:
+    type: int
+  queue.disk.max_size:
+    type: byte
+  queue.disk.path:
+    type: string
+  queue.disk.segment_size:
+    type: byte
+  queue.disk.write_ahead:
+    type: int
+  queue.disk.retry_interval:
+    type: string

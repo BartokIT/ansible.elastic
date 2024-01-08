@@ -121,7 +121,8 @@ class BartokITElasticsearchIndexTemplate(BartokITAnsibleModule):
         """Perform value sanitization"""
         if type == 'input':
             value_copy = copy.deepcopy(value)
-            value_copy['index_template'] = {'template': value_copy.pop('template')}
+            if 'template' in value_copy:
+                value_copy['index_template'] = {'template': value_copy.pop('template')}
             transformed_value = {'name': key, 'index_template': copy.deepcopy(value)}
             # create an index key between the settings
             if 'template' in transformed_value['index_template'] and \

@@ -11,7 +11,7 @@ DOCUMENTATION = r'''
 ---
 module: elasticsearch_users
 
-short_description: This module allow to manage index templates of an Elasticsearch installation
+short_description: This module allow to manage user of an Elasticsearch installation
 
 # If this is part of a collection, you need to use semantic versioning,
 # i.e. the version is of the form "2.5.0" and not "2.4".
@@ -20,7 +20,7 @@ version_added: "0.0.2"
 author:
     - BartoktIT (@BartokIT)
 
-description: This module allow to manage index templates of an Elasticsearch installation
+description: This module allow to manage user of an Elasticsearch installation
 
 options:
     users:
@@ -105,8 +105,19 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
         """Perform value sanitization"""
         if type == 'input':
             value_copy = copy.deepcopy(value)
+            if 'roles' not in value_copy or value_copy['roles'] is None:
+                value_copy['roles'] = []
+            if 'enabled' not in value_copy:
+                value_copy['enabled'] = True
+            if 'metadata' not in value_copy:
+                value_copy['metadata'] = {}
             return value_copy
         else:
+            if 'full_name' in value and value['full_name'] is None:
+                value.pop('full_name')
+            if 'email' in value and value['email'] is None:
+                value.pop('email')
+
             return value
 
     def read_key(self, key):
@@ -150,7 +161,11 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
     def compare_key(self, key, input_value, current_value):
         """ Compare two keys """
 
-        difference_found = self.__find_differences(input_value, current_value)
+        input_value_detached = copy.deepcopy(input_value)
+        input_value_detached.pop('password')
+        logging.debug(input_value)
+        logging.debug(current_value)
+        difference_found = self.__find_differences(input_value_detached, current_value)
         if difference_found:
             logging.debug("Found differences for key %s", key)
         return difference_found
