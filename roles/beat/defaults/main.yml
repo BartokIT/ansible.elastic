@@ -126,7 +126,15 @@ _r_beat_configuration:
       - add_host_metadata: ~
       - add_cloud_metadata: ~
       - add_docker_metadata: ~
-  metric: {}
+  metric:
+    metricbeat:
+      config:
+        modules:
+          enabled: true
+          path: "{{ r_beat_modules_path }}/*.yml"
+          reload:
+            enabled: true
+            period: 60s
   heart: {}
 
 r_beat_configuration: {}
