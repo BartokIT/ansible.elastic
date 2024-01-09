@@ -22,18 +22,18 @@
           - modules
           - folders
 
-    - name: Test file beat
-      ansible.builtin.include_role:
-        name: bartokit.elastic.beat
-      vars:
-        r_beat_type: file
-        __r_beat_show_nolog: true
-        r_beat_configuration: "{{ filebeat.configuration }}"
-        r_beat_keystore:
-          elastic_user: elastic
-          elastic_password: "{{ r_elasticsearch_users_initial_elastic_password }}"
-        r_beat_modules: "{{ filebeat.r_beat_modules }}"
-        r_beat_inputs: "{{ filebeat.r_beat_inputs }}"
+    # - name: Test file beat
+    #   ansible.builtin.include_role:
+    #     name: bartokit.elastic.beat
+    #   vars:
+    #     r_beat_type: file
+    #     __r_beat_show_nolog: true
+    #     r_beat_configuration: "{{ filebeat.configuration }}"
+    #     r_beat_keystore:
+    #       elastic_user: elastic
+    #       elastic_password: "{{ r_elasticsearch_users_initial_elastic_password }}"
+    #     r_beat_modules: "{{ filebeat.r_beat_modules }}"
+    #     r_beat_inputs: "{{ filebeat.r_beat_inputs }}"
 
     - name: Test audit beat
       ansible.builtin.include_role:

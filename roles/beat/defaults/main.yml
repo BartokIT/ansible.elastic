@@ -63,35 +63,35 @@ _r_beat_modules:
   file: {}
   audit:
     auditd:
-      module: auditd
-      audit_rule_files:
-        - '${path.config}/audit.rules.d/*.conf'
+      - module: auditd
+        audit_rule_files:
+          - '${path.config}/audit.rules.d/*.conf'
     file_integrity:
-      module: file_integrity
-      paths:
-        - /bin/
-        - /usr/bin
-        - /sbin
-        - /usr/sbin
-        - /etc
-    system_package:
-      module: system
-      datasets:
-        - package
-      period: 2m
-      state.period: 3m
-    system_other:
-      module: system
-      datasets:
-        - host
-        - login
-        - process
-        - socket
-        - user
-      state.period: 12h
-      user.detect_password_changes: true
-      login.wtmp_file_pattern: /var/log/wtmp*
-      login.btmp_file_pattern: /var/log/btmp*
+      - module: file_integrity
+        paths:
+          - /bin/
+          - /usr/bin
+          - /sbin
+          - /usr/sbin
+          - /etc
+    system:
+      - module: system
+        datasets:
+          - package
+        period: 2m
+        state.period: 3m
+
+      - module: system
+        datasets:
+          - host
+          - login
+          - process
+          - socket
+          - user
+        state.period: 12h
+        user.detect_password_changes: true
+        login.wtmp_file_pattern: /var/log/wtmp*
+        login.btmp_file_pattern: /var/log/btmp*
   metric: {}
 
 r_beat_modules: {}
@@ -123,9 +123,9 @@ _r_beat_configuration:
             enabled: true
             period: 60s
     processors:
-      - add_host_metadata: '~'
-      - add_cloud_metadata: '~'
-      - add_docker_metadata: '~'
+      - add_host_metadata: ~
+      - add_cloud_metadata: ~
+      - add_docker_metadata: ~
   metric: {}
   heart: {}
 

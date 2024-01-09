@@ -23,13 +23,6 @@
       loop_control:
         loop_var: _r_beat_loop_folders
 
-- name: Manage keystore
-  bartokit.elastic.beat_keystore:
-    force: "{{  'enforce_keystore' in r_beat_configure_actions }}"
-    credentials: "{{ r_beat_keystore_complete }}"
-    type: "{{ r_beat_type }}"
-  when:
-    - ('keystore' in r_beat_configure_actions)
 
 - name: Main configuration files
   when: ('main_files' in r_beat_configure_actions )
@@ -53,6 +46,26 @@
         type: "{{ r_beat_type }}"
       when: r_beat_type != 'audit'
 
+    - name: Find modules configuration files
+      find:
+        paths: "{{ r_beat_modules_path }}"
+        patterns: '*.yml'
+      register: r_beat_modules_file_list
+
+    - name: Remove unused files
+      file:
+        path: "{{ _r_beat_module_file_basename }}"
+        state: absent
+      loop: "{{ r_beat_modules_file_list.files }}"
+      loop_control:
+        loop_var: _r_beat_module_file
+        label: "{{ _r_beat_module_file_basename }}"
+      when:
+        - r_beat_type == 'audit'
+        - _r_beat_module_file_basename not in r_beat_modules_complete
+      vars:
+        _r_beat_module_file_basename: "{{ _r_beat_module_file.path | basename | replace('.yml', '') }}"
+
     - name: Manage modules configuration
       copy:
         content: |
@@ -66,6 +79,13 @@
       loop_control:
         loop_var: _r_beat_module_item
 
+- name: Manage keystore
+  bartokit.elastic.beat_keystore:
+    force: "{{  'enforce_keystore' in r_beat_configure_actions }}"
+    credentials: "{{ r_beat_keystore_complete }}"
+    type: "{{ r_beat_type }}"
+  when:
+    - ('keystore' in r_beat_configure_actions)
 
 - name: Flush handlers
   meta: flush_handlers

@@ -20,7 +20,7 @@
   vars:
     _r_elasicsearch_info: >-
         Beat: {{ r_beat_type }}beat
-        Installed: {{ r_beat_info.installed }}
+        |Installed: {{ r_beat_info.installed }}
         {%- if r_beat_info.installed -%}
         |Version:   {{ r_beat_info.version }}
         |Started:   {{ r_beat_info.started }}
