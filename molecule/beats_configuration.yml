@@ -1,21 +1,49 @@
 ---
 - name: Beat configuration
   ansible.builtin.set_fact:
-    r_beat_modules:
-      auditd:
-        - module: auditd
-          log:
-            enabled: false
-      zookeeper:
-    r_beat_inputs:
-      - type: filestream
-        id: dnf
-        paths:
-          - "/var/log/dnf.log"
-        index: beattest
-    filebeat_configuration:
-      output.elasticsearch:
-        hosts:
-          - "https://elastic:9200"
-        username: "${elastic_user}"
-        password: "${elastic_password}"
+    filebeat:
+      r_beat_modules:
+        auditd:
+          - module: auditd
+            log:
+              enabled: false
+        zookeeper:
+      r_beat_inputs:
+        - type: filestream
+          id: dnf
+          paths:
+            - "/var/log/dnf.log"
+          index: beattest
+      configuration:
+        output.elasticsearch:
+          hosts:
+            - "https://elastic:9200"
+          username: "${elastic_user}"
+          password: "${elastic_password}"
+    auditbeat:
+      configuration:
+        output.elasticsearch:
+          hosts:
+            - "https://elastic:9200"
+          username: "${elastic_user}"
+          password: "${elastic_password}"
+    metricbeat:
+      r_beat_modules:
+        system:
+          - module: system
+            metricsets:
+              - cpu
+              - load
+              - memory
+              - network
+              - process
+              - process_summary
+              - uptime
+              - socket_summary
+            enable: true
+      configuration:
+        output.elasticsearch:
+          hosts:
+            - "https://elastic:9200"
+          username: "${elastic_user}"
+          password: "${elastic_password}"

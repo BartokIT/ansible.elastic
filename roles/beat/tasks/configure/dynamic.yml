@@ -1,5 +1,5 @@
 ---
-- name: Check that Filebeat is started
+- name: Check that beat is started
   ansible.builtin.assert:
     that:
       - r_beat_info.started

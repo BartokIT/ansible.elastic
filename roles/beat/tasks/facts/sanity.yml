@@ -25,6 +25,7 @@
       ansible.builtin.set_fact:
         r_beat_keystore_complete: "{{ r_beat_keystore | combine(_r_beat_keystore, recursive=True) }}"
         r_beat_configuration_complete: "{{ _r_beat_configuration[r_beat_type] | combine(r_beat_configuration, recursive=True) }}"
+        r_beat_modules_complete: "{{ _r_beat_modules[r_beat_type] | combine(r_beat_modules) }}"
       no_log: "{{ not (__r_beat_show_nolog | bool) }}"
 
     # validation of the configuration

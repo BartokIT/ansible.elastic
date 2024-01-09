@@ -1,6 +1,30 @@
 ---
 # vars file for elasticsearch
 _r_beat_configuration_schema:
+  # general
+  timestamp.precision:
+    type: string
+    choices:
+      - millisecond
+      - microsecond
+      - nanosecond
+  timeseries.enabled:
+    type: bool
+  metricbeat.max_start_delay:
+    type: string
+  name:
+    type: string
+  tags:
+    type: list
+  fields_under_root:
+    type: bool
+  fields:
+    type: dict
+  processors:
+    type: list
+  max_procs:
+    type: int
+  # project path
   path.home:
     type: string
   path.config:
@@ -9,17 +33,18 @@ _r_beat_configuration_schema:
     type: string
   path.logs:
     type: string
+  system.hostfs:
+    type: string
+  # config loading
+  metricbeat.config.modules.reload.enabled:
+    type: bool
+  metricbeat.config.modules.reload.period:
+    type: string
+  metricbeat.config.modules.enabled:
+    type: bool
+  metricbeat.config.modules.path:
+    type: string
 
-  auditbeat.config.modules.reload.enabled:
-    type: bool
-  auditbeat.config.modules.reload.period:
-    type: string
-  auditbeat.config.modules.enabled:
-    type: bool
-  auditbeat.config.modules.path:
-    type: string
-  auditbeat.max_start_delay:
-    type: string
   # OUTPUT
   output.elasticsearch:
     type: dict
@@ -33,6 +58,40 @@ _r_beat_configuration_schema:
     type: dict
   output.console:
     type: dict
+
+  # ILM management
+  setup.ilm.enabled:
+    type: bool
+  setup.ilm.policy_name:
+    type: string
+  setup.ilm.policy_file:
+    type: string
+  setup.ilm.check_exists:
+    type: string
+  setup.ilm.overwrite:
+    type: string
+
+  # ELK index template
+  setup.template.name:
+    type: string
+  setup.template.fields:
+    type: string
+  setup.template.overwrite:
+    type: bool
+  setup.template.settings:
+    type: dict
+  setup.template.append_fields:
+    type: list
+  setup.template.json.enabled:
+    type: bool
+  setup.template.json.path:
+    type: string
+  setup.template.json.name:
+    type: string
+  setup.template.json.data_stream:
+    type: bool
+
+  # kibana
   setup.kibana.host:
     type: string
   setup.kibana.protocol:
@@ -59,36 +118,35 @@ _r_beat_configuration_schema:
     type: string
   setup.kibana.ssl.ca_sha256:
     type: string
-  setup.ilm.enabled:
-    type: bool
-  setup.ilm.policy_name:
-    type: string
-  setup.ilm.policy_file:
-    type: string
-  setup.ilm.check_exists:
-    type: string
-  setup.ilm.overwrite:
-    type: string
-  setup.template.name:
-    type: string
-  setup.template.fields:
-    type: string
-  setup.template.overwrite:
-    type: bool
-  setup.template.settings:
-    type: dict
-  setup.template.append_fields:
-    type: list
-  setup.template.json.enabled:
-    type: bool
-  setup.template.json.path:
-    type: string
-  setup.template.json.name:
-    type: string
-  setup.template.json.data_stream:
-    type: bool
+
+  # kibana dashboard
   setup.dashboards.enabled:
     type: bool
+  setup.dashboards.directory:
+    type: string
+  setup.dashboards.url:
+    type: string
+  setup.dashboards.file:
+    type: string
+  setup.dashboards.beat:
+    type: string
+  setup.dashboards.kibana_index:
+    type: string
+  setup.dashboards.index:
+    type: string
+  setup.dashboards.always_kibana:
+    type: bool
+  setup.dashboards.retry.enabled:
+    type: bool
+  setup.dashboards.retry.interval:
+    type: int
+  setup.dashboards.retry.maximum:
+    type: int
+  setup.dashboards.string_replacements:
+    type: string
+  metric.autodiscover:
+    type: dict
+
   # queue
   queue.mem.events:
     type: int
@@ -169,6 +227,7 @@ _r_beat_configuration_schema:
     type: int
   http.pprof.mutex_profile_rate:
     type: int
+  # instrumentation
   instrumentation.enabled:
     type: bool
   instrumentation.environment:
@@ -191,23 +250,3 @@ _r_beat_configuration_schema:
     type: string
   features.fqdn.enabled:
     type: bool
-
-  # general
-  name:
-    type: string
-  tags:
-    type: list
-  fields_under_root:
-    type: bool
-  fields:
-    type: dict
-  processors:
-    type: list
-  max_procs:
-    type: int
-  timestamp.precision:
-    type: string
-    choices:
-      - millisecond
-      - microsecond
-      - nanosecond
