@@ -1,0 +1,223 @@
+---
+# vars file for elasticsearch
+_r_beat_configuration_schema:
+  path.home:
+    type: string
+  path.config:
+    type: string
+  path.data:
+    type: string
+  path.logs:
+    type: string
+
+  heartbeat.config.monitors.reload.enabled:
+    type: bool
+  heartbeat.config.monitors.reload.period:
+    type: string
+  heartbeat.config.monitors.enabled:
+    type: bool
+  heartbeat.config.monitors.path:
+    type: string
+  heartbeat.max_start_delay:
+    type: string
+  # scheduler
+  heartbeat.scheduler.limit:
+    type: int
+  heartbeat.scheduler.location:
+    type: string
+  heartbeat.jobs:
+    type: dict
+  # OUTPUT
+  output.elasticsearch:
+    type: dict
+  output.logstash:
+    type: dict
+  output.kafka:
+    type: dict
+  output.redis:
+    type: dict
+  output.file:
+    type: dict
+  output.console:
+    type: dict
+  # kibana
+  setup.kibana.host:
+    type: string
+  setup.kibana.protocol:
+    type: string
+  setup.kibana.path:
+    type: string
+  setup.kibana.space.id:
+    type: string
+  setup.kibana.headers:
+    type: dict
+  setup.kibana.ssl.enabled:
+    type: bool
+  setup.kibana.ssl.certificate_authorities:
+    type: list
+  setup.kibana.ssl.certificate:
+    type: string
+  setup.kibana.ssl.key:
+    type: string
+  setup.kibana.ssl.supported_protocol:
+    type: list
+  setup.kibana.ssl.cipher_suites:
+    type: list
+  setup.kibana.ssl.curve_types:
+    type: string
+  setup.kibana.ssl.ca_sha256:
+    type: string
+  # ilm
+  setup.ilm.enabled:
+    type: bool
+  setup.ilm.policy_name:
+    type: string
+  setup.ilm.policy_file:
+    type: string
+  setup.ilm.check_exists:
+    type: string
+  setup.ilm.overwrite:
+    type: string
+  # template
+  setup.template.name:
+    type: string
+  setup.template.fields:
+    type: string
+  setup.template.overwrite:
+    type: bool
+  setup.template.settings:
+    type: dict
+  setup.template.append_fields:
+    type: list
+  setup.template.json.enabled:
+    type: bool
+  setup.template.json.path:
+    type: string
+  setup.template.json.name:
+    type: string
+  setup.template.json.data_stream:
+    type: bool
+  setup.dashboards.enabled:
+    type: bool
+  # queue
+  queue.mem.events:
+    type: int
+  queue.mem.flush.min_events:
+    type: int
+  queue.mem.flush.timeout:
+    type: int
+  queue.disk.max_size:
+    type: byte
+  queue.disk.path:
+    type: string
+  queue.disk.segment_size:
+    type: byte
+  queue.disk.write_ahead:
+    type: int
+  queue.disk.retry_interval:
+    type: string
+  queue.disk.max_retry_interval:
+    type: string
+
+# logging
+  logging.to_stderr:
+    type: bool
+  logging.to_syslog:
+    type: bool
+  logging.to_eventlog:
+    type: bool
+  logging.to_files:
+    type: bool
+  logging.level:
+    type: string
+    choices:
+      - info
+      - debug
+      - warning
+      - error
+  logging.selectors:
+    type: list
+  logging.metrics.enabled:
+    type: bool
+  logging.metrics.period:
+    type: string
+  logging.metrics.namespaces:
+    type: string
+  logging.files.path:
+    type: string
+  logging.files.name:
+    type: string
+  logging.files.rotateeverybytes:
+    type: string
+  logging.files.keepfiles:
+    type: int
+  logging.files.permissions:
+    type: int
+  logging.files.interval:
+    type: string
+  logging.files.rotateonstartup:
+    type: bool
+  logging.files.redirect_stderr:
+    type: bool
+
+# http
+  http.enabled:
+    type: bool
+  http.host:
+    type: string
+  http.port:
+    type: int
+  http.named_pipe.user:
+    type: string
+  http.named_pipe.security_descriptor:
+    type: string
+  http.pprof.enabled:
+    type: bool
+  http.pprof.block_profile_rate:
+    type: int
+  http.pprof.mem_profile_rate:
+    type: int
+  http.pprof.mutex_profile_rate:
+    type: int
+  instrumentation.enabled:
+    type: bool
+  instrumentation.environment:
+    type: string
+  instrumentation.hosts:
+    type: list
+  instrumentation.api_key:
+    type: string
+  instrumentation.secret_token:
+    type: string
+  instrumentation.profiling.cpu.enabled:
+    type: bool
+  instrumentation.profiling.cpu.interval:
+    type: string
+  instrumentation.profiling.cpu.duration:
+    type: string
+  instrumentation.profiling.heap.enabled:
+    type: bool
+  instrumentation.profiling.heap.interval:
+    type: string
+  features.fqdn.enabled:
+    type: bool
+
+  # general
+  name:
+    type: string
+  tags:
+    type: list
+  fields_under_root:
+    type: bool
+  fields:
+    type: dict
+  processors:
+    type: list
+  max_procs:
+    type: int
+  timestamp.precision:
+    type: string
+    choices:
+      - millisecond
+      - microsecond
+      - nanosecond

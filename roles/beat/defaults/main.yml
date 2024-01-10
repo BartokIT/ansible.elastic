@@ -23,21 +23,22 @@ r_beat_configure_actions: []
 _r_beat_configure_actions_allowed:
   - main_files
   - keystore
-  - folders
+  - inputs
+  - monitors
   - modules
 _r_beat_triggered_restart: false
 
 # ---- installation variables ----
 r_beat_type:
 r_beat_version: '8.11.2'
-r_beat_rpm_name: "{{ r_beat_type }}beat"
+r_beat_rpm_name: "{{ r_beat_type }}beat{%- if r_beat_type == 'heart' -%}-elastic{%- endif -%}"
 r_beat_info:
   installed: false
   version: ''
 r_beat_add_repository: true
 
 # start && stop
-_r_beat_systemd_name: "{{ r_beat_type }}beat.service"
+_r_beat_systemd_name: "{{ r_beat_type }}beat{%- if r_beat_type == 'heart' -%}-elastic{%- endif -%}.service"
 
 # generic configuration
 __r_beat_show_nolog: false   # only for debug purpose
@@ -54,11 +55,49 @@ _r_beat_password_minspecialchars: 1
 _r_beat_password_specialchars: '!._@#'
 
 ## beat.yml configurations
-r_beat_input_path: "{{ _r_beat_config_folder }}/inputs.d"
+r_beat_inputs_path: "{{ _r_beat_config_folder }}/inputs.d"
 r_beat_modules_path: "{{ _r_beat_config_folder }}/modules.d"
+r_beat_monitors_path: "{{ _r_beat_config_folder }}/monitors.d"
 
-# variable with inputs
-r_beat_inputs: []
+r_beat_support:
+  file:
+    inputs: true
+    modules: true
+    module_enabling: true
+    monitors: false
+  heart:
+    inputs: false
+    modules: false
+    module_enabling: false
+    monitors: true
+  audit:
+    inputs: false
+    modules: true
+    module_enabling: false
+    monitors: false
+  metric:
+    inputs: false
+    modules: true
+    module_enabling: true
+    monitors: false
+
+# support monitors
+_r_beat_monitors:
+  file: {}
+  metric: {}
+  heart: {}
+  audit: {}
+r_beat_monitors: {}
+
+# support inputs
+_r_beat_inputs:
+  file: {}
+  metric: {}
+  heart: {}
+  audit: {}
+r_beat_inputs: {}
+
+# support modules
 _r_beat_modules:
   file: {}
   audit:
@@ -93,17 +132,18 @@ _r_beat_modules:
         login.wtmp_file_pattern: /var/log/wtmp*
         login.btmp_file_pattern: /var/log/btmp*
   metric: {}
+  heart: {}
 
 r_beat_modules: {}
+
 # default piece of configuration
 _r_beat_configuration:
   file:
     filebeat:
-      inputs: "{{ r_beat_inputs }}"
       config:
         inputs:
           enabled: true
-          path: "{{ r_beat_input_path }}/*.yml"
+          path: "{{ r_beat_inputs_path }}/*.yml"
           reload:
             enabled: true
             period: 60s
@@ -135,7 +175,15 @@ _r_beat_configuration:
           reload:
             enabled: true
             period: 60s
-  heart: {}
+  heart:
+    heartbeat:
+      config:
+        monitors:
+          enabled: true
+          path: "{{ r_beat_monitors_path }}/*.yml"
+          reload:
+            enabled: true
+            period: 60s
 
 r_beat_configuration: {}
 

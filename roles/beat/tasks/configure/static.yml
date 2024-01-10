@@ -5,25 +5,6 @@
       - r_beat_info.installed
     msg: "Please install first the product"
 
-- name: Folder management
-  when: ('folders' in r_beat_configure_actions)
-  block:
-    - name: Create needed folders
-      ansible.builtin.file:
-        state: directory
-        path: "{{ _r_beat_loop_folders.path }}"
-        owner: "root"
-        group: "root"
-        mode: "{{ _r_beat_loop_folders.mode }}"
-      loop:
-        - path: "{{ r_beat_input_path }}"
-          mode: '755'
-        - path: "{{ r_beat_modules_path }}"
-          mode: '755'
-      loop_control:
-        loop_var: _r_beat_loop_folders
-
-
 - name: Main configuration files
   when: ('main_files' in r_beat_configure_actions )
   block:
@@ -37,14 +18,25 @@
       notify:
         _r_beat_configuration_changed
 
-- name: Main configuration files
-  when: ('modules' in r_beat_configure_actions )
+
+- name: Modules management
+  when:
+    - ('modules' in r_beat_configure_actions )
+    - r_beat_support[r_beat_type].modules
   block:
+    - name: Create modules.d folders
+      ansible.builtin.file:
+        state: directory
+        path: "{{ r_beat_modules_path }}"
+        owner: "root"
+        group: "root"
+        mode: "755"
+
     - name: Manage modules
       bartokit.elastic.beat_modules:
         modules: "{{ r_beat_modules_complete }}"
         type: "{{ r_beat_type }}"
-      when: r_beat_type != 'audit'
+      when: r_beat_support[r_beat_type].module_enabling
 
     - name: Find modules configuration files
       find:
@@ -61,7 +53,7 @@
         loop_var: _r_beat_module_file
         label: "{{ _r_beat_module_file_basename }}"
       when:
-        - r_beat_type == 'audit'
+        - not r_beat_support[r_beat_type].module_enabling
         - _r_beat_module_file_basename not in r_beat_modules_complete
       vars:
         _r_beat_module_file_basename: "{{ _r_beat_module_file.path | basename | replace('.yml', '') }}"
@@ -78,6 +70,93 @@
       loop: "{{ r_beat_modules_complete | dict2items }}"
       loop_control:
         loop_var: _r_beat_module_item
+
+- name: Monitors management
+  when:
+    - ('monitors' in r_beat_configure_actions )
+    - r_beat_support[r_beat_type].monitors
+  block:
+    - name: Create monitors.d folders
+      ansible.builtin.file:
+        state: directory
+        path: "{{ r_beat_monitors_path }}"
+        owner: "root"
+        group: "root"
+        mode: "755"
+
+    - name: Find monitors configuration files
+      find:
+        paths: "{{ r_beat_monitors_path }}"
+        patterns: '*.yml'
+      register: r_beat_monitors_file_list
+
+    - name: Remove unused files
+      file:
+        path: "{{ _r_beat_monitor_file_basename }}"
+        state: absent
+      loop: "{{ r_beat_monitors_file_list.files }}"
+      loop_control:
+        loop_var: _r_beat_monitor_file
+        label: "{{ _r_beat_monitor_file_basename }}"
+      when: r_beat_module_file_basename not in r_beat_modules_complete
+      vars:
+        _r_beat_monitor_file_basename: "{{ _r_beat_monitor_file.path | basename | replace('.yml', '') }}"
+
+    - name: Manage monitors configuration
+      copy:
+        content: |
+          # Ansible managed
+          {{ _r_beat_monitors_item.value | to_nice_yaml | trim }}
+        dest: "{{ r_beat_monitors_path }}/{{ _r_beat_monitors_item.key }}.yml"
+      when:
+        - _r_beat_module_item.value | d(false, true)
+      loop: "{{ r_beat_monitors_complete | dict2items }}"
+      loop_control:
+        loop_var: _r_beat_monitors_item
+
+- name: Inputs management
+  when:
+    - ('inputs' in r_beat_configure_actions )
+    - r_beat_support[r_beat_type].inputs
+  block:
+    - name: Create inputs.d folders
+      ansible.builtin.file:
+        state: directory
+        path: "{{ r_beat_inputs_path }}"
+        owner: "root"
+        group: "root"
+        mode: "755"
+
+    - name: Find inputs configuration files
+      find:
+        paths: "{{ r_beat_inputs_path }}"
+        patterns: '*.yml'
+      register: r_beat_inputs_file_list
+
+    - name: Remove unused files
+      file:
+        path: "{{ _r_beat_input_file_basename }}"
+        state: absent
+      loop: "{{ r_beat_inputs_file_list.files }}"
+      loop_control:
+        loop_var: _r_beat_input_file
+        label: "{{ _r_beat_input_file_basename }}"
+      when: _r_beat_input_file_basename not in r_beat_inputs_complete
+      vars:
+        _r_beat_input_file_basename: "{{ _r_beat_input_file.path | basename | replace('.yml', '') }}"
+
+    - name: Manage inputs configuration
+      copy:
+        content: |
+          # Ansible managed
+          {{ _r_beat_inputs_item.value | to_nice_yaml | trim }}
+        dest: "{{ r_beat_inputs_path }}/{{ _r_beat_inputs_item.key }}.yml"
+      # when:
+      #   - _r_beat_module_item.value | d(false, true)
+      loop: "{{ r_beat_inputs_complete | dict2items }}"
+      loop_control:
+        loop_var: _r_beat_inputs_item
+        label: "{{ _r_beat_inputs_item.key }}"
 
 - name: Manage keystore
   bartokit.elastic.beat_keystore:

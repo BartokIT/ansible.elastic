@@ -9,11 +9,12 @@
               enabled: false
         zookeeper:
       r_beat_inputs:
-        - type: filestream
-          id: dnf
-          paths:
-            - "/var/log/dnf.log"
-          index: beattest
+        dnf:
+          - type: filestream
+            id: dnf
+            paths:
+              - "/var/log/dnf.log"
+            index: beattest
       configuration:
         output.elasticsearch:
           hosts:
@@ -41,6 +42,25 @@
               - uptime
               - socket_summary
             enable: true
+      configuration:
+        output.elasticsearch:
+          hosts:
+            - "https://elastic:9200"
+          username: "${elastic_user}"
+          password: "${elastic_password}"
+    heartbeat:
+      r_beat_monitors:
+        localhost:
+          - type: icmp # monitor type `icmp` (requires root) uses ICMP Echo Request to ping
+            id: my-monitor
+            name: my-icmp-monitor
+            schedule: '*/5 * * * * * *' # exactly every 5 seconds like 10:00:00, 10:00:05, ...
+            hosts: ["localhost"]
+            ipv4: true
+            ipv6: true
+            mode: any
+            timeout: 16s
+            wait: 1s
       configuration:
         output.elasticsearch:
           hosts:

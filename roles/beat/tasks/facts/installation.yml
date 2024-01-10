@@ -10,9 +10,9 @@
 - name: Facts | Installation | Installation info
   ansible.builtin.set_fact:
     r_beat_info:
-      installed: "{{ (ansible_facts.packages[r_beat_type ~ 'beat'] | d([]) | length) > 0 }}"
+      installed: "{{ (ansible_facts.packages[r_beat_rpm_name] | d([]) | length) > 0 }}"
       version: "{{ (ansible_facts.packages[r_beat_type ~ 'beat'] | d([]) | first).version | d('') | trim }}"
-      started: "{{ (ansible_facts.services[r_beat_type ~ 'beat.service'] | d({'state': ''})).state == 'running' }}"
+      started: "{{ (ansible_facts.services[_r_beat_systemd_name] | d({'state': ''})).state == 'running' }}"
 
 - name: Facts | Installation | Print information   # noqa jinja[spacing]
   ansible.builtin.debug:
