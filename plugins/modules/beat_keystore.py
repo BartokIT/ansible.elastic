@@ -62,7 +62,7 @@ credentials:
 
 
 from ..module_utils.base_module import BartokITAnsibleModule
-from ..module_utils.elastic_manager import ElasticManager
+from ..module_utils.beats_manager import BeatManager
 import logging
 
 # module's parameter
@@ -82,7 +82,7 @@ class BartokITElasticsearchBeatKeystore(BartokITAnsibleModule):
         super().__init__(parameter_name_with_mode='mode', parameter_name_with_keys='credentials',
                          argument_spec=argument_spec, supports_check_mode=False,
                          log_file='ansible_beat_keystore.log')
-        self.__em = ElasticManager(self, 'https://localhost:9200')
+        self.__em = BeatManager(self)
 
     def initialization(self, parameters_argument, parameters):
         """
