@@ -21,13 +21,18 @@
             gpgcheck: false
 
     - name: Install | Install expect and python modules
-      ansible.builtin.dnf:
+      ansible.builtin.package:
         name:
-          - python3-cryptography
+          - >-
+            {% if ansible_distribution_major_version == '8' %}
+            python3-cryptography
+            {% else %}
+            python-cryptography
+            {% endif %}
         state: present
 
     - name: Install | Install Beat
-      ansible.builtin.dnf:
+      ansible.builtin.package:
         name: '{{ r_beat_rpm_name }} == {{ r_beat_version }}'
         state: present
       notify:

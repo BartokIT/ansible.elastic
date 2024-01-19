@@ -30,8 +30,7 @@ class ElasticManager:
         if self._rest_api_endpoint is None:
             raise Exception("No endpoint provided")
 
-        api_url = "{endpoint}{path}".format(
-            endpoint=self._rest_api_endpoint, path=path)
+        api_url = "%s%s" % (self._rest_api_endpoint, path)
 
         auth = (self.__api_username, self.__api_password)
         req = requests.request(
@@ -46,10 +45,14 @@ class ElasticManager:
                 req = requests.request(
                         method, api_url, params=parameters, json=body, auth=auth, verify=self._ssl_verify,
                         timeout=10)
+            response = req.json()
             req.raise_for_status()
         except Exception as exc:
             logging.error("{}".format(exc))
+            if 'reason' in response:
+                logging.error("%s" % response.reason)
             raise
+
         if json:
             return req.json()
         else:
@@ -57,7 +60,7 @@ class ElasticManager:
 
     # BEATS
     def get_beat_keystore_path(self, beattype):
-        return os.path.join("/var/lib/{}beat/".format(beattype), "{}beat.keystore".format(beattype))
+        return os.path.join("/var/lib/%sbeat/" % beattype, "%sbeat.keystore"% beattype)
 
     def is_beat_keystore_present(self, beattype):
         ''' Check for presence of beat keystore '''
@@ -67,7 +70,7 @@ class ElasticManager:
             raise Exception("Unsupported beat type")
         result = os.path.isfile(keystore_path)
         if not result:
-            logging.debug("Keystore {} is not present".format(keystore_path))
+            logging.debug("Keystore %s is not present" % keystore_path)
             return False
 
         return True
@@ -81,7 +84,7 @@ class ElasticManager:
             return {
                 'exists': True,
                 'owner': getpwuid(keystore_stat.st_uid).pw_name,
-                'mode': "0{}".format(oct(keystore_stat.st_mode))[-3:],
+                'mode': "0%s" % oct(keystore_stat.st_mode) [-3:],
                 'group': getgrgid(keystore_stat.st_gid).gr_name
             }
         else:
@@ -91,7 +94,7 @@ class ElasticManager:
 
     def create_beat_keystore(self, beattype):
         '''Create an empty beat keystore'''
-        keystore_executable = "{}beat keystore".format(beattype)
+        keystore_executable = "%sbeat keystore" % beattype
         create_command = keystore_executable
         create_command += " create"
 
@@ -100,7 +103,7 @@ class ElasticManager:
             create_command, check_rc=True)
 
         if 'created' not in stdout.lower():
-            logging.error("Impossible to create the keystore RC {} | STDOUT {} | STDERR {}".format(rc, stdout, stderr))
+            logging.error("Impossible to create the keystore RC %s | STDOUT %s | STDERR %s}" % (rc, stdout, stderr))
             raise Exception("Impossible to create the keystore")
 
     def add_beat_keystore_key(self, beattype, key, value):
@@ -108,7 +111,7 @@ class ElasticManager:
         if not self.is_beat_keystore_present(beattype):
             self.create_beat_keystore(beattype)
 
-        add_command = "{}beat keystore add --stdin {} --force".format(beattype, key)
+        add_command = "%sbeat keystore add --stdin %s --force" % (beattype, key)
 
         # Run the command to aad a key to keystore
         rc, stdout, stderr = self.ansible_module.run_command(
@@ -120,7 +123,7 @@ class ElasticManager:
     def delete_beat_keystore_key(self, beattype, key):
         ''' Add key to beat keystore'''
 
-        remove_command = "{}beat keystore remove {}".format(beattype, key)
+        remove_command = "%sbeat keystore remove %s" % (beattype, key)
 
         # Run the command to aad a key to keystore
         rc, stdout, stderr = self.ansible_module.run_command(
@@ -138,7 +141,7 @@ class ElasticManager:
         list_command =  "{}beat keystore list".format(beattype)
         rc, stdout, stderr = self.ansible_module.run_command(
             list_command, check_rc=True)
-        logging.debug("List command output RC {} | STDOUT {} | STDERR {}".format(rc, stdout.replace("\n","\\n"), stderr.replace("\n","\\n")))
+        logging.debug("List command output RC %s | STDOUT %s | STDERR %s" % (rc, stdout.replace("\n","\\n"), stderr.replace("\n","\\n")))
 
         for line in stdout.splitlines():
             data.append(line)
@@ -169,7 +172,7 @@ class ElasticManager:
     def enable_beat_module(self, beattype, module):
         ''' Enable beat modules'''
 
-        remove_command = "{}beat modules enable {}".format(beattype, module)
+        remove_command = "%sbeat modules enable %s" % (beattype, module)
 
         # Run the command to aad a key to keystore
         rc, stdout, stderr = self.ansible_module.run_command(
@@ -178,7 +181,7 @@ class ElasticManager:
     def disable_beat_module(self, beattype, module):
         ''' Enable beat modules'''
 
-        remove_command = "{}beat modules disable {}".format(beattype, module)
+        remove_command = "%sbeat modules disable %s" % (beattype, module)
 
         # Run the command to aad a key to keystore
         rc, stdout, stderr = self.ansible_module.run_command(
@@ -207,8 +210,7 @@ class ElasticManager:
 
     def is_keystore_password_protected(self):
         """Check if the keystore is password protected."""
-        read_command = "{} has-passwd".format(
-            self.__keystore_executable,)
+        read_command = "%s has-passwd" % self.__keystore_executable
         rc, stdout, stderr = self.ansible_module.run_command(
             read_command, check_rc=False)
 
@@ -220,13 +222,13 @@ class ElasticManager:
     def set_keystore_password(self, keystore_password):
         """Set the password for a not-protected keystore."""
         expect_command = """
-        spawn  {exec} passwd
+        spawn  %s passwd
         expect "Enter new password"
-        send -- "{passfirst}\\n"
+        send -- "%s\\n"
         expect "Enter same password"
-        send -- "{passconfirm}\\n"
+        send -- "%s\\n"
         expect eof
-        """.format(exec=self.__keystore_executable, passfirst=keystore_password, passconfirm=keystore_password)
+        """ % (self.__keystore_executable, keystore_password, keystore_password)
         set_command = ["expect", "-c", expect_command]
         rc, stdout, stderr = self.ansible_module.run_command(
             set_command, check_rc=True)
@@ -499,7 +501,7 @@ class ElasticManager:
 
     def get_user(self, name):
         """ _security/usery"""
-        ilm_policy = self._api_call('_security/user/{}'.format(name))
+        ilm_policy = self._api_call('_security/user/%s' % name)
 
         for policy_name in ilm_policy.keys():
                 if policy_name == name:
@@ -517,12 +519,12 @@ class ElasticManager:
             body['roles'] = []
 
         logging.debug("Body: %s" % body)
-        result = self._api_call('_security/user/{}'.format(username),
+        result = self._api_call('_security/user/%s' % username,
                                 method='PUT', body=body, json=False)
         return result
 
     def delete_user(self, name):
         """Delete a user through APIs."""
-        result = self._api_call('_security/user/{}'.format(name),
+        result = self._api_call('_security/user/%' % name,
                                 method='DELETE', json=False)
         return result

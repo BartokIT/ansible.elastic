@@ -51,6 +51,17 @@ platforms:
     tmpfs:
       - /run
     pre_build_image: true
+  - name: beat2
+    image: registry.access.redhat.com/ubi7/ubi-init
+    groups:
+      - beats
+    network: molecule-elastic-standalone-test
+    volume_mounts:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    command: "/usr/sbin/init"
+    tmpfs:
+      - /run
+    pre_build_image: true
 provisioner:
   name: ansible
   options:

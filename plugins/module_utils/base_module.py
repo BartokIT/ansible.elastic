@@ -4,7 +4,6 @@
 from __future__ import (absolute_import, division, print_function)
 import copy
 from ansible.module_utils.basic import AnsibleModule
-from typing import Any
 import logging
 __metaclass__ = type
 
@@ -52,7 +51,7 @@ class BartokITAnsibleModule(AnsibleModule):
         return parameters[parameter_name_with_keys]
 
     # CRUD METHOD
-    def create_key(self, key: str, new_value: Any):
+    def create_key(self, key, new_value):
         """Create the key."""
         raise Exception("Create key not implemented")
 
