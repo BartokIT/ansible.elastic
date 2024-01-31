@@ -36,7 +36,6 @@
         r_beat_modules: "{{ filebeat.r_beat_modules }}"
         r_beat_inputs: "{{ filebeat.r_beat_inputs }}"
 
-
     - name: Test audit beat
       ansible.builtin.include_role:
         name: bartokit.elastic.beat

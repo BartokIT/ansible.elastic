@@ -76,12 +76,12 @@ module_args = dict(
 )
 
 
-class BartokITElasticsearchBeatKeystore(BartokITAnsibleModule):
+class BartokITElasticsearchBeatModule(BartokITAnsibleModule):
     """A class for an Ansible module that manage Elasticsearch Keystore."""
 
     def __init__(self, argument_spec):
         """Call the constructor of the parent class."""
-        super().__init__(parameter_name_with_mode='mode', parameter_name_with_keys='modules',
+        super(BartokITElasticsearchBeatModule, self).__init__(parameter_name_with_mode='mode', parameter_name_with_keys='modules',
                          argument_spec=argument_spec, supports_check_mode=False,
                          log_file='ansible_beat_modules.log')
         self.__em = BeatManager(self)
@@ -128,7 +128,7 @@ class BartokITElasticsearchBeatKeystore(BartokITAnsibleModule):
 
 def main():
     """Run module execution."""
-    BartokITElasticsearchBeatKeystore(argument_spec=module_args).run()
+    BartokITElasticsearchBeatModule(argument_spec=module_args).run()
 
 
 if __name__ == '__main__':

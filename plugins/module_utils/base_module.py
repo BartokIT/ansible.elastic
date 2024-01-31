@@ -30,7 +30,7 @@ class BartokITAnsibleModule(AnsibleModule):
                         present or not inside the resource
 
         """
-        super().__init__(argument_spec=argument_spec, supports_check_mode=supports_check_mode)
+        super(BartokITAnsibleModule, self).__init__(argument_spec=argument_spec, supports_check_mode=supports_check_mode)
 
         self.__changed = True
         self.__parameter_name_with_mode = parameter_name_with_mode
@@ -131,7 +131,7 @@ class BartokITAnsibleModule(AnsibleModule):
         current_keys = self.list_current_keys(self.__keys)
 
         if self.mode == 'present':
-            self._to_be_added = self.list_input_keys() - current_keys
+            self._to_be_added = list(set(self.list_input_keys()) - set(current_keys))
             self._to_be_updated = list(set(current_keys) &
                                        set(self.list_input_keys()))
             diff_before_keys = set(current_keys).intersection(
@@ -141,8 +141,8 @@ class BartokITAnsibleModule(AnsibleModule):
             diff_before_keys = set(current_keys).intersection(
                 set(self.list_input_keys()))
         else:
-            self._to_be_added = self.list_input_keys() - current_keys
-            self._to_be_removed = current_keys - self.list_input_keys()
+            self._to_be_added = list(set(self.list_input_keys()) - set(current_keys))
+            self._to_be_removed = list(set(current_keys) - set(self.list_input_keys()))
             self._to_be_updated = list(set(current_keys) &
                                        set(self.list_input_keys()))
             diff_before_keys = current_keys
