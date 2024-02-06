@@ -26,6 +26,7 @@ _r_beat_configure_actions_allowed:
   - inputs
   - monitors
   - modules
+  - enforce_keystore
 _r_beat_triggered_restart: false
 
 # ---- installation variables ----
