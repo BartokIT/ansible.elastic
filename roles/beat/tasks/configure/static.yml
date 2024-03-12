@@ -1,14 +1,14 @@
 ---
-- name: Check that Beat is installed
+- name: Configure | Static | Check that Beat is installed
   ansible.builtin.assert:
     that:
       - r_beat_info.installed
     msg: "Please install first the product"
 
-- name: Main configuration files
+- name: Configure | Static | Main configuration files
   when: ('main_files' in r_beat_configure_actions )
   block:
-    - name: Write configuration file
+    - name: Configure | Static | Write configuration file
       ansible.builtin.template:
         src: beat.yml.j2
         dest: "{{ _r_beat_config_folder }}/{{ r_beat_type }}beat.yml"
@@ -18,13 +18,12 @@
       notify:
         _r_beat_configuration_changed
 
-
-- name: Modules management
+- name: Configure | Static | Modules management
   when:
     - ('modules' in r_beat_configure_actions )
     - r_beat_support[r_beat_type].modules
   block:
-    - name: Create modules.d folders
+    - name: Configure | Static | Create modules.d folders
       ansible.builtin.file:
         state: directory
         path: "{{ r_beat_modules_path }}"
@@ -32,19 +31,19 @@
         group: "root"
         mode: "755"
 
-    - name: Manage modules
+    - name: Configure | Static | Manage modules
       bartokit.elastic.beat_modules:
         modules: "{{ r_beat_modules_complete }}"
         type: "{{ r_beat_type }}"
       when: r_beat_support[r_beat_type].module_enabling
 
-    - name: Find modules configuration files
+    - name: Configure | Static | Find modules configuration files
       find:
         paths: "{{ r_beat_modules_path }}"
         patterns: '*.yml'
       register: r_beat_modules_file_list
 
-    - name: Remove unused files
+    - name: Configure | Static | Remove unused files
       file:
         path: "{{ _r_beat_module_file_basename }}"
         state: absent
@@ -58,7 +57,7 @@
       vars:
         _r_beat_module_file_basename: "{{ _r_beat_module_file.path | basename | replace('.yml', '') }}"
 
-    - name: Manage modules configuration
+    - name: Configure | Static | Manage modules configuration
       copy:
         content: |
           # Ansible managed
@@ -71,12 +70,12 @@
       loop_control:
         loop_var: _r_beat_module_item
 
-- name: Monitors management
+- name: Configure | Static | Monitors management
   when:
     - ('monitors' in r_beat_configure_actions )
     - r_beat_support[r_beat_type].monitors
   block:
-    - name: Create monitors.d folders
+    - name: Configure | Static | Create monitors.d folders
       ansible.builtin.file:
         state: directory
         path: "{{ r_beat_monitors_path }}"
@@ -84,14 +83,14 @@
         group: "root"
         mode: "755"
 
-    - name: Find monitors configuration files
-      find:
+    - name: Configure | Static | Find monitors configuration files
+      ansible.builtin.find:
         paths: "{{ r_beat_monitors_path }}"
         patterns: '*.yml'
       register: r_beat_monitors_file_list
 
-    - name: Remove unused files
-      file:
+    - name: Configure | Static | Remove unused files
+      ansible.builtin.file:
         path: "{{ _r_beat_monitor_file_basename }}"
         state: absent
       loop: "{{ r_beat_monitors_file_list.files }}"
@@ -102,8 +101,8 @@
       vars:
         _r_beat_monitor_file_basename: "{{ _r_beat_monitor_file.path | basename | replace('.yml', '') }}"
 
-    - name: Manage monitors configuration
-      copy:
+    - name: Configure | Static | Manage monitors configuration
+      ansible.builtin.copy:
         content: |
           # Ansible managed
           {{ _r_beat_monitors_item.value | to_nice_yaml | trim }}
@@ -114,12 +113,12 @@
       loop_control:
         loop_var: _r_beat_monitors_item
 
-- name: Inputs management
+- name: Configure | Static | Inputs management
   when:
     - ('inputs' in r_beat_configure_actions )
     - r_beat_support[r_beat_type].inputs
   block:
-    - name: Create inputs.d folders
+    - name: Configure | Static | Create inputs.d folders
       ansible.builtin.file:
         state: directory
         path: "{{ r_beat_inputs_path }}"
@@ -127,13 +126,13 @@
         group: "root"
         mode: "755"
 
-    - name: Find inputs configuration files
+    - name: Configure | Static | Find inputs configuration files
       find:
         paths: "{{ r_beat_inputs_path }}"
         patterns: '*.yml'
       register: r_beat_inputs_file_list
 
-    - name: Remove unused files
+    - name: Configure | Static | Remove unused files
       file:
         path: "{{ _r_beat_input_file_basename }}"
         state: absent
@@ -145,7 +144,7 @@
       vars:
         _r_beat_input_file_basename: "{{ _r_beat_input_file.path | basename | replace('.yml', '') }}"
 
-    - name: Manage inputs configuration
+    - name: Configure | Static | Manage inputs configuration
       copy:
         content: |
           # Ansible managed
@@ -158,13 +157,20 @@
         loop_var: _r_beat_inputs_item
         label: "{{ _r_beat_inputs_item.key }}"
 
-- name: Manage keystore
+- name: Configure | Static | Manage keystore
   bartokit.elastic.beat_keystore:
     force: "{{  'enforce_keystore' in r_beat_configure_actions }}"
     credentials: "{{ r_beat_keystore_complete }}"
     type: "{{ r_beat_type }}"
   when:
     - ('keystore' in r_beat_configure_actions)
+
+- name: Configure | Static | Systemd management
+  ansible.builtin.systemd:
+    name: "{{ _r_beat_systemd_name }}"
+    enabled: "{{ r_beat_systemd_enabled }}"
+  when:
+    - ('systemd' in r_beat_configure_actions)
 
 - name: Flush handlers
   meta: flush_handlers

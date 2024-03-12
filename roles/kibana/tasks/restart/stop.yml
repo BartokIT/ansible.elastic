@@ -1,4 +1,7 @@
-- name: Stop the elasticsearch service
+- name: Stop the kibana service
   systemd:
-    name: elasticsearch
+    name: "{{ _r_kibana_systemd_name }}"
     state: stopped
+
+- name: Flush handlers
+  meta: flush_handlers

@@ -64,7 +64,6 @@
       ansible.builtin.set_fact:
         r_kibana_keystore: "{{ r_kibana_keystore | combine(_r_kibana_keystore, recursive=True) }}"
         r_kibana_configuration: "{{ _r_kibana_configuration | combine(r_kibana_configuration, recursive=True) }}"
-        r_kibana_users: "{{ r_kibana_users | combine(_r_kibana_api_user, recursive=True) }}"
       no_log: "{{ not (__r_kibana_show_nolog | bool) }}"
 
 

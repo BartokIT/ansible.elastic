@@ -124,5 +124,13 @@
         group: "{{ _r_elasticsearch_group }}"
         mode: '0660'
 
+- name: Configure | Static | Systemd management
+  ansible.builtin.systemd:
+    name: "{{ _r_elasticsearch_systemd_name }}"
+    enabled: "{{ r_elasticsearch_systemd_enabled }}"
+    daemon_reload: true
+  when:
+    - ('systemd' in r_elasticsearch_configure_actions)
+
 - name: Flush handlers
   meta: flush_handlers

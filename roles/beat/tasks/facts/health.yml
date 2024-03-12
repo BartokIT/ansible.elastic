@@ -1,1 +1,9 @@
 ---
+- name: Facts | Healt| Populate service facts
+  ansible.builtin.service_facts:
+
+- name: Facts | Installation | Installation info
+  ansible.builtin.set_fact:
+    r_beat_info: "{{ r_beat_info | combine({ 'started': _r_beat_info_started }) }}"
+  vars:
+    _r_beat_info_started: "{{ (ansible_facts.services[_r_beat_systemd_name] | d({'state': ''})).state == 'running' }}"

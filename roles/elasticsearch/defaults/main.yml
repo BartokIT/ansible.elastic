@@ -44,6 +44,7 @@ r_elasticsearch_add_repository: true
 
 # start && stop
 _r_elasticsearch_systemd_name: elasticsearch.service
+r_elasticsearch_systemd_enabled: true
 
 # generic configuration
 __r_elasticsearch_show_nolog: false   # only for debug purpose

@@ -356,15 +356,15 @@ class ElasticManager:
         return result
 
     # --------------------- Users method --------------------------------------
-    def get_users(self, managed=False):
+    def get_users(self, managed=False, only_managed=False):
         """Get all the users through APIs."""
         users_output = {}
         users = self._api_call('_security/user')
         for user in users.keys():
             if users[user].get('metadata',{}).get('_reserved', False):
-                if managed:
+                if managed or only_managed:
                     users_output[user] = users[user]
-            else:
+            elif not only_managed:
                 users_output[user] = users[user]
 
         return users_output

@@ -25,11 +25,73 @@ _r_elasticsearch_configuration_schema:
     type: list
     secure: false
     reloadable: false
+  bootstrap.memory_lock:
+    type: bool
+    secure: false
+    reloadable: false
   # NODE
   node.roles:
     type: list
     secure: false
     reloadable: false
+  # ML
+  xpack.ml.enabled:
+    type: bool
+    secure: false
+    reloadable: false
+  xpack.ml.inference_model.cache_size:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.ml.inference_model.time_to_live:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.ml.max_inference_processors:
+    type: int
+    secure: false
+    reloadable: true
+  # MONITORING
+  xpack.monitoring.collection.enabled:
+    type: bool
+    secure: false
+    reloadable: true
+  xpack.monitoring.collection.interval:
+    type: string
+    secure: false
+    reloadable: true
+  xpack.monitoring.elasticsearch.collection.enabled:
+    type: bool
+    secure: false
+    reloadable: true
+  xpack.monitoring.collection.cluster.stats.timeout:
+    type: string
+    secure: false
+    reloadable: true
+  xpack.monitoring.collection.node.stats.timeout:
+    type: string
+    secure: false
+    reloadable: true
+  xpack.monitoring.collection.indices:
+    type: string
+    secure: false
+    reloadable: true
+  xpack.monitoring.collection.index.stats.timeout:
+    type: string
+    secure: false
+    reloadable: true
+  xpack.monitoring.collection.index.recovery.active_only:
+    type: string
+    secure: false
+    reloadable: true
+  xpack.monitoring.collection.index.recovery.timeout:
+    type: string
+    secure: false
+    reloadable: true
+  xpack.monitoring.history.duration:
+    type: string
+    secure: false
+    reloadable: true
   # AUDIT
   xpack.security.audit.enabled:
     type: bool
@@ -63,6 +125,7 @@ _r_elasticsearch_configuration_schema:
     type: bool
     secure: false
     reloadable: true
+
   # circuit breaker
   indices.breaker.total.use_real_memory:
     type: bool
@@ -287,7 +350,7 @@ _r_elasticsearch_configuration_schema:
     secure: false
     reloadable: false
   # to be expanded
-  # security
+  # security - general
   xpack.security.enabled:
     type: bool
     secure: false
@@ -308,6 +371,69 @@ _r_elasticsearch_configuration_schema:
     type: bool
     secure: false
     reloadable: false
+  # general - Password hashing settings
+  xpack.security.authc.password_hashing.algorithm:
+    type: string
+    secure: false
+    reloadable: false
+  # general - anonymous access settings
+  xpack.security.authc.anonymous.username:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.authc.anonymous.roles:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.authc.anonymous.authz_exception:
+    type: bool
+    secure: false
+    reloadable: false
+  # general - Automata Settings
+  xpack.security.automata.max_determinized_states:
+    type: int
+    secure: false
+    reloadable: false
+  xpack.security.automata.cache.enabled:
+    type: bool
+    secure: false
+    reloadable: false
+  xpack.security.automata.cache.size:
+    type: int
+    secure: false
+    reloadable: false
+  xpack.security.automata.cache.ttl:
+    type: string
+    secure: false
+    reloadable: false
+  # general - Document and field level security settings
+  xpack.security.dls_fls.enabled:
+    type: bool
+    secure: false
+    reloadable: false
+  xpack.security.dls.bitset.cache.ttl:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.dls.bitset.cache.size:
+    type: string
+    secure: false
+    reloadable: false
+  # general - Token service settings
+  xpack.security.authc.token.enabled:
+    type: bool
+    secure: false
+    reloadable: false
+  xpack.security.authc.token.timeout:
+    type: string
+    secure: false
+    reloadable: false
+  # general - API key service settings
+  xpack.security.authc.api_key.enabled:
+    type: bool
+    secure: false
+    reloadable: false
+  # ----
   xpack.security.http.ssl.enabled:
     type: bool
     secure: false
@@ -316,11 +442,78 @@ _r_elasticsearch_configuration_schema:
     type: bool
     secure: false
     reloadable: false
+  xpack.security.transport.ssl.key:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.transport.ssl.key_passphrase:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.transport.ssl.secure_key_passphrase:
+    type: string
+    secure: true
+    reloadable: false
   xpack.security.http.ssl.keystore.path:
     type: string
     secure: false
     reloadable: false
   xpack.security.transport.ssl.keystore.path:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.transport.ssl.keystore.type:
+    type: string
+    secure: false
+    reloadable: false
+    choices:
+      - jks
+      - PKCS12
+
+  xpack.security.transport.ssl.keystore.password:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.transport.ssl.keystore.secure_password:
+    type: string
+    secure: true
+    reloadable: false
+  xpack.security.transport.ssl.keystore.key_password:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.transport.ssl.keystore.secure_key_password:
+    type: string
+    secure: true
+    reloadable: false
+  xpack.security.transport.ssl.truststore.path:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.transport.ssl.truststore.type:
+    type: string
+    secure: false
+    reloadable: false
+    choices:
+      - jks
+      - PKCS12
+  xpack.security.transport.ssl.truststore.password:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.transport.ssl.truststore.secure_password:
+    type: string
+    secure: true
+    reloadable: false
+  xpack.security.transport.ssl.client_authentication:
+    type: string
+    secure: false
+    reloadable: false
+    choices:
+      - required
+      - optional
+      - none
+  xpack.security.transport.ssl.supported_protocols:
     type: string
     secure: false
     reloadable: false
@@ -340,11 +533,117 @@ _r_elasticsearch_configuration_schema:
       - full
       - certificate
       - none
+  xpack.security.transport.ssl.certificate:
+    type: string
+    secure: false
+    reloadable: false
   xpack.security.transport.ssl.certificate_authorities:
     type: list
     secure: false
     reloadable: false
+  xpack.security.transport.ssl.cipher_suites:
+    type: string
+    secure: false
+    reloadable: false
   xpack.security.http.ssl.certificate_authorities:
     type: list
+    secure: false
+    reloadable: false
+  xpack.security.remote_cluster_server.ssl.enabled:
+    type: bool
+    secure: false
+    reloadable: false
+  xpack.security.remote_cluster_server.ssl.supported_protocols:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.remote_cluster_server.ssl.client_authentication:
+    type: string
+    secure: false
+    reloadable: false
+    choices:
+      - required
+      - optional
+      - none
+  xpack.security.remote_cluster_server.ssl.verification_mode:
+    type: string
+    secure: false
+    reloadable: false
+    choices:
+      - full
+      - certificate
+      - none
+  xpack.security.remote_cluster_server.ssl.cipher_suites:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.remote_cluster_server.ssl.key:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.remote_cluster_server.ssl.secure_key_passphrase:
+    type: string
+    secure: true
+    reloadable: false
+  xpack.security.remote_cluster_server.ssl.certificate:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.remote_cluster_server.ssl.keystore.path:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.remote_cluster_server.ssl.keystore.secure_password:
+    type: string
+    secure: true
+    reloadable: false
+  xpack.security.remote_cluster_server.ssl.keystore.secure_key_password:
+    type: string
+    secure: true
+    reloadable: false
+  xpack.security.remote_cluster_server.ssl.truststore.path:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.remote_cluster_server.ssl.truststore.secure_password:
+    type: string
+    secure: true
+    reloadable: false
+  xpack.security.transport.filter.allow:
+    type: list
+    secure: false
+    reloadable: true
+  xpack.security.transport.filter.deny:
+    type: list
+    secure: false
+    reloadable: true
+  xpack.security.http.filter.allow:
+    type: list
+    secure: false
+    reloadable: true
+  xpack.security.http.filter.deny:
+    type: list
+    secure: false
+    reloadable: true
+  #TODO: to be managed by the filter
+  transport.profiles.$PROFILE.xpack.security.filter.allow:
+    type: list
+    secure: false
+    reloadable: true
+  transport.profiles.$PROFILE.xpack.security.filter.deny:
+    type: list
+    secure: false
+    reloadable: true
+  xpack.security.remote_cluster.filter.allow:
+    type: list
+    secure: false
+    reloadable: true
+  xpack.security.remote_cluster.filter.deny:
+    type: list
+    secure: false
+    reloadable: true
+  # security - user cache e password hash
+  cache.hash_algo:
+    type: string
     secure: false
     reloadable: false

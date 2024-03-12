@@ -24,10 +24,15 @@
     r_elasticsearch_configuration_ssl_certificate_authorities: "{{ _converge_ca_certificate.content | b64decode }}"
     r_elasticsearch_api_password: 'ansiblepassword'
     r_elasticsearch_configuration:
+      bootstrap:
+        memory_lock: false
       xpack:
         security:
           audit:
             enabled: false
+        monitoring:
+          collection:
+            enabled: true
     r_elasticsearch_component_templates:
       template1:
         _meta:
@@ -58,6 +63,16 @@
       beattest:
         index_patterns:
           - beattest*
+        composed_of:
+          - beattest-ct
+      filebeat-8.11.2:
+        index_patterns:
+          - filebeat*
+        composed_of:
+          - beattest-ct
+      metricbeat-8.11.2:
+        index_patterns:
+          - metricbeat*
         composed_of:
           - beattest-ct
     r_elasticsearch_ilm_policies:
@@ -96,8 +111,28 @@
               rollover:
                 max_age: "30d"
                 max_primary_shard_size: "50gb"
+      metricbeat:
+        phases:
+          hot:
+            min_age: "0ms"
+            actions:
+              rollover:
+                max_age: "30d"
+                max_primary_shard_size: "50gb"
+      auditbeat:
+        phases:
+          hot:
+            min_age: "0ms"
+            actions:
+              rollover:
+                max_age: "30d"
+                max_primary_shard_size: "50gb"
     r_elasticsearch_users:
       mytestuser:
         password: unknown.1234
         roles:
         full_name: test user
+      kibana_system:
+        password: unknown.1234
+        roles:
+          - kibana_system

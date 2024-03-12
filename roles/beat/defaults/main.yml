@@ -27,6 +27,7 @@ _r_beat_configure_actions_allowed:
   - monitors
   - modules
   - enforce_keystore
+  - systemd
 _r_beat_triggered_restart: false
 
 # ---- installation variables ----
@@ -38,8 +39,9 @@ r_beat_info:
   version: ''
 r_beat_add_repository: true
 
-# start && stop
+# start && stop && enable
 _r_beat_systemd_name: "{{ r_beat_type }}beat{%- if r_beat_type == 'heart' -%}-elastic{%- endif -%}.service"
+r_beat_systemd_enabled: true
 
 # generic configuration
 __r_beat_show_nolog: false   # only for debug purpose

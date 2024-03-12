@@ -1,16 +1,16 @@
 ---
-- name: Facts | Perform basic setup
+- name: Facts | Main | Gather facts
   ansible.builtin.setup:
     gather_subset:
-      - min
-  when: ansible_fqdn is not defined
+      - distribution_major_version
+  when: distribution_major_version is not defined
 
-- name: Facts | Actions that will be performed
-  ansible.builtin.debug:
-    msg: "{{ r_beat_actions }}"
-
-- name: Facts | Include installation facts gather
-  ansible.builtin.include_tasks: facts/installation.yml
+- name: Facts | Main | Initialization
+  ansible.builtin.set_fact:
+    r_beat_info:
+      installed: false
+      version: ''
+      started: false
 
 - name: Facts | Include variable sanity checks
   ansible.builtin.include_tasks: facts/sanity.yml
@@ -20,4 +20,16 @@
 
 - name: Facts | Include health facts gather
   ansible.builtin.include_tasks: facts/health.yml
-  when: r_beat_info.started
+  when: r_beat_info.installed
+
+- name: Facts | Installation | Print information   # noqa jinja[spacing]
+  ansible.builtin.debug:
+    msg: "{{ _r_elasicsearch_info.split('|') }}"
+  vars:
+    _r_elasicsearch_info: >-
+        Beat: {{ r_beat_type }}beat
+        |Installed: {{ r_beat_info.installed }}
+        {%- if r_beat_info.installed -%}
+        |Version:   {{ r_beat_info.version }}
+        |Started:   {{ r_beat_info.started }}
+        {%- endif -%}

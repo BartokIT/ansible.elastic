@@ -52,7 +52,7 @@ def validate_configuration(configuration, schema):
         if key not in schema:
             validation_errors += ["The key %s is not allowed" % key]
 
-        if found_schema_key:
+        elif found_schema_key:
             if schema[found_schema_key]['type'] == 'bool':
                 if not isinstance(flatted_dict[key], bool):
                     validation_errors += ["The key {} must be boolean (found {})".format(found_schema_key, type(flatted_dict[key]))]

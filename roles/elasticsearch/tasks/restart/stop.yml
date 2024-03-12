@@ -1,4 +1,4 @@
 - name: Stop the elasticsearch service
   systemd:
-    name: elasticsearch
+    name: "{{ _r_elasticsearch_systemd_name }}"
     state: stopped

@@ -173,6 +173,12 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
     def list_current_keys(self, input_keys):
         """Return the list of components template actually present."""
         components = self.__em.get_users()
+        components_managed = self.__em.get_users(only_managed=True)
+        differences = [value for value in input_keys if value in components_managed.keys()]
+        logging.debug("Managed users found %s" % differences)
+        if differences:
+            for key in differences:
+                components[key]=components_managed[key]
         return components
 
 

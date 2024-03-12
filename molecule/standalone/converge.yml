@@ -1,6 +1,6 @@
 ---
-- name: Converge beats
-  hosts: beats
+- name: Standalone | Converge | Beats
+  hosts: none
   gather_facts: false
   tasks:
     - name: Read configurations
@@ -75,7 +75,7 @@
           elastic_password: "{{ r_elasticsearch_users_initial_elastic_password }}"
         r_beat_monitors: "{{ heartbeat.r_beat_monitors }}"
 
-- name: Converge
+- name: Standalone | Converge | Elasticsearch
   hosts: cluster
   gather_facts: false
   tasks:
@@ -106,8 +106,7 @@
       ansible.builtin.include_role:
         name: bartokit.elastic.elasticsearch
 
-
-- name: Converge Kibana
+- name: Standalone | Converge | Kibana
   hosts: kibanas
   gather_facts: false
   tasks:

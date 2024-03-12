@@ -1,6 +1,6 @@
-- name: Start the elasticsearch service
+- name: Start the kibana service
   systemd:
-    name: elasticsearch
+    name: "{{ _r_kibana_systemd_name }}"
     state: started
   notify: _r_kibana_gather_installation_facts
 

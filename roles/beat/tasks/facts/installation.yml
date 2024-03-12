@@ -4,24 +4,14 @@
     manager: auto
   no_log: true
 
-- name: Facts | Installation | Populate service facts
-  ansible.builtin.service_facts:
-
 - name: Facts | Installation | Installation info
   ansible.builtin.set_fact:
-    r_beat_info:
-      installed: "{{ (ansible_facts.packages[r_beat_rpm_name] | d([]) | length) > 0 }}"
-      version: "{{ (ansible_facts.packages[r_beat_type ~ 'beat'] | d([]) | first).version | d('') | trim }}"
-      started: "{{ (ansible_facts.services[_r_beat_systemd_name] | d({'state': ''})).state == 'running' }}"
-
-- name: Facts | Installation | Print information   # noqa jinja[spacing]
-  ansible.builtin.debug:
-    msg: "{{ _r_elasicsearch_info.split('|') }}"
+    r_beat_info: >-
+      {{ r_beat_info | combine({
+        'installed': _r_beat_info_installed,
+        'version': _r_beat_info_version
+      })
+      }}
   vars:
-    _r_elasicsearch_info: >-
-        Beat: {{ r_beat_type }}beat
-        |Installed: {{ r_beat_info.installed }}
-        {%- if r_beat_info.installed -%}
-        |Version:   {{ r_beat_info.version }}
-        |Started:   {{ r_beat_info.started }}
-        {%- endif -%}
+    _r_beat_info_installed: "{{ ( ansible_facts.packages[r_beat_rpm_name] | d([]) | length) > 0 }}"
+    _r_beat_info_version: "{{ (ansible_facts.packages[r_beat_type ~ 'beat'] | d([]) | first).version | d('') | trim }}"

@@ -1,5 +1,5 @@
 ---
-- name: Search | Prepare | Import repository
+- name: Standalone | Prepare | Import repository
   hosts: all
   tasks:
     - name: Import a key from a url
@@ -16,7 +16,7 @@
         enabled: true
         gpgcheck: false
 
-- name: Search | Prepare | Create prepare_certificates
+- name: Standalone | Prepare | Create prepare_certificates
   hosts: all[0]
   vars:
     prepare_ca_privatekey: /etc/pki/tls/private/ca-certificate.key
