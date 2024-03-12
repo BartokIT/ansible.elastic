@@ -1,0 +1,35 @@
+---
+- name: Get certificate
+  ansible.builtin.slurp:
+    path: /etc/pki/tls/certs/ca-certificate.pem
+  register: _converge_ca_certificate
+
+- name: Cluster configuration
+  ansible.builtin.set_fact:
+    r_kibana_cluster_name: molecule_cluster
+    r_kibana_node_rack: rotating
+    r_kibana_elasticsearch_nodes: >-
+      {%- filter list -%}
+        [{%- for node in groups.cluster -%}
+          '{{ node }}',
+      {%- endfor -%}]{%- endfilter -%}
+    r_kibana_users_initial_elastic_password: bA3nb0g.Hyw
+    r_kibana_keystore_password: 'adfs8NSM2nc.ug'
+    r_kibana_keystore:
+      keystore.seed: 'J=Z4Y50EUvoAUS?^rQ_@'
+      xpack.security.http.ssl.keystore.secure_password: 'XC9sxbnkTzCP9aTEc74LfQ'
+      xpack.security.transport.ssl.keystore.secure_password: XC9sxbnkTzCP9aTEc74LfQ
+      xpack.security.transport.ssl.truststore.secure_password: XC9sxbnkTzCP9aTEc74LfQ
+      # test.secure.key: passwd1
+    r_kibana_configuration_ssl_certificate_authorities: "{{ _converge_ca_certificate.content | b64decode }}"
+    r_kibana_api_password: 'ansiblepassword'
+    r_kibana_configuration:
+      bootstrap:
+        memory_lock: false
+      xpack:
+        security:
+          audit:
+            enabled: false
+        monitoring:
+          collection:
+            enabled: true

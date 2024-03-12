@@ -111,7 +111,7 @@
   gather_facts: false
   tasks:
     - name: Read configurations
-      ansible.builtin.include_tasks: ../elasticsearch_configuration.yml
+      ansible.builtin.include_tasks: ../kibana_configuration.yml
 
     - name: Test the installation, configuration and product start
       ansible.builtin.set_fact:

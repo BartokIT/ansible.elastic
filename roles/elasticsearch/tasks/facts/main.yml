@@ -5,6 +5,13 @@
       - min
   when: ansible_fqdn is not defined
 
+- name: Facts | Installation | Installation info
+  ansible.builtin.set_fact:
+    r_elasticsearch_info:
+      installed: false
+      version: ''
+      started: false
+
 - name: Facts | Actions that will be performed
   ansible.builtin.debug:
     msg: "{{ r_elasticsearch_actions }}"
@@ -20,4 +27,4 @@
 
 - name: Facts | Include health facts gather
   ansible.builtin.include_tasks: facts/health.yml
-  when: r_elasticsearch_info.started
+  when: r_elasticsearch_info.installed

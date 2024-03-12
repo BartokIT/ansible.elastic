@@ -1,5 +1,14 @@
 ---
-- name: Gather information
+- name: Facts | Health | Populate service facts
+  ansible.builtin.service_facts:
+
+- name: Facts | Health | Startup info
+  ansible.builtin.set_fact:
+    r_elasticsearch_info: "{{ r_elasticsearch_info | combine({'started': _r_elasticsearch_started}) }}"
+  vars:
+    _r_elasticsearch_started: "{{ (ansible_facts.services['elasticsearch.service'] | d({'state': ''})).state == 'running' }}"
+
+- name: Facts | Health | Gather information
   bartokit.elastic.elasticsearch_info:
     user: 'elastic'
     password: "{{ r_elasticsearch_users_initial_elastic_password | d(omit) }}"
@@ -9,3 +18,4 @@
       - cluster_health
     ssl_verify: false
   register: _r_elasticsearch_status_info
+  when: r_elasticsearch_info.started

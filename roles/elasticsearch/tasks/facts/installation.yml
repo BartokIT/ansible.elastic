@@ -9,10 +9,10 @@
 
 - name: Facts | Installation | Installation info
   ansible.builtin.set_fact:
-    r_elasticsearch_info:
-      installed: "{{ (ansible_facts.packages.elasticsearch | d([]) | length) > 0 }}"
-      version: "{{ (ansible_facts.packages.elasticsearch | d([]) | first).version | d('') }}"
-      started: "{{ (ansible_facts.services['elasticsearch.service'] | d({'state': ''})).state == 'running' }}"
+    r_elasticsearch_info: "{{ r_elasticsearch_info | combine({'installed': _r_elasticsearch_installed, 'version': _r_elasticsearch_version}) }}"
+  vars:
+    _r_elasticsearch_installed: "{{ (ansible_facts.packages.elasticsearch | d([]) | length) > 0 }}"
+    _r_elasticsearch_version: "{{ (ansible_facts.packages.elasticsearch | d([]) | first).version | d('') }}"
 
 - name: Facts | Installation | Print information   # noqa jinja[spacing]
   ansible.builtin.debug:
