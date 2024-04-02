@@ -64,8 +64,7 @@ _r_kibana_configuration:
     name: '{{ r_kibana_node_name }}'
     host: '{{ r_kibana_node_name }}'
   path:
-    logs: /var/log/elasticsearch
-    data: /var/lib/elasticsearch
+    data: /var/lib/kibana
   logging:
     root:
       appenders:
@@ -89,6 +88,13 @@ r_kibana_keystore_password_file: "{{ _r_kibana_config_folder }}/keystore.passwor
 r_kibana_keystore:
 _r_kibana_keystore:
   "bootstrap.password": "{{ r_kibana_users_initial_elastic_password }}"
+## password quality settings
+_r_kibana_password_minlength: 12
+_r_kibana_password_minuppercase: 3
+_r_kibana_password_minlowercase: 3
+_r_kibana_password_mindigits: 2
+_r_kibana_password_minspecialchars: 1
+_r_kibana_password_specialchars: '!._@#'
 
 ## jvm setting
 r_kibana_jvm_initial_heap: 1g

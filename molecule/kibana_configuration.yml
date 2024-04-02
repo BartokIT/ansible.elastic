@@ -24,12 +24,52 @@
     r_kibana_configuration_ssl_certificate_authorities: "{{ _converge_ca_certificate.content | b64decode }}"
     r_kibana_api_password: 'ansiblepassword'
     r_kibana_configuration:
-      bootstrap:
-        memory_lock: false
+      elasticsearch:
+        username: kibana_system
+        password: unknown.1234
+        ssl:
+          certificateAuthorities: /etc/pki/tls/certs/ca-certificate.pem
+      server:
+        publicBaseUrl: https://localhost:5601/
+        ssl:
+          enabled: true
+          certificate: /etc/pki/tls/certs/kibana.pem
+          key: /etc/pki/tls/private/kibana.key
+          supportedProtocols:
+            - TLSv1.3
+            - TLSv1.2
+          cipherSuites:
+            - "ECDHE-RSA-AES256-GCM-SHA384"
+            - "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"
+            - "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384"
+            - "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256"
+            - "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256"
+            - "TLS_RSA_WITH_AES_256_GCM_SHA384"
+            - "TLS_RSA_WITH_AES_128_GCM_SHA256"
+            - "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+            - "TLS_AES_256_GCM_SHA384"
+            - "TLS_AES_128_GCM_SHA256"
+            - "TLS_CHACHA20_POLY1305_SHA256"
+            - "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"
+            - "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+            - "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384"
+            - "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256"
+            - "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
+            - "TLS_RSA_WITH_AES_256_CBC_SHA256"
+            - "TLS_RSA_WITH_AES_128_CBC_SHA256"
       xpack:
+        encryptedSavedObjects:
+          encryptionKey: 0b8f42d021e388b4ee314977ee2af522
+        reporting:
+          encryptionKey: 623cb14bb42259ac0be7c53b7fac1d44
+          csv:
+            maxSizeBytes: 2097152000
+          queue:
+            timeout: 1800000
         security:
-          audit:
-            enabled: false
-        monitoring:
+          encryptionKey: 02fa78f4e9e83fecfaf4084ec5672409
+
+      monitoring:
+        kibana:
           collection:
-            enabled: true
+            enabled: false

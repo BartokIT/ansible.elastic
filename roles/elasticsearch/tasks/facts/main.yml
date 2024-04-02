@@ -28,3 +28,14 @@
 - name: Facts | Include health facts gather
   ansible.builtin.include_tasks: facts/health.yml
   when: r_elasticsearch_info.installed
+
+- name: Facts | Installation | Print information   # noqa jinja[spacing]
+  ansible.builtin.debug:
+    msg: "{{ _r_elasicsearch_info.split('|') }}"
+  vars:
+    _r_elasicsearch_info: >-
+        Installed: {{ r_elasticsearch_info.installed }}
+        {%- if r_elasticsearch_info.installed -%}
+        |Version:   {{ r_elasticsearch_info.version }}
+        |Started:   {{ r_elasticsearch_info.started }}
+        {%- endif -%}

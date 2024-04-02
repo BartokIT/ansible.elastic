@@ -1,6 +1,8 @@
 ---
 - name: Standalone | Converge | Beats
-  hosts: none
+  hosts: beats
+  tags:
+    - beats
   gather_facts: false
   tasks:
     - name: Read configurations
@@ -77,6 +79,8 @@
 
 - name: Standalone | Converge | Elasticsearch
   hosts: cluster
+  tags:
+    - elastic
   gather_facts: false
   tasks:
 
@@ -108,6 +112,8 @@
 
 - name: Standalone | Converge | Kibana
   hosts: kibanas
+  tags:
+    - kibana
   gather_facts: false
   tasks:
     - name: Read configurations

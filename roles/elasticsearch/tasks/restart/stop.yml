@@ -2,3 +2,8 @@
   systemd:
     name: "{{ _r_elasticsearch_systemd_name }}"
     state: stopped
+  notify: _r_elasticsearch_gather_health_facts
+
+- name: Flush handlers
+  meta: flush_handlers
+  when: ('stop' in r_elasticsearch_actions)

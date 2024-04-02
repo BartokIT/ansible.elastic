@@ -5,6 +5,11 @@
   listen:
     - _r_elasticsearch_gather_installation_facts
 
+- name: Get starting informations
+  ansible.builtin.include_tasks: facts/health.yml
+  listen:
+    - _r_elasticsearch_gather_health_facts
+
 
 - name: Set restart flag to true
   ansible.builtin.set_fact:

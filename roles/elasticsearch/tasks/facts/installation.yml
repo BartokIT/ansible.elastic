@@ -4,9 +4,6 @@
     manager: auto
   no_log: true
 
-- name: Facts | Installation | Populate service facts
-  ansible.builtin.service_facts:
-
 - name: Facts | Installation | Installation info
   ansible.builtin.set_fact:
     r_elasticsearch_info: "{{ r_elasticsearch_info | combine({'installed': _r_elasticsearch_installed, 'version': _r_elasticsearch_version}) }}"
@@ -14,13 +11,4 @@
     _r_elasticsearch_installed: "{{ (ansible_facts.packages.elasticsearch | d([]) | length) > 0 }}"
     _r_elasticsearch_version: "{{ (ansible_facts.packages.elasticsearch | d([]) | first).version | d('') }}"
 
-- name: Facts | Installation | Print information   # noqa jinja[spacing]
-  ansible.builtin.debug:
-    msg: "{{ _r_elasicsearch_info.split('|') }}"
-  vars:
-    _r_elasicsearch_info: >-
-        Installed: {{ r_elasticsearch_info.installed }}
-        {%- if r_elasticsearch_info.installed -%}
-        |Version:   {{ r_elasticsearch_info.version }}
-        |Started:   {{ r_elasticsearch_info.started }}
-        {%- endif -%}
+

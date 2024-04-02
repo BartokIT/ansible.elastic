@@ -193,7 +193,9 @@ _r_kibana_configuration_schema:
     type: string
   server.socketTimeout:
     type: int
-  server.ssl.certificate and server.ssl.key:
+  server.ssl.certificate:
+    type: string
+  server.ssl.key:
     type: string
   server.ssl.certificateAuthorities:
     type: string
@@ -253,5 +255,112 @@ _r_kibana_configuration_schema:
     type: bool
   xpack.upgrade_assistant.ui.enabled:
     type: bool
+  xpack.encryptedSavedObjects.encryptionKey:
+    type: string
+  xpack.encryptedSavedObjects.keyRotation.decryptionOnlyKeys:
+    type: list
+  xpack.reporting.enabled:
+    type: bool
+  xpack.reporting.encryptionKey:
+    type: string
+  xpack.reporting.capture.maxAttempts:
+    type: int
+  xpack.reporting.queue.indexInterval:
+    type: string
+  xpack.reporting.queue.pollEnabled:
+    type: bool
+  xpack.reporting.queue.pollInterval:
+    type: string
+  xpack.reporting.queue.timeout:
+    type: string
+  xpack.screenshotting.capture.timeouts.openUrl:
+    type: string
+  xpack.screenshotting.capture.timeouts.waitForElements:
+    type: string
+  xpack.screenshotting.capture.timeouts.renderComplete:
+    type: string
+  xpack.screenshotting.browser.chromium.disableSandbox:
+    type: bool
+  xpack.screenshotting.browser.chromium.proxy.enabled:
+    type: bool
+  xpack.screenshotting.browser.chromium.proxy.server:
+    type: string
+  xpack.screenshotting.browser.chromium.proxy.bypass:
+    type: list
+  xpack.screenshotting.networkPolicy.enabled:
+    type: bool
+  xpack.screenshotting.networkPolicy.rules:
+    type: list
+  xpack.reporting.csv.maxSizeBytes:
+    type: string
+  xpack.reporting.csv.scroll.size:
+    type: int
+  xpack.reporting.csv.scroll.duration:
+    type: string
+  xpack.reporting.csv.scroll.strategy:
+    type: string
+    choices:
+      - pit
+      - scroll
+  xpack.reporting.csv.checkForFormulas:
+    type: bool
+  xpack.reporting.csv.escapeFormulaValues:
+    type: bool
+  xpack.reporting.csv.enablePanelActionDownload:
+    type: bool
+  xpack.reporting.csv.useByteOrderMarkEncoding:
+    type: bool
+  xpack.reporting.roles.enabled:
+    type: bool
+  xpack.reporting.roles.allow:
+    type: string
+  xpack.reporting.kibanaServer.port:
+    type: string
+  xpack.reporting.kibanaServer.protocol:
+    type: string
+  xpack.reporting.kibanaServer.hostname:
+    type: string
+  xpack.security.cookieName:
+    type: string
+  xpack.security.encryptionKey:
+    type: string
+  xpack.security.secureCookies:
+    type: string
+  xpack.security.sameSiteCookies:
+    type: string
+  xpack.security.session.idleTimeout:
+    type: string
+  xpack.security.session.lifespan:
+    type: string
+  xpack.security.session.cleanupInterval:
+    type: string
+  xpack.security.session.concurrentSessions.maxSessions:
+    type: string
+  xpack.security.audit.enabled:
+    type: bool
+  xpack.security.audit.appender:
+    type: dict
+  monitoring.cluster_alerts.email_notifications.enabled:
+    type: bool
+  monitoring.cluster_alerts.email_notifications.email_address:
+    type: string
+  monitoring.ui.ccs.enabled:
+    type: bool
+  monitoring.ui.elasticsearch.hosts:
+    type: string
+  monitoring.ui.elasticsearch.username:
+    type: string
+  monitoring.ui.elasticsearch.password:
+    type: string
+  monitoring.ui.elasticsearch.serviceAccountToken:
+    type: string
+  monitoring.ui.elasticsearch.pingTimeout:
+    type: int
+  monitoring.ui.elasticsearch.ssl:
+    type: dict
+  monitoring.kibana.collection.enabled:
+    type: bool
+  monitoring.kibana.collection.interval:
+    type: int
   i18n.locale:
     type: string

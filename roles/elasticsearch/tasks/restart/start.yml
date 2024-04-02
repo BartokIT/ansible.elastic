@@ -2,7 +2,8 @@
   systemd:
     name: "{{ _r_elasticsearch_systemd_name }}"
     state: started
-  notify: _r_elasticsearch_gather_installation_facts
+  notify: _r_elasticsearch_gather_health_facts
 
 - name: Flush handlers
   meta: flush_handlers
+  when: ('start' in r_elasticsearch_actions)

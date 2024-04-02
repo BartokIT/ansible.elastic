@@ -4,8 +4,11 @@
     (_r_elasticsearch_triggered_restart and
     'restart_on_configuration_change' in r_elasticsearch_actions)
 
-- name: Stop Elasticsearch
+- name: Start Elasticsearch
   ansible.builtin.include_tasks: restart/start.yml
   when: >-
     (_r_elasticsearch_triggered_restart and
     'restart_on_configuration_change' in r_elasticsearch_actions)
+
+- name: Flush handlers
+  meta: flush_handlers
