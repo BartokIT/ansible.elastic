@@ -26,8 +26,6 @@
         group: "{{ _r_kibana_group }}"
         mode: "{{ _r_kibana_loop_folders.mode }}"
       loop:
-        - path: "{{ r_kibana_configuration.path.logs }}"
-          mode: '755'
         - path: "{{ r_kibana_configuration.path.data }}"
           mode: '755'
       loop_control:
@@ -36,17 +34,6 @@
 - name: Main configuration files
   when: ('main_files' in r_kibana_configure_actions )
   block:
-    - name: Configure jvm heap settings
-      ansible.builtin.copy:
-        content: |-
-          -Xms{{ r_kibana_jvm_initial_heap }}
-          -Xmx{{ r_kibana_jvm_maximum_heap }}
-        dest: "{{ _r_kibana_config_folder }}/jvm.options.d/heap.options"
-        mode: 0660
-        owner: root
-        group: "{{ _r_kibana_group }}"
-      notify:
-        _r_kibana_configuration_changed
     - name: Write elasticsearch.yml configuration file
       ansible.builtin.template:
         src: kibana.yml.j2
@@ -97,29 +84,28 @@
 - name: SSL/TLS keystore management
   when:
     - ('ssl' in r_kibana_configure_actions)
-    - r_kibana_configuration.xpack.security.enabled | bool
-    - r_kibana_configuration.xpack.security.http.ssl.enabled | bool or
-      r_kibana_configuration.xpack.security.transport.ssl.enabled | bool
+    - r_kibana_configuration.server.ssl.enabled | default(false) | bool
   block:
-    - name: Create the PKCS12 http file
-      community.crypto.openssl_pkcs12:
-        action: export
-        path: "{{ _r_kibana_config_folder }}/{{ r_kibana_configuration.xpack.security.http.ssl.keystore.path }}"
-        friendly_name: elastic
-        privatekey_path: /etc/pki/tls/private/{{ ansible_fqdn }}.key
-        certificate_path: /etc/pki/tls/certs/{{ ansible_fqdn }}.pem
-        other_certificates: /etc/pki/tls/certs/ca-certificate.pem
-        privatekey_passphrase: omit
-        passphrase: "{{ r_kibana_keystore['xpack.security.http.ssl.keystore.secure_password'] }}"
-        state: present
+    - name: Write the ssl key
+      ansible.builtin.copy:
+        content: "{{ r_kibana_configuration_ssl_key }}"
+        dest: "{{ r_kibana_configuration.server.ssl.key }}"
         owner: root
         group: "{{ _r_kibana_group }}"
-        mode: '0660'
+        mode: '0640'
+
+    - name: Write the ssl key
+      ansible.builtin.copy:
+        content: "{{ r_kibana_configuration_ssl_certificate }}"
+        dest: "{{ r_kibana_configuration.server.ssl.certificate }}"
+        owner: root
+        group: "{{ _r_kibana_group }}"
+        mode: '0640'
 
     - name: Write the CA certificate
       ansible.builtin.copy:
         content: "{{ r_kibana_configuration_ssl_certificate_authorities }}"
-        dest: "{{ _r_kibana_config_folder }}/{{ r_kibana_configuration.xpack.security.transport.ssl.certificate_authorities }}"
+        dest: "{{ r_kibana_configuration.elasticsearch.ssl.certificateAuthorities }}"
         owner: root
         group: "{{ _r_kibana_group }}"
         mode: '0660'

@@ -126,11 +126,10 @@
           - configure
           - start
           # - restart_on_configuration_change
-        # r_kibana_configure_actions:
-        #   - folders
-        #   - main_files
-        #   - keystore
-        #   - ssl
+        r_kibana_configure_actions:
+           - folders
+           - main_files
+           - ssl
         #   - enforce_keystore
         #   - component_template
         #   - index_template

@@ -27,7 +27,6 @@
           - "{{ ansible_fqdn in (r_kibana_cluster_nodes | map(attribute='host') | list) }}"
         msg: Current host ({{ ansible_fqdn }}) is not present inside the cluster nodes list
 
-
     - name: Facts | Sanity | Assertion about keystore password quality
       ansible.builtin.assert:
         that:
@@ -66,6 +65,16 @@
         r_kibana_configuration: "{{ _r_kibana_configuration | combine(r_kibana_configuration, recursive=True) }}"
       no_log: "{{ not (__r_kibana_show_nolog | bool) }}"
 
+    - name: Facts | Sanity | Assertion about ssl parameters
+      ansible.builtin.assert:
+        that:
+          - r_kibana_configuration.ssl.key is truthy
+          - r_kibana_configuration.ssl.certificate is truthy
+          - r_kibana_configuration_ssl_key is truthy
+          - r_kibana_configuration_ssl_certificate is truthy
+          - r_kibana_configuration_ssl_certificate_authorities is truthy
+        msg: SSL enabled but not all configurations set
+      when: r_kibana_configuration.ssl.enabled | d(false) | bool
 
 # validation of the configuration
 - name: Include variables

@@ -20,7 +20,12 @@ _r_kibana_actions_allowed:
 
 # more granular configuration actions
 r_kibana_configure_actions: []
-_r_kibana_configure_actions_allowed: []
+_r_kibana_configure_actions_allowed:
+  - folders
+  - sysctl
+  - main_files
+  - keystore
+  - ssl
 _r_kibana_triggered_restart: false
 
 # ---- installation variables ----
@@ -80,6 +85,8 @@ _r_kibana_configuration:
 
 
 r_kibana_configuration_ssl_certificate_authorities: ''
+r_kibana_configuration_ssl_key: ''
+r_kibana_configuration_ssl_certificate: ''
 r_kibana_configuration: {}
 
 ## keystore settings

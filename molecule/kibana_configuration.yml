@@ -1,7 +1,17 @@
 ---
-- name: Get certificate
+- name: Get ca certificate
   ansible.builtin.slurp:
     path: /etc/pki/tls/certs/ca-certificate.pem
+  register: _converge_ssl_ca_certificate
+
+- name: Get key
+  ansible.builtin.slurp:
+    path:  /etc/pki/tls/private/kibana.key
+  register: _converge_ssl_key
+
+- name: Get certificate
+  ansible.builtin.slurp:
+    path: /etc/pki/tls/certs/kibana.pem
   register: _converge_ca_certificate
 
 - name: Cluster configuration
@@ -21,20 +31,23 @@
       xpack.security.transport.ssl.keystore.secure_password: XC9sxbnkTzCP9aTEc74LfQ
       xpack.security.transport.ssl.truststore.secure_password: XC9sxbnkTzCP9aTEc74LfQ
       # test.secure.key: passwd1
-    r_kibana_configuration_ssl_certificate_authorities: "{{ _converge_ca_certificate.content | b64decode }}"
+    r_kibana_configuration_ssl_certificate_authorities: "{{ _converge_ssl_ca_certificate.content | b64decode }}"
+    r_kibana_configuration_ssl_key: "{{ _converge_ssl_key.content | b64decode }}"
+    r_kibana_configuration_ssl_certificate: "{{ _converge_ca_certificate.content | b64decode }}"
     r_kibana_api_password: 'ansiblepassword'
     r_kibana_configuration:
       elasticsearch:
         username: kibana_system
         password: unknown.1234
         ssl:
-          certificateAuthorities: /etc/pki/tls/certs/ca-certificate.pem
+          certificateAuthorities: /etc/kibana/ca-certificate.pem
       server:
         publicBaseUrl: https://localhost:5601/
+        host: "0.0.0.0"
         ssl:
           enabled: true
-          certificate: /etc/pki/tls/certs/kibana.pem
-          key: /etc/pki/tls/private/kibana.key
+          certificate: /etc/kibana/kibana.pem
+          key: /etc/kibana/kibana.key
           supportedProtocols:
             - TLSv1.3
             - TLSv1.2
