@@ -37,7 +37,7 @@
     - name: Write elasticsearch.yml configuration file
       ansible.builtin.template:
         src: kibana.yml.j2
-        dest: "{{ _r_kibana_config_folder }}/elasticsearch.yml"
+        dest: "{{ _r_kibana_config_folder }}/kibana.yml"
         mode: 0660
         owner: root
         group: "{{ _r_kibana_group }}"
