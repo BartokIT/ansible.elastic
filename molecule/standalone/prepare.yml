@@ -109,8 +109,8 @@
     - name: Create private key for new certificate
       community.crypto.openssl_privatekey:
         path: "/tmp/{{ item.key }}_{{ item.name }}.key"
-        cipher: auto
-        passphrase: omit
+        # cipher: auto
+        # passphrase: omit
       loop: "{{ prepare_certificates | bartokit.elastic.dictoflist2flatlist }}"
 
     - name: Slurp private key
@@ -124,7 +124,7 @@
         common_name: "{{ item.name }}"
         privatekey_path: "/tmp/{{ item.key }}_{{ item.name }}.key"
         subject_alt_name: "{{ item.subject_alt_name }}"
-        #privatekey_passphrase: omit
+        # privatekey_passphrase: omit
       loop: "{{ prepare_certificates | dictoflist2flatlist }}"
       register: _prepare_certificates_csr
 
