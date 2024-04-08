@@ -21,7 +21,7 @@
     r_kibana_elasticsearch_nodes: >-
       {%- filter list -%}
         [{%- for node in groups.cluster -%}
-          '{{ node }}',
+          'https://{{ node }}:9200',
       {%- endfor -%}]{%- endfilter -%}
     r_kibana_users_initial_elastic_password: bA3nb0g.Hyw
     r_kibana_keystore_password: 'adfs8NSM2nc.ug'
