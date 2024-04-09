@@ -89,6 +89,7 @@ module_args = dict(
     api_endpoint=dict(type='str', required=False, default='https://localhost:9200'),
     ssl_verify=dict(type='bool', required=False, default=True),
     mode=dict(type='str', required=False, choiches=['multiple', 'present', 'absent'], default='multiple'),
+    enforce_key=dict(type='bool', required=False, default=False),
     users=dict(type='list', required=True, no_log=False, elements='dict', options=dict(
         enabled=dict(type='bool', required=False, default=True),
         email=dict(type='str', required=False, default=None),
@@ -123,6 +124,7 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
         Return the keys/values and set the behaviour of the base class
         """
         self.settings(compare_values=parameters['force'])
+        self._enforce_key =
         return parameters[parameters_argument]
 
     def initialization(self, parameter_name_with_items, parameters):
@@ -169,14 +171,16 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
         """Add a component template."""
         value_detach = copy.deepcopy(value)
         logging.debug(value_detach)
-        self.__em.put_user(key, **value_detach)
+        if key not in self.__managed_users:
+            self.__em.put_user(key, **value_detach)
 
     def update_key(self, key, input_value, current_value):
         """Update a component template."""
         value_detach = copy.deepcopy(input_value)
         value_detach.pop('password')
         logging.debug("Values %s", value_detach)
-        self.__em.put_user(key, **value_detach)
+        if key not in self.__managed_users:
+            self.__em.put_user(key, **value_detach)
 
     def __find_differences(self, d1, d2, path=""):
         for k in d1:
@@ -213,9 +217,11 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
         components_managed = self.__em.get_users(only_managed=True)
         differences = [value for value in input_keys if value in components_managed.keys()]
         logging.debug("Managed users found %s" % differences)
+        self.__managed_users = []
         if differences:
             for key in differences:
                 components[key]=components_managed[key]
+                self.__managed_users.append(key)
         return components
 
 
