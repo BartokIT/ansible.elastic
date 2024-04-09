@@ -10,7 +10,7 @@
     user: 'elastic'
     password: "xxxxxx"
     ssl_verify: false
-    users: "{{ _r_elasticsearch_api_user }}"
+    users: "{{ _r_elasticsearch_api_user | bartokit.elastic.dictofdict2listofdict('username') }}"
     mode: present
   run_once: true
   when: ('initial' in r_elasticsearch_configure_actions)
@@ -20,7 +20,7 @@
     user: '{{ _r_elasticsearch_api_user.keys() | first }}'
     password: "{{ r_elasticsearch_api_password }}"
     ssl_verify: false
-    users: "{{ r_elasticsearch_users }}"
+    users: "{{ r_elasticsearch_users | bartokit.elastic.dictofdict2listofdict('username') }}"
   run_once: true
   when: ('users' in r_elasticsearch_configure_actions)
 

@@ -49,8 +49,8 @@ class ElasticManager:
             req.raise_for_status()
         except Exception as exc:
             logging.error("{}".format(exc))
-            if 'reason' in response:
-                logging.error("%s" % response.reason)
+            if 'error' in response:
+                logging.error("Error: %s" % response['error'])
             raise
 
         if json:

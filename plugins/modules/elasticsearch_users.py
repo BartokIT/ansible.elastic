@@ -28,7 +28,30 @@ options:
           - This is a key value dictionary containing as key the username of the usert and as value the specifications
           - 'The allowed keys for the subdictionary are: I(index_patterns), I(composed_of), I(data_stream), I(_meta), I(priority) or I(template).'
         required: true
-        type: dict
+        type: list
+        elements:
+            enabled:
+                type: bool
+                required false
+            email:
+                type: str
+                required: false
+            full_name:
+                type: str
+                required: false
+            username:
+                type: str
+                required: true
+            password:
+                type: str
+                required: false
+                no_log: true
+            metadata:
+                type: str
+                required: false
+            roles:
+                type= list
+                required: false
 extends_documentation_fragment:
   - bartokit.elastic.login_options
 '''
@@ -66,7 +89,15 @@ module_args = dict(
     api_endpoint=dict(type='str', required=False, default='https://localhost:9200'),
     ssl_verify=dict(type='bool', required=False, default=True),
     mode=dict(type='str', required=False, choiches=['multiple', 'present', 'absent'], default='multiple'),
-    users=dict(type='dict', required=True, no_log=True)
+    users=dict(type='list', required=True, no_log=False, elements='dict', options=dict(
+        enabled=dict(type='bool', required=False, default=True),
+        email=dict(type='str', required=False, default=None),
+        full_name=dict(type='str', required=False, default=None),
+        username=dict(type='str', required=True),
+        password=dict(type='str', required=True, no_log=True),
+        metadata=dict(type='dict', required=False, default={}),
+        roles=dict(type='list', required=False, default=[])
+    ))
 )
 
 
@@ -75,7 +106,8 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
 
     def __init__(self, argument_spec):
         """Call the constructor of the parent class."""
-        super().__init__(parameter_name_with_mode='mode', parameter_name_with_keys='users',
+        super().__init__(parameter_name_with_mode='mode', parameter_name_with_items='users',
+                         items_type='list', item_identifier_subkey_name='username',
                          argument_spec=argument_spec, supports_check_mode=False,
                          log_file='ansible_elasticsearch_users.log')
         self.__em = ElasticManager(self,
@@ -93,9 +125,9 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
         self.settings(compare_values=parameters['force'])
         return parameters[parameters_argument]
 
-    def initialization(self, parameter_name_with_keys, parameters):
+    def initialization(self, parameter_name_with_items, parameters):
         """Initialize the base class."""
-        return parameters[parameter_name_with_keys]
+        return parameters[parameter_name_with_items]
 
     def pre_crud(self, current_keys):
         # Remove from the list the key managed by the system
@@ -111,6 +143,10 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
                 value_copy['enabled'] = True
             if 'metadata' not in value_copy:
                 value_copy['metadata'] = {}
+            if not value_copy['full_name']:
+                value_copy.pop('full_name')
+            if not value_copy['email']:
+                value_copy.pop('email')
             return value_copy
         else:
             if 'full_name' in value and value['full_name'] is None:
@@ -139,6 +175,7 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
         """Update a component template."""
         value_detach = copy.deepcopy(input_value)
         value_detach.pop('password')
+        logging.debug("Values %s", value_detach)
         self.__em.put_user(key, **value_detach)
 
     def __find_differences(self, d1, d2, path=""):
@@ -163,8 +200,8 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
 
         input_value_detached = copy.deepcopy(input_value)
         input_value_detached.pop('password')
-        logging.debug(input_value)
-        logging.debug(current_value)
+        logging.debug("INPUT %s",input_value_detached)
+        logging.debug("CURRENT %s", current_value)
         difference_found = self.__find_differences(input_value_detached, current_value)
         if difference_found:
             logging.debug("Found differences for key %s", key)

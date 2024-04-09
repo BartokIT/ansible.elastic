@@ -82,7 +82,7 @@ class BartokITElasticsearchILMPolicies(BartokITAnsibleModule):
 
     def __init__(self, argument_spec):
         """Call the constructor of the parent class."""
-        super().__init__(parameter_name_with_mode='mode', parameter_name_with_keys='policies',
+        super().__init__(parameter_name_with_mode='mode', parameter_name_with_items='policies',
                          argument_spec=argument_spec, supports_check_mode=False,
                          log_file='ansible_elasticsearch_ilm_policies.log')
         self.__em = ElasticManager(self,
@@ -100,9 +100,9 @@ class BartokITElasticsearchILMPolicies(BartokITAnsibleModule):
         self.settings(compare_values=parameters['force'])
         return parameters[parameters_argument]
 
-    def initialization(self, parameter_name_with_keys, parameters):
+    def initialization(self, parameter_name_with_items, parameters):
         """Initialize the base class."""
-        return parameters[parameter_name_with_keys]
+        return parameters[parameter_name_with_items]
 
     def pre_crud(self, current_keys):
         # Remove from the list the key managed by the system

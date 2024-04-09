@@ -19,7 +19,7 @@ class BartokITAnsibleModule(AnsibleModule):
 
     """
 
-    def __init__(self, argument_spec, parameter_name_with_mode='mode', parameter_name_with_keys='keys', supports_check_mode=True, log_file=None):
+    def __init__(self, argument_spec, parameter_name_with_mode='mode', parameter_name_with_items='keys', items_type='dict', item_identifier_subkey_name='name', supports_check_mode=True, log_file=None):
         """
         Initialize the ansible modules.
 
@@ -34,7 +34,9 @@ class BartokITAnsibleModule(AnsibleModule):
 
         self.__changed = True
         self.__parameter_name_with_mode = parameter_name_with_mode
-        self.__parameter_name_with_keys = parameter_name_with_keys
+        self.__parameter_name_with_items = parameter_name_with_items
+        self.__items_type = items_type
+        self.__item_identifier_subkey_name = item_identifier_subkey_name
         self.behaviour = dict()
         self._to_be_added = []
         self._to_be_removed = []
@@ -46,9 +48,24 @@ class BartokITAnsibleModule(AnsibleModule):
         """Set the module behaviour."""
         self.__compare_values = compare_values
 
-    def initialization(self, parameter_name_with_keys, parameters):
+    def __list_or_dict_support(self, parameters):
+        """Convert list or dictionary."""
+        if self.__items_type == 'dict':
+            pass
+        elif self.__items_type == 'list':
+            # cast list to dict
+            dictionary_from_list = {}
+            for _item in parameters[self.__parameter_name_with_items]:
+                dictionary_from_list[_item[self.__item_identifier_subkey_name]] = _item
+                _item.pop(self.__item_identifier_subkey_name)
+            self.params[self.__parameter_name_with_items] = dictionary_from_list
+        else:
+            raise Exception("items type must be list or dict")
+
+
+    def initialization(self, parameter_name_with_items, parameters):
         """Initialize the parameters."""
-        return parameters[parameter_name_with_keys]
+        return parameters[parameter_name_with_items]
 
     # CRUD METHOD
     def create_key(self, key, new_value):
@@ -121,8 +138,9 @@ class BartokITAnsibleModule(AnsibleModule):
         diff_before_keys = []
         diff_after_keys = []
         # initialization
+        self.__list_or_dict_support(self.params)
         self.__keys = self.initialization(
-            self.__parameter_name_with_keys, self.params)
+            self.__parameter_name_with_items, self.params)
 
         diff_before_output = copy.deepcopy(self.describe_info_for_output())
         self.__changed = self.pre_run()
@@ -202,9 +220,9 @@ class BartokITAnsibleModule(AnsibleModule):
         diff_after_keys.sort()
         diff_after_output = copy.deepcopy(self.describe_info_for_output())
         diff_before_output.update(
-            {self.__parameter_name_with_keys: diff_before_keys})
+            {self.__parameter_name_with_items: diff_before_keys})
         diff_after_output.update(
-            {self.__parameter_name_with_keys: diff_after_keys})
+            {self.__parameter_name_with_items: diff_after_keys})
         result = {'diff': {'before': diff_before_output,
                            'after': diff_after_output}, 'changed': self.__changed}
         result.update(diff_after_output)

@@ -109,7 +109,7 @@
         privatekey_path: /etc/pki/tls/private/{{ ansible_fqdn }}.key
         certificate_path: /etc/pki/tls/certs/{{ ansible_fqdn }}.pem
         other_certificates: /etc/pki/tls/certs/ca-certificate.pem
-        privatekey_passphrase: omit
+        privatekey_passphrase: "{{ r_elasticsearch_pkcs12_password | d(omit) }}"
         passphrase: "{{ r_elasticsearch_keystore['xpack.security.http.ssl.keystore.secure_password'] }}"
         state: present
         owner: root

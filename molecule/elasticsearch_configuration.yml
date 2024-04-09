@@ -67,7 +67,7 @@
           - beattest-ct
       auditbeat-8.11.2:
         index_patterns:
-          -  auditbeat-8.11.2
+          - auditbeat-8.11.2
         composed_of: []
       filebeat-8.11.2:
         index_patterns:
@@ -132,7 +132,6 @@
     r_elasticsearch_users:
       mytestuser:
         password: unknown.1234
-        roles:
         full_name: test user
       kibana_system:
         password: unknown.1234

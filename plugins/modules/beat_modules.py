@@ -81,7 +81,7 @@ class BartokITElasticsearchBeatModule(BartokITAnsibleModule):
 
     def __init__(self, argument_spec):
         """Call the constructor of the parent class."""
-        super(BartokITElasticsearchBeatModule, self).__init__(parameter_name_with_mode='mode', parameter_name_with_keys='modules',
+        super(BartokITElasticsearchBeatModule, self).__init__(parameter_name_with_mode='mode', parameter_name_with_items='modules',
                          argument_spec=argument_spec, supports_check_mode=False,
                          log_file='ansible_beat_modules.log')
         self.__em = BeatManager(self)
