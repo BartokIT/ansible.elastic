@@ -89,7 +89,7 @@ module_args = dict(
     api_endpoint=dict(type='str', required=False, default='https://localhost:9200'),
     ssl_verify=dict(type='bool', required=False, default=True),
     mode=dict(type='str', required=False, choiches=['multiple', 'present', 'absent'], default='multiple'),
-    enforce_key=dict(type='bool', required=False, default=False),
+    enforce_password=dict(type='bool', required=False, default=False),
     users=dict(type='list', required=True, no_log=False, elements='dict', options=dict(
         enabled=dict(type='bool', required=False, default=True),
         email=dict(type='str', required=False, default=None),
@@ -107,7 +107,7 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
 
     def __init__(self, argument_spec):
         """Call the constructor of the parent class."""
-        super().__init__(parameter_name_with_mode='mode', parameter_name_with_items='users',
+        super(BartokITElasticsearchUsers, self).__init__(parameter_name_with_mode='mode', parameter_name_with_items='users',
                          items_type='list', item_identifier_subkey_name='username',
                          argument_spec=argument_spec, supports_check_mode=False,
                          log_file='ansible_elasticsearch_users.log')
@@ -117,18 +117,14 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
                                    api_password=self.params['password'],
                                    ssl_verify=self.params['ssl_verify'])
 
-    def initialization(self, parameters_argument, parameters):
+    def initialization(self, parameter_name_with_items, parameters):
         """
         Initialize the module.
 
         Return the keys/values and set the behaviour of the base class
         """
-        self.settings(compare_values=parameters['force'])
-        self._enforce_key =
-        return parameters[parameters_argument]
-
-    def initialization(self, parameter_name_with_items, parameters):
-        """Initialize the base class."""
+        self.__enforce_password = parameters['enforce_password']
+        logging.debug("Requested to enforce password: %s", self.__enforce_password)
         return parameters[parameter_name_with_items]
 
     def pre_crud(self, current_keys):
@@ -181,6 +177,9 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
         logging.debug("Values %s", value_detach)
         if key not in self.__managed_users:
             self.__em.put_user(key, **value_detach)
+        if self.__enforce_password:
+            self.__em.set_user_password(key, input_value['password'])
+
 
     def __find_differences(self, d1, d2, path=""):
         for k in d1:
@@ -204,12 +203,12 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
 
         input_value_detached = copy.deepcopy(input_value)
         input_value_detached.pop('password')
-        logging.debug("INPUT %s",input_value_detached)
-        logging.debug("CURRENT %s", current_value)
         difference_found = self.__find_differences(input_value_detached, current_value)
         if difference_found:
             logging.debug("Found differences for key %s", key)
-        return difference_found
+        else:
+            logging.debug("No differences found for key %s", key)
+        return difference_found or self.__enforce_password
 
     def list_current_keys(self, input_keys):
         """Return the list of components template actually present."""

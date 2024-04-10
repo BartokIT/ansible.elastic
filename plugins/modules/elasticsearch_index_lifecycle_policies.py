@@ -143,7 +143,7 @@ class BartokITElasticsearchILMPolicies(BartokITAnsibleModule):
         try:
             self.__em.put_ilm_policy(key, **value_detach)
         except requests.exceptions.HTTPError as err:
-            logging.error("%s" % req.text)
+            logging.error("%s" % err.text)
             raise SystemExit(err)
 
     def __find_differences(self, d1, d2, path=""):

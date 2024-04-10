@@ -370,7 +370,7 @@ class ElasticManager:
         return users_output
 
     def get_user(self, name):
-        """ _security/usery"""
+        """ Get a user details _security/usery"""
         ilm_policy = self._api_call('_security/user/%s' % name)
 
         for policy_name in ilm_policy.keys():
@@ -394,7 +394,26 @@ class ElasticManager:
         return result
 
     def delete_user(self, name):
-        """Delete a user through APIs."""
+        """Delete a user through APIs
+
+        Args:
+            name (string): the user to be deleted
+
+        Returns:
+            _type_: _description_
+        """
         result = self._api_call('_security/user/%' % name,
                                 method='DELETE', json=False)
         return result
+
+    def set_user_password(self, username, password):
+        """ User to manage the password
+
+        Args:
+            username (string): the username of the user which password will be changed
+            password (string): the password to be set
+        """
+        body={'password': password}
+        logging.debug("Set user for password: %s", username)
+        result = self._api_call('_security/user/%s/_password' % username,
+                                method='PUT', body=body, json=True)

@@ -42,7 +42,7 @@ class BartokITAnsibleModule(AnsibleModule):
         self._to_be_removed = []
         self._to_be_updated = []
         logging.basicConfig(filename='/tmp/' + log_file,
-                            level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+                            level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
     def settings(self, compare_values=True, keys_to_be_skipped=None):
         """Set the module behaviour."""
@@ -137,8 +137,11 @@ class BartokITAnsibleModule(AnsibleModule):
         diff_after_output = {}
         diff_before_keys = []
         diff_after_keys = []
+
         # initialization
+        logging.debug("Start list transformation call")
         self.__list_or_dict_support(self.params)
+        logging.debug("Start initialization call")
         self.__keys = self.initialization(
             self.__parameter_name_with_items, self.params)
 

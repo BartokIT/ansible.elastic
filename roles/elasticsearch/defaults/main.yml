@@ -32,6 +32,7 @@ _r_elasticsearch_configure_actions_allowed:
   - ilm_policies
   - users
   - initial
+  - enforce_user_password
 _r_elasticsearch_triggered_restart: false
 
 # ---- installation variables ----

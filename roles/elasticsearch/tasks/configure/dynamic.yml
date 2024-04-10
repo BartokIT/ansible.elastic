@@ -21,6 +21,7 @@
     password: "{{ r_elasticsearch_api_password }}"
     ssl_verify: false
     users: "{{ r_elasticsearch_users | bartokit.elastic.dictofdict2listofdict('username') }}"
+    enforce_password: "{{ 'enforce_user_password' in r_elasticsearch_configure_actions}}"
   run_once: true
   when: ('users' in r_elasticsearch_configure_actions)
 

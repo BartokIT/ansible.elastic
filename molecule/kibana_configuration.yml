@@ -6,7 +6,7 @@
 
 - name: Get key
   ansible.builtin.slurp:
-    path:  /etc/pki/tls/private/kibana.key
+    path: /etc/pki/tls/private/kibana.key
   register: _converge_ssl_key
 
 - name: Get certificate

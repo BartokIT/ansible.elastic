@@ -90,19 +90,20 @@
     - name: Test the installation, configuration and product start
       ansible.builtin.set_fact:
         r_elasticsearch_actions:
-          # - install
+          - install
           - configure
-          # - start
-          # - restart_on_configuration_change
+          - start
+          - restart_on_configuration_change
         r_elasticsearch_configure_actions:
-          # - folders
-          # - main_files
-          # - keystore
-          # - ssl
-          # - enforce_keystore
-          # - component_template
-          # - index_template
-          # - ilm_policies
+          - folders
+          - main_files
+          - keystore
+          - ssl
+          - enforce_keystore
+          - enforce_user_password
+          - component_template
+          - index_template
+          - ilm_policies
           - users
           - initial
 
@@ -127,9 +128,9 @@
           - start
           # - restart_on_configuration_change
         r_kibana_configure_actions:
-           - folders
-           - main_files
-           - ssl
+          - folders
+          - main_files
+          - ssl
         #   - enforce_keystore
         #   - component_template
         #   - index_template
