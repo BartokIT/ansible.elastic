@@ -434,10 +434,7 @@ _r_elasticsearch_configuration_schema:
     secure: false
     reloadable: false
   # ----
-  xpack.security.http.ssl.enabled:
-    type: bool
-    secure: false
-    reloadable: false
+
   xpack.security.transport.ssl.enabled:
     type: bool
     secure: false
@@ -454,10 +451,7 @@ _r_elasticsearch_configuration_schema:
     type: string
     secure: true
     reloadable: false
-  xpack.security.http.ssl.keystore.path:
-    type: string
-    secure: false
-    reloadable: false
+
   xpack.security.transport.ssl.keystore.path:
     type: string
     secure: false
@@ -517,14 +511,7 @@ _r_elasticsearch_configuration_schema:
     type: string
     secure: false
     reloadable: false
-  xpack.security.http.ssl.verification_mode:
-    type: string
-    secure: false
-    reloadable: false
-    choices:
-      - full
-      - certificate
-      - none
+
   xpack.security.transport.ssl.verification_mode:
     type: string
     secure: false
@@ -544,6 +531,59 @@ _r_elasticsearch_configuration_schema:
   xpack.security.transport.ssl.cipher_suites:
     type: string
     secure: false
+    reloadable: false
+  # HTTP TLS/SSL settings
+  xpack.security.http.ssl.enabled:
+    type: bool
+    secure: false
+    reloadable: false
+  xpack.security.http.ssl.supported_protocols:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.http.ssl.client_authentication:
+    type: string
+    secure: false
+    reloadable: false
+    choices:
+      - required
+      - optional
+      - none
+  xpack.security.http.ssl.verification_mode:
+    type: string
+    secure: false
+    reloadable: false
+    choices:
+      - full
+      - certificate
+      - none
+  xpack.security.http.ssl.cipher_suites:
+    type: string
+    secure: false
+    reloadable: false
+
+  # Java keystore files
+  xpack.security.http.ssl.keystore.path:
+    type: string
+    secure: false
+    reloadable: false
+
+  # PEM encoded files
+  xpack.security.http.ssl.key:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.http.ssl.key_passphrase:
+    type: string
+    secure: false
+    reloadable: false
+  xpack.security.http.ssl.secure_key_passphrase:
+    type: string
+    secure: true
+    reloadable: false
+  xpack.security.http.ssl.certificate:
+    type: string
+    secure: true
     reloadable: false
   xpack.security.http.ssl.certificate_authorities:
     type: list
