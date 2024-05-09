@@ -3,7 +3,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 """Elasticsearch Info Ansible module."""
 from __future__ import (absolute_import, division, print_function)
-
+import requests
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -96,17 +96,19 @@ class BartokITElasticsearchInfo(AnsibleModule):
             if len(not_allowed_parameters):
                 self.fail_json(msg='Gather subset not allowed {}'.format(
                     not_allowed_parameters))
-
-            if 'license' in gather_subset or 'all' in gather_subset:
-                output_info['license'] = em.get_license_info()
-            if 'nodes' in gather_subset or 'all' in gather_subset:
-                output_info['nodes'] = em.get_nodes_info()
-            if 'health' in gather_subset or 'all' in gather_subset:
-                output_info['health'] = em.get_health_info()
-            if 'cluster_health' in gather_subset or 'all' in gather_subset:
-                output_info['cluster_health'] = em.get_cluster_health_info()
-            if 'component_templates' in gather_subset or 'all' in gather_subset:
-                output_info['component_templates'] = em.get_component_templates()
+            try:
+                if 'license' in gather_subset or 'all' in gather_subset:
+                    output_info['license'] = em.get_license_info()
+                if 'nodes' in gather_subset or 'all' in gather_subset:
+                    output_info['nodes'] = em.get_nodes_info()
+                if 'health' in gather_subset or 'all' in gather_subset:
+                    output_info['health'] = em.get_health_info()
+                if 'cluster_health' in gather_subset or 'all' in gather_subset:
+                    output_info['cluster_health'] = em.get_cluster_health_info()
+                if 'component_templates' in gather_subset or 'all' in gather_subset:
+                    output_info['component_templates'] = em.get_component_templates()
+            except requests.exceptions.Timeout:
+                self.exit_json("error":"port timeout")
             self.exit_json(**output_info)
         except Exception as e:
             self.fail_json(msg=str(e))

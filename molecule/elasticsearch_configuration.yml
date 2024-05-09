@@ -12,7 +12,7 @@
     r_elasticsearch_cluster_nodes: >-
       {%- filter list -%}
         [{%- for node in groups.cluster -%}
-            { 'host': '{{ node }}', 'name': '{{ node }}', 'roles': {{ hostvars[node].roles }} },
+            { 'host': '{{ node }}', 'name': '{{ node }}x', 'roles': {{ hostvars[node].roles }} },
       {%- endfor -%}]{%- endfilter -%}
     r_elasticsearch_users_initial_elastic_password: bA3nb0g.Hyw
     r_elasticsearch_keystore_password: 'adfs8NSM2nc.ug'
@@ -78,6 +78,7 @@
         index_patterns:
           - metricbeat-8.11.2
         composed_of: []
+      ilm-history-7
     r_elasticsearch_ilm_policies:
       beattest-ilm:
         phases:

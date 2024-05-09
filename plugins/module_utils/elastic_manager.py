@@ -47,6 +47,8 @@ class ElasticManager:
                         timeout=10)
             response = req.json()
             req.raise_for_status()
+        except requests.exceptions.Timeout as exctimeout:
+            logging.error("{}".format(exctimeout))
         except Exception as exc:
             logging.error("{}".format(exc))
             if 'error' in response:
@@ -260,7 +262,7 @@ class ElasticManager:
         return result
 
     # ------------------ Index template methods------------------------
-    def get_index_templates(self, hidden=False):
+    def get_index_templates(self, hidden=False, managed=False):
         """Get all the component templates through APIs."""
         templates_dict = {}
         templates_list = self._api_call('_index_template')['index_templates']
@@ -268,6 +270,14 @@ class ElasticManager:
         for template in templates_list:
             if not template['name'].startswith('.') or hidden:
                 templates_dict[template['name']] = template
+            if template['name'].startswith('.')('.'):
+                if hidden:
+                    templates_dict[template['name']] = template
+            elif template.get('_meta',{}).get('managed', False):
+                if managed:
+                    templates_dict[template['name']] = template
+            else:
+               templates_dict[template['name']] = template
 
 
         return templates_dict

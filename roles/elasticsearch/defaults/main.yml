@@ -99,7 +99,7 @@ _r_elasticsearch_configuration:
     logs: /var/log/elasticsearch
     data: /var/lib/elasticsearch
   discovery:
-    seed_hosts: "{{ r_elasticsearch_cluster_nodes | selectattr('roles','bartokit.elastic.contains', 'master') | map(attribute='name') | list }}"
+    seed_hosts: "{{ r_elasticsearch_cluster_nodes | selectattr('roles','bartokit.elastic.contains', 'master') | map(attribute='host') | list }}"
   xpack:
     security:
       enabled: true
