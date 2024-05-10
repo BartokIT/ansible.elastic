@@ -270,7 +270,7 @@ class ElasticManager:
         for template in templates_list:
             if not template['name'].startswith('.') or hidden:
                 templates_dict[template['name']] = template
-            if template['name'].startswith('.')('.'):
+            if template['name'].startswith('.'):
                 if hidden:
                     templates_dict[template['name']] = template
             elif template.get('_meta',{}).get('managed', False):

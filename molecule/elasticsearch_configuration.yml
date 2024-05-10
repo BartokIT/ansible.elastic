@@ -78,7 +78,6 @@
         index_patterns:
           - metricbeat-8.11.2
         composed_of: []
-      ilm-history-7
     r_elasticsearch_ilm_policies:
       beattest-ilm:
         phases:
