@@ -268,12 +268,10 @@ class ElasticManager:
         templates_list = self._api_call('_index_template')['index_templates']
 
         for template in templates_list:
-            if not template['name'].startswith('.') or hidden:
-                templates_dict[template['name']] = template
             if template['name'].startswith('.'):
                 if hidden:
                     templates_dict[template['name']] = template
-            elif template.get('_meta',{}).get('managed', False):
+            elif template['index_template'].get('_meta',{}).get('managed', False):
                 if managed:
                     templates_dict[template['name']] = template
             else:
@@ -427,3 +425,47 @@ class ElasticManager:
         logging.debug("Set user for password: %s", username)
         result = self._api_call('_security/user/%s/_password' % username,
                                 method='PUT', body=body, json=True)
+
+
+    # ------------------Pipelines methods------------------------
+    def get_pipelines(self, hidden=False, managed=False):
+        """Get all the _ilm policies  templates through APIs."""
+        pipelines_output = {}
+        pipelines = self._api_call('/_ingest/pipeline')
+
+        for policy_name in pipelines.keys():
+
+            if policy_name.startswith('.'):
+                if hidden:
+                    pipelines_output[policy_name] = pipelines[policy_name]
+            elif pipelines[policy_name]['policy'].get('_meta',{}).get('managed', False):
+                if managed:
+                    pipelines_output[policy_name] = pipelines[policy_name]
+            else:
+                pipelines_output[policy_name] = pipelines[policy_name]
+
+        return pipelines_output
+
+    def get_pipeline(self, name):
+        """ _ilm/policy"""
+        ilm_policy = self._api_call('_ilm/policy/{}'.format(name))
+
+        for policy_name in ilm_policy.keys():
+                if policy_name == name:
+                    return ilm_policy[policy_name]
+        raise Exception(
+            "Impossible to find the '{}' ILM policy requested".format(name))
+
+    def put_pipeline(self, name, policy):
+        """Create a ILM policy through APIs."""
+        body =  {'policy': policy}
+        logging.debug("Body: %s" % body)
+        result = self._api_call('_ilm/policy/{}'.format(name),
+                                method='PUT', body=body, json=False)
+        return result
+
+    def delete_pipeline(self, name):
+        """Delete the ILM policy through APIs."""
+        result = self._api_call('_ilm/policy/{}'.format(name),
+                                method='DELETE', json=False)
+        return result
