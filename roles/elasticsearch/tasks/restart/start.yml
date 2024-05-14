@@ -8,6 +8,6 @@
   meta: flush_handlers
   when: ('start' in r_elasticsearch_actions)
 
-- name: Assert about status
+- name: Assert about status<
   assert:
-    that: 'error' not in _r_elasticsearch_status_info
+    that: ('error' not in _r_elasticsearch_status_info)
