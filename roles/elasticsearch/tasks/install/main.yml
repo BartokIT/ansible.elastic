@@ -1,7 +1,9 @@
 ---
 
 - name: Install the product
-  when: not r_elasticsearch_info.installed
+  when: >-
+    not r_elasticsearch_info.installed or
+    r_elasticsearch_info.to_be_upgraded
   block:
     - name: Add the public repository
       when: r_elasticsearch_add_repository | bool

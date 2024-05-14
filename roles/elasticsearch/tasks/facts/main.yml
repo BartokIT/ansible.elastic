@@ -35,7 +35,9 @@
   vars:
     _r_elasicsearch_info: >-
         Installed: {{ r_elasticsearch_info.installed }}
+        |Requested version:   {{ r_elasticsearch_version }}
         {%- if r_elasticsearch_info.installed -%}
         |Version:   {{ r_elasticsearch_info.version }}
         |Started:   {{ r_elasticsearch_info.started }}
+        |To be upgraded:   {{ r_elasticsearch_info.to_be_upgraded }}
         {%- endif -%}

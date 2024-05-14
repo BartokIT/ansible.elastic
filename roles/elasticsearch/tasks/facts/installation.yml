@@ -6,9 +6,18 @@
 
 - name: Facts | Installation | Installation info
   ansible.builtin.set_fact:
-    r_elasticsearch_info: "{{ r_elasticsearch_info | combine({'installed': _r_elasticsearch_installed, 'version': _r_elasticsearch_version}) }}"
+    r_elasticsearch_info: "{{ r_elasticsearch_info | combine({'installed': _r_elasticsearch_installed, 'version': _r_elasticsearch_version, 'to_be_upgraded': false}) }}"
   vars:
     _r_elasticsearch_installed: "{{ (ansible_facts.packages.elasticsearch | d([]) | length) > 0 }}"
     _r_elasticsearch_version: "{{ (ansible_facts.packages.elasticsearch | d([]) | first).version | d('') }}"
+
+- name: Facts | Installation | Upgrade info
+  ansible.builtin.set_fact:
+    r_elasticsearch_info: "{{ r_elasticsearch_info | combine({'to_be_upgraded': _r_elasticsearch_to_be_upgraded}) }}"
+  when: r_elasticsearch_info.installed
+  vars:
+    _r_elasticsearch_to_be_upgraded: >-
+      {{ r_elasticsearch_info.version|length > 0 and
+      r_elasticsearch_version is version( r_elasticsearch_info.version, '>') }}
 
 

@@ -36,7 +36,7 @@ class ElasticManager:
         req = requests.request(
             method, api_url, params=parameters, json=body, auth=auth, verify=self._ssl_verify,
             timeout=10)
-
+        response = {}
         try:
             if req.status_code == 401:
                 # try to guess elastic password and resubmit password
@@ -63,17 +63,18 @@ class ElasticManager:
     # ------------------ Elasticsearch keystore methods------------------------
     def guess_keystore_password(self):
         systemd_envfile = '/etc/systemd/system/elasticsearch.service.d/keystore.conf'
-        with open(systemd_envfile,'r') as f:
-            envfile_content = f.readlines()
-        for line in envfile_content:
-            if 'ES_KEYSTORE_PASSPHRASE_FILE' in line:
-                # search the keystore file
-                m = re.search(".*ES_KEYSTORE_PASSPHRASE_FILE=(.*)\"", line)
-                if m:
-                    password_file = m.group(1)
-                    with open(password_file,'r') as f:
-                        keystore_password = f.read()
-                        return keystore_password
+        if os.path.exists(systemd_envfile):
+            with open(systemd_envfile,'r') as f:
+                envfile_content = f.readlines()
+            for line in envfile_content:
+                if 'ES_KEYSTORE_PASSPHRASE_FILE' in line:
+                    # search the keystore file
+                    m = re.search(".*ES_KEYSTORE_PASSPHRASE_FILE=(.*)\"", line)
+                    if m:
+                        password_file = m.group(1)
+                        with open(password_file,'r') as f:
+                            keystore_password = f.read()
+                            return keystore_password
         raise Exception("Impossible to guess elastic password")
 
     def guess_elastic_default_password(self):

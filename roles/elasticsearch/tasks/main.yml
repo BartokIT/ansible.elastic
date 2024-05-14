@@ -3,9 +3,11 @@
 - name: Gather fact and sanity checks
   ansible.builtin.include_tasks: facts/main.yml
 
-- name: Install Elasticsearch
+- name: Install/Upgrade Elasticsearch
   ansible.builtin.include_tasks: install/main.yml
-  when: ('install' in r_elasticsearch_actions | list )
+  when: >-
+    ('install' in r_elasticsearch_actions | list ) or
+    ('upgrade' in r_elasticsearch_actions | list )
 
 - name: Configure static files
   ansible.builtin.include_tasks: configure/static.yml
