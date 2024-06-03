@@ -50,36 +50,9 @@
     - ('keystore' in r_kibana_configure_actions)
   block:
     - name: Manage keystore
-      bartokit.elastic.elasticsearch_keystore:
+      bartokit.elastic.kibana_keystore:
         force: "{{  'enforce_keystore' in r_kibana_configure_actions }}"
         credentials: "{{ r_kibana_keystore }}"
-        password: "{{ r_kibana_keystore_password | d(omit) }}"
-
-    - name: Put keystore password in a file
-      ansible.builtin.copy:
-        content: "{{ r_kibana_keystore_password }}"
-        dest: "{{ r_kibana_keystore_password_file }}"
-        owner: elasticsearch
-        group: root
-        mode: 0600
-
-    - name: Create dropin service folder
-      ansible.builtin.file:
-        state: directory
-        path: /etc/systemd/system/{{ _r_kibana_systemd_name }}.d
-        group: root
-        owner: root
-        mode: 0775
-
-    - name: Set environment variable for keystore password
-      ansible.builtin.copy:
-        content: |-
-          [Service]
-          Environment="ES_KEYSTORE_PASSPHRASE_FILE={{ r_kibana_keystore_password_file }}"
-        dest: /etc/systemd/system/{{ _r_kibana_systemd_name }}.d/keystore.conf
-        group: root
-        owner: root
-        mode: 0644
 
 - name: SSL/TLS keystore management
   when:
@@ -109,6 +82,7 @@
         owner: root
         group: "{{ _r_kibana_group }}"
         mode: '0660'
+      when: r_kibana_configuration_ssl_certificate_authorities is truthy
 
 - name: Flush handlers
   meta: flush_handlers

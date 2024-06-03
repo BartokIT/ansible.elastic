@@ -27,33 +27,6 @@
           - "{{ ansible_fqdn in (r_kibana_cluster_nodes | map(attribute='host') | list) }}"
         msg: Current host ({{ ansible_fqdn }}) is not present inside the cluster nodes list
 
-    - name: Facts | Sanity | Assertion about keystore password quality
-      ansible.builtin.assert:
-        that:
-          - >-
-            r_kibana_keystore_password | length >=
-            _r_kibana_password_minlength
-          - >-
-            r_kibana_keystore_password is
-            regex("([a-z].*){" ~ _r_kibana_password_minlowercase ~ "}")
-          - >-
-            r_kibana_keystore_password is
-            regex("([A-Z].*){" ~ _r_kibana_password_minuppercase ~ "}")
-          - >-
-            r_kibana_keystore_password is
-            regex("([0-9].*){" ~ _r_kibana_password_mindigits ~ "}")
-          - >-
-            r_kibana_keystore_password is
-            regex("([" ~ _r_kibana_password_specialchars ~ ".*]){" ~ _r_kibana_password_minspecialchars ~ "}")
-        msg:
-          - "Please set the keystore password and ensure correct strength"
-          - "Password must have minimum length of {{ _r_kibana_password_minlength }}"
-          - "Password must at least of {{ _r_kibana_password_minlowercase }} lower case chars"
-          - "Password must at least of {{ _r_kibana_password_minuppercase }} upper case chars"
-          - "Password must at least of {{ _r_kibana_password_mindigits }} digits"
-          - "Password must at least of {{ _r_kibana_password_minspecialchars }} special chars choosed from {{ _r_kibana_password_specialchars }}"
-      when: r_kibana_keystore_password | d(false, true)
-
     - name: Facts | Sanity | Set elastic node
       ansible.builtin.set_fact:
         r_kibana_node_name: "{{ (r_kibana_cluster_nodes | selectattr('host', '==', ansible_fqdn) | first).name }}"
@@ -68,13 +41,12 @@
     - name: Facts | Sanity | Assertion about ssl parameters
       ansible.builtin.assert:
         that:
-          - r_kibana_configuration.ssl.key is truthy
-          - r_kibana_configuration.ssl.certificate is truthy
+          - r_kibana_configuration.server.ssl.key is truthy
+          - r_kibana_configuration.server.ssl.certificate is truthy
           - r_kibana_configuration_ssl_key is truthy
           - r_kibana_configuration_ssl_certificate is truthy
-          - r_kibana_configuration_ssl_certificate_authorities is truthy
         msg: SSL enabled but not all configurations set
-      when: r_kibana_configuration.ssl.enabled | d(false) | bool
+      when: r_kibana_configuration.server.ssl.enabled | d(false) | bool
 
 # validation of the configuration
 - name: Include variables
