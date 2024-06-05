@@ -241,6 +241,8 @@ _r_kibana_configuration_schema:
     type: bool
   xpack.discoverEnhanced.actions.exploreDataInChart.enabled:
     type: bool
+  xpack.fleet.isAirGapped:
+    type: bool
   xpack.ilm.ui.enabled:
     type: bool
   xpack.index_management.ui.enabled:
