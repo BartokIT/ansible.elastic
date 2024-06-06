@@ -93,8 +93,7 @@ r_kibana_configuration: {}
 r_kibana_keystore_password:
 r_kibana_keystore_password_file: "{{ _r_kibana_config_folder }}/keystore.password"
 r_kibana_keystore:
-_r_kibana_keystore:
-  "bootstrap.password": "{{ r_kibana_users_initial_elastic_password }}"
+_r_kibana_keystore: []
 ## password quality settings
 _r_kibana_password_minlength: 12
 _r_kibana_password_minuppercase: 3
