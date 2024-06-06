@@ -389,6 +389,10 @@ _r_elasticsearch_configuration_schema:
     type: bool
     secure: false
     reloadable: false
+ xpack.security.authc.realms.active_directory:
+    type: dict
+    secure: false
+    reloadable: false
   # general - Automata Settings
   xpack.security.automata.max_determinized_states:
     type: int
