@@ -389,7 +389,7 @@ _r_elasticsearch_configuration_schema:
     type: bool
     secure: false
     reloadable: false
- xpack.security.authc.realms.active_directory:
+  xpack.security.authc.realms.active_directory:
     type: dict
     secure: false
     reloadable: false
