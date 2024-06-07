@@ -375,13 +375,13 @@ class ElasticManager:
 
     def get_user(self, name):
         """ Get a user details _security/usery"""
-        ilm_policy = self._api_call('_security/user/%s' % name)
+        user = self._api_call('_security/user/%s' % name)
 
-        for policy_name in ilm_policy.keys():
+        for policy_name in user.keys():
                 if policy_name == name:
-                    return ilm_policy[policy_name]
+                    return user[policy_name]
         raise Exception(
-            "Impossible to find the '{}' ILM policy requested".format(name))
+            "Impossible to find the '{}' user requested".format(name))
 
     def put_user(self, username, **kwargs):
         """Create a user through APIs."""
@@ -422,7 +422,53 @@ class ElasticManager:
         result = self._api_call('_security/user/%s/_password' % username,
                                 method='PUT', body=body, json=True)
 
+    # ------------------Roles methods----------------------------
+    def get_roles(self, managed=False, only_managed=False):
+        """Get all the roles through APIs."""
+        roles_output = {}
+        roles = self._api_call('_security/role')
+        for role in roles.keys():
+            if roles[role].get('metadata',{}).get('_reserved', False):
+                if managed or only_managed:
+                    roles_output[role] = roles[role]
+            elif not only_managed:
+                roles_output[role] = roles[role]
 
+        return roles_output
+
+    def get_role(self, name):
+        """ Get a role details _security/role"""
+        role = self._api_call('_security/role/%s' % name)
+
+        for policy_name in role.keys():
+                if policy_name == name:
+                    return role[policy_name]
+        raise Exception(
+            "Impossible to find the '{}' role requested".format(name))
+
+    def put_role(self, name, **kwargs):
+        """Create a role through APIs."""
+        body =  {}
+        if set(kwargs.keys()) - set(['applications', 'cluster', 'global', 'indices', 'metadata', 'run_as', 'remote_indices', 'transient_metadata']):
+            raise Exception("Not valid role paramteres")
+        body=kwargs
+        logging.debug("Body: %s" % body)
+        result = self._api_call('_security/role/%s' % name,
+                                method='PUT', body=body, json=False)
+        return result
+
+    def delete_role(self, name):
+        """Delete a role through APIs
+
+        Args:
+            name (string): the role to be deleted
+
+        Returns:
+            _type_: _description_
+        """
+        result = self._api_call('_security/role/%' % name,
+                                method='DELETE', json=False)
+        return result
     # ------------------Pipelines methods------------------------
     def get_pipelines(self, hidden=False, managed=False):
         """Get all the _ilm policies  templates through APIs."""

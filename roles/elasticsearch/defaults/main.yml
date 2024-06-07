@@ -31,6 +31,7 @@ _r_elasticsearch_configure_actions_allowed:
   - index_template
   - ilm_policies
   - users
+  - roles
   - initial
   - enforce_user_password
 _r_elasticsearch_triggered_restart: false
@@ -146,3 +147,13 @@ _r_elasticsearch_api_user:
       reserved_to_automation: true
     roles:
       - superuser
+
+# component templates
+r_elasticsearch_component_templates: {}
+# index templates
+r_elasticsearch_index_templates: {}
+# ilm policies
+r_elasticsearch_ilm_policies: {}
+# roles
+r_elasticsearch_roles: {}
+

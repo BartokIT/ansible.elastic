@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # Copyright: (c) 2023, BartoktIT
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-"""Elasticsearch Component Templates Ansible module."""
+"""Elasticsearch Roles Ansible module."""
 
 from __future__ import (absolute_import, division, print_function)
 
@@ -9,9 +9,9 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: elasticsearch_component_template
+module: elasticsearch_role
 
-short_description: This module allow to manage component templates of an Elasticsearch installation
+short_description: This module allow to manage roless of an Elasticsearch installation
 
 # If this is part of a collection, you need to use semantic versioning,
 # i.e. the version is of the form "2.5.0" and not "2.4".
@@ -20,12 +20,12 @@ version_added: "0.0.1"
 author:
     - BartoktIT (@BartokIT)
 
-description: This module allow to manage component templates of an Elasticsearch installation
+description: This module allow to manage roless of an Elasticsearch installation
 
 options:
-    component_templates:
+    roles:
         description:
-          - This is a key value dictionary containing as key the name of the component template and as value the specifications
+          - This is a key value dictionary containing as key the name of the roles and as value the specifications
           - 'The allowed keys for the subdictionary are: I(_meta) and/or I(template).'
           - 'The template key allow only three keys: I(settings), I(mapping) and I(aliases).'
         required: true
@@ -37,7 +37,7 @@ extends_documentation_fragment:
 EXAMPLES = r'''
 # Ensure that the only component present in the cluster are the specified
 - name: Ensure that the only key present is the bootstrap.password with an unprotected keystore
-  bartokit.elastic.elasticsearch_component_template:
+  bartokit.elastic.elasticsearch_role:
   components:
     template1:
         _meta:
@@ -74,18 +74,18 @@ module_args = dict(
     api_endpoint=dict(type='str', required=False, default='https://localhost:9200'),
     ssl_verify=dict(type='bool', required=False, default=True),
     mode=dict(type='str', required=False, choiches=['multiple', 'present', 'absent'], default='multiple'),
-    component_templates=dict(type='dict', required=True)
+    roles=dict(type='dict', required=True)
 )
 
 
-class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
+class BartokITElasticsearchRole(BartokITAnsibleModule):
     """A class for an Ansible module that manage Elasticsearch Keystore."""
 
     def __init__(self, argument_spec):
         """Call the constructor of the parent class."""
-        super().__init__(parameter_name_with_mode='mode', parameter_name_with_items='component_templates',
+        super().__init__(parameter_name_with_mode='mode', parameter_name_with_items='roles',
                          argument_spec=argument_spec, supports_check_mode=False,
-                         log_file='ansible_elasticsearch_component_template.log')
+                         log_file='ansible_elasticsearch_roles.log')
         self.__em = ElasticManager(self,
                                    rest_api_endpoint=self.params['api_endpoint'],
                                    api_username=self.params['user'],
@@ -107,65 +107,29 @@ class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
 
     def pre_crud(self, current_keys):
         # Remove from the list the key managed by the system
-        for ckey in current_keys.keys():
-            if current_keys[ckey]['component_template']['_meta'].get('managed', False) is True:
-                if ckey in self._to_be_added:
-                    self._to_be_added.remove(ckey)
-                if ckey in self._to_be_removed:
-                    self._to_be_removed.remove(ckey)
-                if ckey in self._to_be_updated:
-                    self._to_be_updated.remove(ckey)
         return False
 
     def transform_key(self, key, value, type):
         """Perform value sanitization"""
-        if type == 'input':
-            value_copy = copy.deepcopy(value)
-            value_copy['component_template'] = {'template': value_copy.pop('template')}
-            if 'settings' in value['template']:
-                # initialize the settings index dictionary
-                if 'index' not in value['template']['settings']:
-                    value_copy['component_template']['template']['settings']['index'] = {}
-
-                for setting in value['template']['settings'].keys():
-                    # add all properties to index subkey
-                    if setting.startswith('index.'):
-                        setting_value = value_copy['component_template']['template']['settings'].pop(setting)
-                        value_copy['component_template']['template']['settings']['index'][setting.replace('index.', '')] = setting_value
-                    elif setting == 'index':
-                        continue
-                    else:
-                        setting_value = "%s" % value_copy['component_template']['template']['settings'].pop(setting)
-                        value_copy['component_template']['template']['settings']['index'][setting] = setting_value
-
-            value_copy['name'] = key
-            if '_meta' in value_copy:
-                value_copy['component_template']['_meta'] = value_copy.pop('_meta')
-            return value_copy
-        else:
-            return value
+        return value
 
     def read_key(self, key):
-        """Get a component template."""
-        value = self.__em.get_component_template(key)
+        """Get a roles."""
+        value = self.__em.get_role(key)
         return value
 
     def delete_key(self, key, current_value):
-        """Delete component key."""
-        self.__em.delete_component_templates(key)
+        """Delete role key."""
+        self.__em.delete_role(key)
 
     def create_key(self, key, value):
-        """Add a component template."""
+        """Add a roles."""
         self.update_key(key, value, None)
 
     def update_key(self, key, input_value, current_value):
-        """Update a component template."""
+        """Update a roles."""
         value_detach = copy.deepcopy(input_value)
-        value_detach.pop('name')
-        if '_meta' in value_detach['component_template']:
-            value_detach['component_template']['template']['_meta'] = value_detach['component_template']['_meta']
-
-        self.__em.put_component_templates(key, **value_detach['component_template']['template'])
+        self.__em.put_role(key, **value_detach)
 
     def __find_differences(self, d1, d2, path=""):
         for k in d1:
@@ -194,13 +158,13 @@ class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
 
     def list_current_keys(self, input_keys):
         """Return the list of components template actually present."""
-        components = self.__em.get_component_templates()
+        components = self.__em.get_roles(managed=False)
         return components
 
 
 def main():
     """Run module execution."""
-    BartokITElasticsearchComponentTemplate(argument_spec=module_args).run()
+    BartokITElasticsearchRole(argument_spec=module_args).run()
 
 
 if __name__ == '__main__':

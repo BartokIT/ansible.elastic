@@ -389,7 +389,40 @@ _r_elasticsearch_configuration_schema:
     type: bool
     secure: false
     reloadable: false
+  # realms
   xpack.security.authc.realms.active_directory:
+    type: dict
+    secure: false
+    reloadable: false
+  xpack.security.authc.realms.file:
+    type: dict
+    secure: false
+    reloadable: false
+  xpack.security.authc.realms.native:
+    type: dict
+    secure: false
+    reloadable: false
+  xpack.security.authc.realms.ldap:
+    type: dict
+    secure: false
+    reloadable: false
+  xpack.security.authc.realms.pki:
+    type: dict
+    secure: false
+    reloadable: false
+  xpack.security.authc.realms.saml:
+    type: dict
+    secure: false
+    reloadable: false
+  xpack.security.authc.realms.kerberos:
+    type: dict
+    secure: false
+    reloadable: false
+  xpack.security.authc.realms.oidc:
+    type: dict
+    secure: false
+    reloadable: false
+  xpack.security.authc.realms.jwt:
     type: dict
     secure: false
     reloadable: false

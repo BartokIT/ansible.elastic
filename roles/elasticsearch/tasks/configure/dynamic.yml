@@ -34,7 +34,6 @@
   run_once: true
   when: ('ilm_policies' in r_elasticsearch_configure_actions)
 
-
 - name: Manage component template
   bartokit.elastic.elasticsearch_component_templates:
     user: '{{ _r_elasticsearch_api_user.keys() | first }}'
@@ -52,3 +51,12 @@
     templates: "{{ r_elasticsearch_index_templates }}"
   run_once: true
   when: ('index_template' in r_elasticsearch_configure_actions)
+
+- name: Manage roles
+  bartokit.elastic.elasticsearch_role:
+    user: '{{ _r_elasticsearch_api_user.keys() | first }}'
+    password: "{{ r_elasticsearch_api_password }}"
+    ssl_verify: false
+    roles: "{{ r_elasticsearch_roles }}"
+  run_once: true
+  when: ('roles' in r_elasticsearch_configure_actions)
