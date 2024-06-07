@@ -117,21 +117,15 @@ class ElasticManager:
 
     def get_keystore_key(self, key, keystore_password=None):
         """Read keystore settings."""
-
-        read_command = []
+        # removed expect due to bugs: https://github.com/blink1073/oct2py/issues/248
+        data=None
         if keystore_password is not None:
+            data=keystore_password
 
-            expect_command = """
-            spawn  {} show {}
-            expect "Enter password for the elasticsearch keystore"
-            send -- "{}\\n"
-            expect eof
-            """.format(self.__keystore_executable, key, keystore_password)
-            read_command = ["expect", "-c", expect_command]
-        else:
-            read_command = [self.__keystore_executable, "show", key]
+        read_command = [self.__keystore_executable, "show", key]
         rc, stdout, stderr = self.ansible_module.run_command(
-            read_command, check_rc=True)
+            read_command, check_rc=True, data=data)
+
         element = [item.strip()
                    for item in stdout.split("\n") if item.strip()][-1]
         return element
@@ -223,7 +217,8 @@ class ElasticManager:
         templates_dict = {}
         templates_list = self._api_call('_component_template')['component_templates']
         for template in templates_list:
-            templates_dict[template['name']] = template
+            if not template['name'].startswith('.'):
+                templates_dict[template['name']] = template
         return templates_dict
 
     def get_component_template(self, name):

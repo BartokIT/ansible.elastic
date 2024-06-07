@@ -108,7 +108,7 @@ class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
     def pre_crud(self, current_keys):
         # Remove from the list the key managed by the system
         for ckey in current_keys.keys():
-            if current_keys[ckey]['component_template']['_meta'].get('managed', False) is True:
+            if current_keys[ckey]['component_template'].get('_meta',{}).get('managed', False) is True:
                 if ckey in self._to_be_added:
                     self._to_be_added.remove(ckey)
                 if ckey in self._to_be_removed:
