@@ -60,3 +60,12 @@
     roles: "{{ r_elasticsearch_roles }}"
   run_once: true
   when: ('roles' in r_elasticsearch_configure_actions)
+
+- name: Manage role mappings
+  bartokit.elastic.elasticsearch_role_mapping:
+    user: '{{ _r_elasticsearch_api_user.keys() | first }}'
+    password: "{{ r_elasticsearch_api_password }}"
+    ssl_verify: false
+    role_mappings: "{{ r_elasticsearch_role_mappings}}"
+  run_once: true
+  when: ('role_mappings' in r_elasticsearch_configure_actions)

@@ -32,6 +32,7 @@ _r_elasticsearch_configure_actions_allowed:
   - ilm_policies
   - users
   - roles
+  - role_mappings
   - initial
   - enforce_user_password
 _r_elasticsearch_triggered_restart: false
@@ -156,4 +157,4 @@ r_elasticsearch_index_templates: {}
 r_elasticsearch_ilm_policies: {}
 # roles
 r_elasticsearch_roles: {}
-
+r_elasticsearch_role_mappings: {}

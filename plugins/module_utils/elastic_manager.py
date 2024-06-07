@@ -469,6 +469,55 @@ class ElasticManager:
         result = self._api_call('_security/role/%' % name,
                                 method='DELETE', json=False)
         return result
+
+    # ------------------Role mapping methods---------------------
+    def get_role_mappings(self, managed=False, only_managed=False):
+        """Get all the roles through APIs."""
+        role_mappings_output = {}
+        role_mappings = self._api_call('_security/role_mapping')
+        for role_map in role_mappings.keys():
+            if role_mappings[role_map].get('metadata',{}).get('_reserved', False):
+                if managed or only_managed:
+                    role_mappings_output[role_map] = role_mappings[role_map]
+            elif not only_managed:
+                role_mappings_output[role_map] = role_mappings[role_map]
+
+        return role_mappings_output
+
+    def get_role_mapping(self, name):
+        """ Get a role mapping details _security/role_mapping"""
+        role_mapping = self._api_call('_security/role_mapping/%s' % name)
+
+        for rm in role_mapping.keys():
+                if rm == name:
+                    return role_mapping[rm]
+        raise Exception(
+            "Impossible to find the '{}' role mapping requested".format(name))
+
+    def put_role_mapping(self, name, **kwargs):
+        """Create a role mapping through APIs."""
+        body =  {}
+        if set(kwargs.keys()) - set(['enabled', 'metadata', 'roles', 'role_templates', 'rules']):
+            raise Exception("Not valid role paramteres")
+        body=kwargs
+        logging.debug("Body: %s" % body)
+        result = self._api_call('_security/role_mapping/%s' % name,
+                                method='PUT', body=body, json=False)
+        return result
+
+    def delete_role_mapping(self, name):
+        """Delete a role mapping through APIs
+
+        Args:
+            name (string): the role to be deleted
+
+        Returns:
+            _type_: _description_
+        """
+        result = self._api_call('_security/role_mapping/%s' % name,
+                                method='DELETE', json=False)
+        return result
+
     # ------------------Pipelines methods------------------------
     def get_pipelines(self, hidden=False, managed=False):
         """Get all the _ilm policies  templates through APIs."""
