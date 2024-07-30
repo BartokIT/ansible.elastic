@@ -1,0 +1,3 @@
+minor_changes:
+ - added module plugin to manage ingest pipeline
+ - added module plugin to manage logstash pipeline
