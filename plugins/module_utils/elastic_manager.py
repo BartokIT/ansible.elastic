@@ -563,3 +563,41 @@ class ElasticManager:
         result = self._api_call('_ingest/pipeline/{}'.format(name),
                                 method='DELETE', json=False)
         return result
+
+    # ------------------Logstash pipelines methods------------------------
+    def get_logstash_pipelines(self):
+        """Get all the logstash pipeline through APIs."""
+        pipelines_output = {}
+        pipelines = self._api_call('_logstash/pipeline')
+
+        for pipeline_name in pipelines.keys():
+            pipelines_output[pipeline_name] = pipelines[pipeline_name]
+
+        return pipelines_output
+
+    def get_logstash_pipeline(self, name):
+        """ get a logstash pipeline"""
+        pipeline = self._api_call('_logstash/pipeline/{}'.format(name))
+
+        for pipeline_name in pipeline.keys():
+                if pipeline_name == name:
+                    return pipeline[pipeline_name]
+        raise Exception(
+            "Impossible to find the '{}' ingest pipeline requested".format(name))
+
+    def put_logstash_pipeline(self, name, **kwargs):
+        """Create a logstash pipeline through APIs."""
+        body =  {}
+        if set(kwargs.keys()) - set(['description', 'last_modified', 'pipeline', 'pipeline_metadata', 'pipeline_settings', 'username']):
+            raise Exception("Not valid pipeline parametres")
+        body=kwargs
+
+        result = self._api_call('_logstash/pipeline/{}'.format(name),
+                                method='PUT', body=body, json=False)
+        return result
+
+    def delete_logstash_pipeline(self, name):
+        """Delete the logstash pipeline through APIs."""
+        result = self._api_call('_logstash/pipeline/{}'.format(name),
+                                method='DELETE', json=False)
+        return result
