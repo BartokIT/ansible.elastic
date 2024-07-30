@@ -522,41 +522,44 @@ class ElasticManager:
     def get_pipelines(self, hidden=False, managed=False):
         """Get all the _ilm policies  templates through APIs."""
         pipelines_output = {}
-        pipelines = self._api_call('/_ingest/pipeline')
+        pipelines = self._api_call('_ingest/pipeline')
 
-        for policy_name in pipelines.keys():
+        for pipeline_name in pipelines.keys():
 
-            if policy_name.startswith('.'):
+            if pipeline_name.startswith('.'):
                 if hidden:
-                    pipelines_output[policy_name] = pipelines[policy_name]
-            elif pipelines[policy_name]['policy'].get('_meta',{}).get('managed', False):
+                    pipelines_output[pipeline_name] = pipelines[pipeline_name]
+            elif pipelines[pipeline_name].get('_meta',{}).get('managed', False):
                 if managed:
-                    pipelines_output[policy_name] = pipelines[policy_name]
+                    pipelines_output[pipeline_name] = pipelines[pipeline_name]
             else:
-                pipelines_output[policy_name] = pipelines[policy_name]
+                pipelines_output[pipeline_name] = pipelines[pipeline_name]
 
         return pipelines_output
 
     def get_pipeline(self, name):
         """ _ilm/policy"""
-        ilm_policy = self._api_call('_ilm/policy/{}'.format(name))
+        pipeline = self._api_call('_ingest/pipeline/{}'.format(name))
 
-        for policy_name in ilm_policy.keys():
-                if policy_name == name:
-                    return ilm_policy[policy_name]
+        for pipeline_name in pipeline.keys():
+                if pipeline_name == name:
+                    return pipeline[pipeline_name]
         raise Exception(
-            "Impossible to find the '{}' ILM policy requested".format(name))
+            "Impossible to find the '{}' ingest pipeline requested".format(name))
 
-    def put_pipeline(self, name, policy):
+    def put_pipeline(self, name, **kwargs):
         """Create a ILM policy through APIs."""
-        body =  {'policy': policy}
-        logging.debug("Body: %s" % body)
-        result = self._api_call('_ilm/policy/{}'.format(name),
+        body =  {}
+        if set(kwargs.keys()) - set(['description', 'on_failure', 'processors', 'version', '_meta', 'deprecated']):
+            raise Exception("Not valid pipeline parametres")
+        body=kwargs
+
+        result = self._api_call('_ingest/pipeline/{}'.format(name),
                                 method='PUT', body=body, json=False)
         return result
 
     def delete_pipeline(self, name):
         """Delete the ILM policy through APIs."""
-        result = self._api_call('_ilm/policy/{}'.format(name),
+        result = self._api_call('_ingest/pipeline/{}'.format(name),
                                 method='DELETE', json=False)
         return result

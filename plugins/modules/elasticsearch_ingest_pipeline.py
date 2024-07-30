@@ -105,40 +105,19 @@ class BartokITElasticsearchPipelines(BartokITAnsibleModule):
         """Perform value sanitization"""
         if type == 'input':
             value_copy = copy.deepcopy(value)
-            if 'template' in value_copy:
-                value_copy['index_template'] = {'template': value_copy.pop('template')}
-            transformed_value = {'name': key, 'index_template': copy.deepcopy(value)}
-            # create an index key between the settings
-            if 'template' in transformed_value['index_template'] and \
-               'settings' in transformed_value['index_template']['template']:
-
-                settings_swp = transformed_value['index_template']['template'].pop('settings')
-                if 'index' not in settings_swp:
-                    settings_swp['index'] = {}
-                settings_key = list(settings_swp.keys())
-                for setting in settings_key:
-                    if setting.startswith('index.'):
-                        setting_value = settings_swp.pop(setting)
-                        settings_swp['index'][setting.replace('index.', '')] = setting_value
-                    elif setting == 'index':
-                        continue
-                    else:
-                        setting_value = "%s" % settings_swp.pop(setting)
-                        settings_swp['index'][setting] = setting_value
-                transformed_value['index_template']['template']['settings'] = settings_swp
-            return transformed_value
+            return value_copy
 
         else:
             return value
 
     def read_key(self, key):
         """Get a component template."""
-        value = self.__em.get_index_template(key)
+        value = self.__em.get_pipeline(key)
         return value
 
     def delete_key(self, key, current_value):
         """Delete component key."""
-        self.__em.delete_index_templates(key)
+        self.__em.delete_pipeline(key)
 
     def create_key(self, key, value):
         """Add a component template."""
@@ -147,8 +126,7 @@ class BartokITElasticsearchPipelines(BartokITAnsibleModule):
     def update_key(self, key, input_value, current_value):
         """Update a component template."""
         value_detach = copy.deepcopy(input_value)
-        value_detach = input_value['index_template']
-        self.__em.put_index_templates(key, **value_detach)
+        self.__em.put_pipeline(key, **value_detach)
 
     def __find_differences(self, d1, d2, path=""):
         for k in d1:
@@ -176,8 +154,8 @@ class BartokITElasticsearchPipelines(BartokITAnsibleModule):
         return difference_found
 
     def list_current_keys(self, input_keys):
-        """Return the list of components template actually present."""
-        components = self.__em.get_index_templates()
+        """Return the list of pipeline actually present."""
+        components = self.__em.get_pipelines()
         return components
 
 

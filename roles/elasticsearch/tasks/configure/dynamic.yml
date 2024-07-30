@@ -52,6 +52,15 @@
   run_once: true
   when: ('index_template' in r_elasticsearch_configure_actions)
 
+- name: Manage ingest pipelines
+  bartokit.elastic.elasticsearch_ingest_pipeline:
+    user: '{{ _r_elasticsearch_api_user.keys() | first }}'
+    password: "{{ r_elasticsearch_api_password }}"
+    ssl_verify: false
+    pipelines: "{{ r_elasticsearch_ingest_pipelines }}"
+  run_once: true
+  when: ('ingest_pipelines' in r_elasticsearch_configure_actions)
+
 - name: Manage roles
   bartokit.elastic.elasticsearch_role:
     user: '{{ _r_elasticsearch_api_user.keys() | first }}'

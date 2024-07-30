@@ -35,6 +35,7 @@ _r_elasticsearch_configure_actions_allowed:
   - role_mappings
   - initial
   - enforce_user_password
+  - ingest_pipelines
 _r_elasticsearch_triggered_restart: false
 
 # ---- installation variables ----
@@ -155,6 +156,10 @@ r_elasticsearch_component_templates: {}
 r_elasticsearch_index_templates: {}
 # ilm policies
 r_elasticsearch_ilm_policies: {}
+#pipelines
+r_elasticsearch_ingest_pipelines: {}
 # roles
 r_elasticsearch_roles: {}
 r_elasticsearch_role_mappings: {}
+
+
