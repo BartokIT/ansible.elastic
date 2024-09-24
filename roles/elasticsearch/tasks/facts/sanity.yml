@@ -1,22 +1,6 @@
 ---
 # action assert
 
-- name: Check for allowed actions
-  assert:
-    that:
-      - r_elasticsearch_actions | list | difference(_r_elasticsearch_actions_allowed) | length < 1
-    msg: >-
-      The following actions are not allowed:
-      {{ r_elasticsearch_actions | difference(_r_elasticsearch_actions_allowed) }}
-
-- name: Check for configuration actions
-  assert:
-    that:
-      - r_elasticsearch_configure_actions | list | difference(_r_elasticsearch_configure_actions_allowed) | length < 1
-    msg: >-
-      The following configuration actions are not allowed:
-      {{ r_elasticsearch_configure_actions | difference(_r_elasticsearch_configure_actions_allowed) }}
-
 # configuration assert
 - name: Sanity check configuration variables
   when: ('configure' in r_elasticsearch_actions)
@@ -96,8 +80,8 @@
   vars:
     params:
       files:
-        - "{{ r_elasticsearch_version | regex_replace('^([0-9])\\.([0-9]*).*', '\\1.\\2') }}.yml"
-        - main.yml
+        - "{{ r_elasticsearch_version | regex_replace('^([0-9])\\.([0-9]*).*', '\\1.\\2') }}_schema.yml"
+        - common_schema.yml
       paths:
         - "vars"
 

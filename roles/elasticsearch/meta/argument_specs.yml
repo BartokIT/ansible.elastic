@@ -1,0 +1,55 @@
+---
+argument_specs:
+  # roles/myapp/tasks/main.yml entry point
+  main:
+    short_description: Main entry point for the elasticsearch role
+    description:
+      - This is the main entrypoint for the C(elasticsearch) role.
+    author:
+      - BartokIT
+    options:
+      r_elasticsearch_actions:
+        type: "list"
+        required: false
+        default: []
+        choices:
+          - install
+          - configure
+          - stop
+          - upgrade
+          - start
+          - uninstall
+          - restart_on_configuration_change
+        description:
+          - "Actions allowed for the roles."
+      r_elasticsearch_configure_actions:
+        type: "list"
+        required: false
+        default: []
+        choices:
+          - sysctl
+          - folders
+          - main_files
+          - keystore
+          - enforce_keystore
+          - ssl
+          - component_template
+          - index_template
+          - ilm_policies
+          - users
+          - roles
+          - role_mappings
+          - initial
+          - enforce_user_password
+          - ingest_pipelines
+          - logstash_pipelines
+        description:
+          - "Configuration actions allowed for the roles."
+          - "By specifying the configuration action the role will perform only the configuration of the specified resources"
+      r_elasticsearch_configuration:
+        type: "dict"
+        required: false
+        default: {}
+        description:
+          - "A dictionary containing the configurations to be included inside the elasticsearch.yml file"
+          - "The dictionary content is validated using the common_schema.yml file content or a specific version configuration file can be used"
