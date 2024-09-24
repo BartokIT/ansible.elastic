@@ -109,25 +109,27 @@ class BartokITElasticsearchRoleMapping(BartokITAnsibleModule):
         # Remove from the list the key managed by the system
         return False
 
-    def transform_key(self, key, value, type):
+    def transform_key(self, key, value, key_type):
         """Perform value sanitization"""
+        if key_type == 'current':
+            value = value[key]
         return value
 
     def read_key(self, key):
-        """Get a roles."""
+        """Get a role mapping detail"""
         value = self.__em.get_role_mappings(key)
         return value
 
     def delete_key(self, key, current_value):
-        """Delete role key."""
+        """Delete specified role mapping """
         self.__em.delete_role_mapping(key)
 
     def create_key(self, key, value):
-        """Add a roles."""
+        """Add a role mapping"""
         self.update_key(key, value, None)
 
     def update_key(self, key, input_value, current_value):
-        """Update a roles."""
+        """Update a role mapping item"""
         value_detach = copy.deepcopy(input_value)
         self.__em.put_role_mapping(key, **value_detach)
 
