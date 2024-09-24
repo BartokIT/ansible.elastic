@@ -109,7 +109,7 @@ class BartokITElasticsearchRole(BartokITAnsibleModule):
         # Remove from the list the key managed by the system
         return False
 
-    def transform_key(self, key, value, type):
+    def transform_key(self, key, value, key_type):
         """Perform value sanitization"""
         return value
 
