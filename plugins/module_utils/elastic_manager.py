@@ -466,7 +466,7 @@ class ElasticManager:
         Returns:
             _type_: _description_
         """
-        result = self._api_call('_security/role/%' % name,
+        result = self._api_call('_security/role/%s' % name,
                                 method='DELETE', json=False)
         return result
 
