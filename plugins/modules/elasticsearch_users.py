@@ -131,9 +131,9 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
         # Remove from the list the key managed by the system
         return False
 
-    def transform_key(self, key, value, type):
+    def transform_key(self, key, value, key_type):
         """Perform value sanitization"""
-        if type == 'input':
+        if key_type == 'input':
             value_copy = copy.deepcopy(value)
             if 'roles' not in value_copy or value_copy['roles'] is None:
                 value_copy['roles'] = []

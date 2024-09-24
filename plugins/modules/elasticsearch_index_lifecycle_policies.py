@@ -116,9 +116,9 @@ class BartokITElasticsearchILMPolicies(BartokITAnsibleModule):
                     self._to_be_updated.remove(ckey)
         return False
 
-    def transform_key(self, key, value, type):
+    def transform_key(self, key, value, key_type):
         """Perform value sanitization"""
-        if type == 'input':
+        if key_type == 'input':
             transformed_value = {'policy': copy.deepcopy(value)}
             return transformed_value
         else:

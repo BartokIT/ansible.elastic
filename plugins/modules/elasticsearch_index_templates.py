@@ -117,9 +117,9 @@ class BartokITElasticsearchIndexTemplate(BartokITAnsibleModule):
                     self._to_be_updated.remove(ckey)
         return False
 
-    def transform_key(self, key, value, type):
+    def transform_key(self, key, value, key_type):
         """Perform value sanitization"""
-        if type == 'input':
+        if key_type == 'input':
             value_copy = copy.deepcopy(value)
             if 'template' in value_copy:
                 value_copy['index_template'] = {'template': value_copy.pop('template')}

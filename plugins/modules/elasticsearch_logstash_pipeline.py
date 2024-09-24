@@ -101,9 +101,9 @@ class BartokITElasticsearchPipelines(BartokITAnsibleModule):
         """Initialize the base class."""
         return parameters[parameter_name_with_items]
 
-    def transform_key(self, key, value, type):
+    def transform_key(self, key, value, key_type):
         """Perform value sanitization"""
-        if type == 'input':
+        if key_type == 'input':
             value_copy = copy.deepcopy(value)
             return value_copy
 
