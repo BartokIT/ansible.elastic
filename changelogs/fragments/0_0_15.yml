@@ -1,0 +1,4 @@
+minor_changes:
+ - fixed role module plugin drop role
+ - fixed role mapping module plugin idempotency
+ - added logging directive to beats roles
