@@ -119,7 +119,7 @@ _r_beat_configuration_schema:
   queue.disk.max_retry_interval:
     type: string
 
-# logging
+  # logging
   logging.to_stderr:
     type: bool
   logging.to_syslog:
@@ -128,11 +128,13 @@ _r_beat_configuration_schema:
     type: bool
   logging.to_files:
     type: bool
+  logging.to_files:
+    type: bool
   logging.level:
     type: string
     choices:
-      - info
       - debug
+      - info
       - warning
       - error
   logging.selectors:
@@ -142,24 +144,37 @@ _r_beat_configuration_schema:
   logging.metrics.period:
     type: string
   logging.metrics.namespaces:
-    type: string
+    type: list
   logging.files.path:
     type: string
   logging.files.name:
     type: string
   logging.files.rotateeverybytes:
-    type: string
+    type: int
   logging.files.keepfiles:
     type: int
   logging.files.permissions:
-    type: int
+    type: string
   logging.files.interval:
     type: string
   logging.files.rotateonstartup:
     type: bool
   logging.files.redirect_stderr:
     type: bool
-
+  logging.event_data.files.path:
+    type: string
+  logging.event_data.files.name:
+    type: string
+  logging.event_data.files.rotateeverybytes:
+    type: int
+  logging.event_data.files.keepfiles:
+    type: int
+  logging.event_data.files.permissions:
+    type: string
+  logging.event_data.files.interval:
+    type: string
+  logging.event_data.files.rotateonstartup:
+    type: bool
 # http
   http.enabled:
     type: bool

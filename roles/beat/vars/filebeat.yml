@@ -96,3 +96,59 @@ _r_beat_configuration_schema:
     type: bool
   filebeat.autodiscover.providers:
     type: dict
+  # logging
+  logging.to_stderr:
+    type: bool
+  logging.to_syslog:
+    type: bool
+  logging.to_eventlog:
+    type: bool
+  logging.to_files:
+    type: bool
+  logging.to_files:
+    type: bool
+  logging.level:
+    type: string
+    choices:
+      - debug
+      - info
+      - warning
+      - error
+  logging.selectors:
+    type: list
+  logging.metrics.enabled:
+    type: bool
+  logging.metrics.period:
+    type: string
+  logging.metrics.namespaces:
+    type: list
+  logging.files.path:
+    type: string
+  logging.files.name:
+    type: string
+  logging.files.rotateeverybytes:
+    type: int
+  logging.files.keepfiles:
+    type: int
+  logging.files.permissions:
+    type: string
+  logging.files.interval:
+    type: string
+  logging.files.rotateonstartup:
+    type: bool
+  logging.files.redirect_stderr:
+    type: bool
+  logging.event_data.files.path:
+    type: string
+  logging.event_data.files.name:
+    type: string
+  logging.event_data.files.rotateeverybytes:
+    type: int
+  logging.event_data.files.keepfiles:
+    type: int
+  logging.event_data.files.permissions:
+    type: string
+  logging.event_data.files.interval:
+    type: string
+  logging.event_data.files.rotateonstartup:
+    type: bool
