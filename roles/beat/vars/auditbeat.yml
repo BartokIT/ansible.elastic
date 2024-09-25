@@ -69,6 +69,8 @@ _r_beat_configuration_schema:
     type: string
   setup.ilm.overwrite:
     type: string
+  setup.template.enabled:
+    type: bool
   setup.template.name:
     type: string
   setup.template.fields:

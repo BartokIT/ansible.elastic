@@ -72,6 +72,8 @@ _r_beat_configuration_schema:
     type: string
 
   # ELK index template
+  setup.template.enabled:
+    type: bool
   setup.template.name:
     type: string
   setup.template.fields:
