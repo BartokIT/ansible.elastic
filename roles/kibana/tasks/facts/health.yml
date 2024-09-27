@@ -1,1 +1,19 @@
 ---
+- name: Facts | Health | Populate service facts
+  ansible.builtin.service_facts:
+
+- name: Facts | Health | Startup info
+  ansible.builtin.set_fact:
+    r_kibana_info: "{{ r_kibana_info | combine({'started': _r_kibana_started}) }}"
+  vars:
+    _r_kibana_started: "{{ (ansible_facts.services['kibana.service'] | d({'state': ''})).state == 'running' }}"
+
+- name: Facts | Health | Gather information
+  bartokit.elastic.kibana_info:
+    user: '{{ r_kibana_api_username }}'
+    password: "{{ r_kibana_api_password }}"
+    gather_subset:
+      - health
+    ssl_verify: false
+  register: _r_kibana_status_info
+  when: r_kibana_info.started

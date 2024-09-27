@@ -1,9 +1,14 @@
 ---
-# handlers file for elasticsearch
+# handlers file for kibana
 - name: Get installation informations
   ansible.builtin.include_tasks: facts/installation.yml
   listen:
     - _r_kibana_gather_installation_facts
+
+- name: Get starting informations
+  ansible.builtin.include_tasks: facts/health.yml
+  listen:
+    - _r_kibana_gather_health_facts
 
 
 - name: Set restart flag to true

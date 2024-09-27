@@ -26,6 +26,7 @@ _r_kibana_configure_actions_allowed:
   - main_files
   - keystore
   - ssl
+  - spaces
 _r_kibana_triggered_restart: false
 
 # ---- installation variables ----
@@ -44,13 +45,12 @@ __r_kibana_show_nolog: false   # only for debug purpose
 
 
 # static configuration
+r_kibana_enforce: false
 _r_kibana_config_folder: /etc/kibana
 
 ## linux username and password
 _r_kibana_username: kibana
 _r_kibana_group: kibana
-
-
 
 ## elasticsearch.yml configurations
 r_kibana_node_name: ''
@@ -104,13 +104,5 @@ r_kibana_jvm_initial_heap: 1g
 r_kibana_jvm_maximum_heap: 1g
 
 # admin user and password
-r_kibana_users_initial_elastic_password: bA3nb0g.Hyw
+r_kibana_api_username: ansible
 r_kibana_api_password:
-r_kibana_users: {}
-_r_kibana_api_user:
-  ansible:
-    password: "{{ r_kibana_api_password }}"
-    metadata:
-      reserved_to_automation: true
-    roles:
-      - superuser

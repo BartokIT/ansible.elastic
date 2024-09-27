@@ -10,8 +10,8 @@
 
 - name: Facts | Health | Gather information
   bartokit.elastic.elasticsearch_info:
-    user: 'elastic'
-    password: "{{ r_elasticsearch_users_initial_elastic_password | d(omit) }}"
+    user: '{{ _r_elasticsearch_api_username }}'
+    password: "{{ r_elasticsearch_api_password }}"
     gather_subset:
       - health
       - license

@@ -1,6 +1,16 @@
 ---
-- name: Check that Elasticsearch is started
+- name: Check that kibana is started
   ansible.builtin.assert:
     that:
       - r_kibana_info.started
     msg: "Please start first the product"
+
+- name: Manage spaces
+  bartokit.elastic.kibana_spaces:
+    user: '{{ r_kibana_api_username }}'
+    password: "{{ r_kibana_api_password }}"
+    ssl_verify: false
+    spaces: "{{ r_kibana_spaces }}"
+    mode: "{{ (r_kibana_enforce | bool) | ternary('multiple','present') }}"
+  run_once: true
+  when: ('spaces' in r_kibana_configure_actions)
