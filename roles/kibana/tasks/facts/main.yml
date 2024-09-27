@@ -5,9 +5,13 @@
       - min
   when: ansible_fqdn is not defined
 
-- name: Facts | Actions that will be performed
-  ansible.builtin.debug:
-    msg: "{{ r_kibana_actions }}"
+- name: Facts | Installation | Installation info
+  ansible.builtin.set_fact:
+    r_kibana_info:
+      installed: false
+      version: ''
+      started: false
+
 
 - name: Facts | Include installation facts gather
   ansible.builtin.include_tasks: facts/installation.yml
@@ -20,4 +24,18 @@
 
 - name: Facts | Include health facts gather
   ansible.builtin.include_tasks: facts/health.yml
-  when: r_kibana_info.started
+  when: r_kibana_info.installed
+
+
+- name: Facts | Installation | Print information   # noqa jinja[spacing]
+  ansible.builtin.debug:
+    msg: "{{ _r_elasicsearch_info.split('|') }}"
+  vars:
+    _r_elasicsearch_info: >-
+        Installed: {{ r_kibana_info.installed }}
+        |Requested version:   {{ r_kibana_version }}
+        {%- if r_kibana_info.installed -%}
+        |Version:   {{ r_kibana_info.version }}
+        |Started:   {{ r_kibana_info.started }}
+        |To be upgraded:   {{ r_kibana_info.to_be_upgraded }}
+        {%- endif -%}

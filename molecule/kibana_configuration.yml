@@ -87,3 +87,9 @@
         kibana:
           collection:
             enabled: false
+    r_kibana_spaces:
+      another:
+        name: Another space
+        description: a test space
+        initials: AS
+    r_kibana_enforce: true

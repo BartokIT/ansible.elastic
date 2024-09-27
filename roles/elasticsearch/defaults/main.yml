@@ -27,7 +27,7 @@ r_elasticsearch_add_repository: true
 r_elasticsearch_systemd_enabled: true
 
 # generic configuration
-r_elasticsearch_enforce: true
+r_elasticsearch_enforce: false
 __r_elasticsearch_show_nolog: false   # only for debug purpose
 
 

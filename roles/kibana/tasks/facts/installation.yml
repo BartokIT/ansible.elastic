@@ -4,23 +4,21 @@
     manager: auto
   no_log: true
 
-- name: Facts | Installation | Populate service facts
-  ansible.builtin.service_facts:
-
 - name: Facts | Installation | Installation info
   ansible.builtin.set_fact:
-    r_kibana_info:
-      installed: "{{ (ansible_facts.packages.kibana | d([]) | length) > 0 }}"
-      version: "{{ (ansible_facts.packages.kibana | d([]) | first).version | d('') }}"
-      started: "{{ (ansible_facts.services['kibana.service'] | d({'state': ''})).state == 'running' }}"
-
-- name: Facts | Installation | Print information   # noqa jinja[spacing]
-  ansible.builtin.debug:
-    msg: "{{ _r_elasicsearch_info.split('|') }}"
+    r_kibana_info: >-
+      {{ r_kibana_info | combine(
+        {'installed': _r_kibana_installed, 'version': _r_kibana_version, 'to_be_upgraded': false}
+      ) }}
   vars:
-    _r_elasicsearch_info: >-
-        Installed: {{ r_kibana_info.installed }}
-        {%- if r_kibana_info.installed -%}
-        |Version:   {{ r_kibana_info.version }}
-        |Started:   {{ r_kibana_info.started }}
-        {%- endif -%}
+    _r_kibana_installed: "{{ (ansible_facts.packages.kibana | d([]) | length) > 0 }}"
+    _r_kibana_version: "{{ (ansible_facts.packages.kibana | d([]) | first).version | d('') }}"
+
+- name: Facts | Installation | Upgrade info
+  ansible.builtin.set_fact:
+    r_kibana_info: "{{ r_kibana_info | combine({'to_be_upgraded': _r_kibana_to_be_upgraded}) }}"
+  when: r_kibana_info.installed
+  vars:
+    _r_kibana_to_be_upgraded: >-
+      {{ r_kibana_info.version | length > 0 and
+      r_kibana_version is version( r_kibana_info.version, '>')}}

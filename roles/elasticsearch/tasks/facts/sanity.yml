@@ -54,7 +54,7 @@
       ansible.builtin.set_fact:
         r_elasticsearch_keystore: "{{ r_elasticsearch_keystore | combine(_r_elasticsearch_keystore, recursive=True) }}"
         r_elasticsearch_configuration: "{{ _r_elasticsearch_configuration | combine(r_elasticsearch_configuration, recursive=True) }}"
-        r_elasticsearch_users: "{{ r_elasticsearch_users | combine(_r_elasticsearch_api_user, recursive=True) }}"
+        r_elasticsearch_users: "{{ r_elasticsearch_users | combine({_r_elasticsearch_api_username: {'password': r_elasticsearch_api_password, 'roles':['superuser'] }}, recursive=True) }}"
       no_log: "{{ not (__r_elasticsearch_show_nolog | bool) }}"
 
     - name: Facts | Sanity | Combine rack awareness variable

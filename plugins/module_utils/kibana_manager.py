@@ -30,17 +30,9 @@ class KibanaManager:
         api_url = "%s%s" % (self._rest_api_endpoint, path)
 
         auth = (self.__api_username, self.__api_password)
-        req = requests.request(
-            method, api_url, params=parameters, json=body, auth=auth, verify=self._ssl_verify,
-            timeout=10)
         response = {}
         try:
-            if req.status_code == 401:
-                # try to guess elastic password and resubmit password
-                password = self.guess_elastic_default_password()
-                auth = ('elastic', password)
-                req = requests.request(method, api_url, params=parameters, json=body, auth=auth, verify=self._ssl_verify,
-                                       timeout=10)
+            req = requests.request(method, api_url, params=parameters, json=body, auth=auth, verify=self._ssl_verify, timeout=10)
             response = req.json()
             req.raise_for_status()
         except requests.exceptions.Timeout as exctimeout:
@@ -93,3 +85,72 @@ class KibanaManager:
         delete_command = [self.__keystore_executable, "remove", key]
         rc, stdout, stderr = self.ansible_module.run_command(
             delete_command, check_rc=True)
+
+    # feature
+    def get_features(self):
+        """Get all the features through APIs."""
+        features_output = {}
+        features = self._api_call('api/features')
+
+        for feature in features:
+            features_output[feature['id']] = feature
+
+        return features_output
+
+    # spaces
+    def get_spaces(self, reserved=False):
+        """Get all the spaces through APIs."""
+        spaces_output = {}
+        spaces = self._api_call('api/spaces/space')
+
+        for space in spaces:
+            if reserved or not space["_reserved"]:
+                spaces_output[space['id']] = space
+
+        return spaces_output
+
+    def put_space(self, sid, **kwargs):
+        """Create a space mapping through APIs."""
+        body = {}
+        if set(kwargs.keys()) - set(['name', 'description', 'color', 'disabledFeatures', 'initials', 'imageUrl', 'solution']):
+            raise Exception("Not valid space paramteres")
+        body = kwargs
+        body['id'] = sid
+        logging.debug("Body: %s", body)
+        result = self._api_call('api/spaces/space',
+                                method='POST', body=body, json=True)
+        return result
+
+    def get_space(self, id):
+        """Create a space mapping through APIs."""
+        return self._api_call('api/spaces/space/%s' % id)
+
+    def delete_space(self, id):
+        """Delete a space through APIs
+
+        Args:
+            id (string): the space to be deleted
+
+        Returns:
+            _type_: _description_
+        """
+        result = self._api_call('api/spaces/space/%s' % id,
+                                method='DELETE', json=False)
+        return result
+
+
+    # data views
+    def get_data_views(self):
+        """Get all the data views through APIs."""
+        views_output = {}
+        views = self._api_call('api/data_views')
+
+        for view in views['data_view']:
+            views_output[view['name']] = view
+
+        return views_output
+
+    # status
+    def get_health_info(self):
+        """Get status through APIs."""
+        return  self._api_call('api/status')

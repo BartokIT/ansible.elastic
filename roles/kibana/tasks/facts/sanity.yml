@@ -2,7 +2,7 @@
 # action assert
 
 - name: Check for allowed actions
-  assert:
+  ansible.builtin.assert:
     that:
       - r_kibana_actions | list | difference(_r_kibana_actions_allowed) | length < 1
     msg: >-
@@ -10,7 +10,7 @@
       {{ r_kibana_actions | difference(_r_kibana_actions_allowed) }}
 
 - name: Check for configuration actions
-  assert:
+  ansible.builtin.assert:
     that:
       - r_kibana_configure_actions | list | difference(_r_kibana_configure_actions_allowed) | length < 1
     msg: >-
@@ -24,7 +24,7 @@
     - name: Facts | Sanity | Assertion about node name
       ansible.builtin.assert:
         that:
-          - "{{ ansible_fqdn in (r_kibana_cluster_nodes | map(attribute='host') | list) }}"
+          - "ansible_fqdn in (r_kibana_cluster_nodes | map(attribute='host') | list)"
         msg: Current host ({{ ansible_fqdn }}) is not present inside the cluster nodes list
 
     - name: Facts | Sanity | Set elastic node
@@ -32,7 +32,7 @@
         r_kibana_node_name: "{{ (r_kibana_cluster_nodes | selectattr('host', '==', ansible_fqdn) | first).name }}"
         r_kibana_node_rack: "{{ (r_kibana_cluster_nodes | selectattr('host', '==', ansible_fqdn) | first).rack | d(omit) }}"
 
-    - name: Facts | Sanity | Combine elasticsearch configurations with defaults
+    - name: Facts | Sanity | Combine kibana configurations with defaults
       ansible.builtin.set_fact:
         r_kibana_keystore: "{{ r_kibana_keystore | combine(_r_kibana_keystore, recursive=True) }}"
         r_kibana_configuration: "{{ _r_kibana_configuration | combine(r_kibana_configuration, recursive=True) }}"
@@ -60,5 +60,5 @@
         - "vars"
 
 - name: Check the validity of the configuration
-  assert:
+  ansible.builtin.assert:
     that: "{{ r_kibana_configuration is bartokit.elastic.validate_configuration(_r_kibana_configuration_schema) }}"

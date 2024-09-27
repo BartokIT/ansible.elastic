@@ -6,6 +6,7 @@
 
 - name: Cluster configuration
   ansible.builtin.set_fact:
+    r_elasticsearch_enforce: true
     r_elasticsearch_version: '8.13.2'
     r_elasticsearch_cluster_name: molecule_cluster
     r_elasticsearch_node_rack: rotating
@@ -145,9 +146,9 @@
               field: "field1"
               value:
                 - "value1"
-        pipeline2:
-            processors:
-              - append:
-                  field: "field2"
-                  value:
-                    - "value2"
+      pipeline2:
+        processors:
+          - append:
+              field: "field2"
+              value:
+                - "value2"

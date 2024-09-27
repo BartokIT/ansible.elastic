@@ -90,22 +90,22 @@
     - name: Test the installation, configuration and product start
       ansible.builtin.set_fact:
         r_elasticsearch_actions:
-          # - install
+          - install
           - configure
-          # - start
-          # - restart_on_configuration_change
+          - start
+          - restart_on_configuration_change
         r_elasticsearch_configure_actions:
-          # - folders
-          # - main_files
-          # - keystore
-          # - ssl
-          # - enforce_keystore
-          # - enforce_user_password
-          # - component_template
-          # - index_template
-          # - ilm_policies
-          # - users
-          # - initial
+          - folders
+          - main_files
+          - keystore
+          - ssl
+          - enforce_keystore
+          - enforce_user_password
+          - component_template
+          - index_template
+          - ilm_policies
+          - users
+          - initial
           - ingest_pipelines
           - logstash_pipelines
 
@@ -125,7 +125,7 @@
     - name: Test the installation, configuration and product start
       ansible.builtin.set_fact:
         r_kibana_actions:
-          - install
+          # - install
           - configure
           - start
           # - restart_on_configuration_change
@@ -133,11 +133,7 @@
           - folders
           - main_files
           - ssl
-        #   - enforce_keystore
-        #   - component_template
-        #   - index_template
-        #   - ilm_policies
-        #   - users
+          - spaces
 
     - name: Replace this task with one that validates your content
       ansible.builtin.include_role:
