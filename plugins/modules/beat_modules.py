@@ -11,16 +11,24 @@ module: beat_modules
 
 short_description: This module allow to manage the beat modules.
 
-# If this is part of a collection, you need to use semantic versioning,
-# i.e. the version is of the form "2.5.0" and not "2.4".
 version_added: "0.0.1"
 
 description: This module allow to manage the elasticsearch keystore.
 
 options:
+    type:
+        description: choose the keystore to be managed
+        required: true
+        type: str
+        choices:
+          - file
+          - heart
+          - metric
+          - audit
     force:
         description: Force the overwrite of a key if it already exists.
         required: false
+        default: false
         type: bool
     modules:
         description:
@@ -34,6 +42,7 @@ options:
           - If present the module ensure that the credentials specified will be present
           - If absent the specified credentials will be removed.
         required: false
+        default: multiple
         type: str
         choices:
           - multiple
@@ -69,10 +78,10 @@ import logging
 
 # module's parameter
 module_args = dict(
-    type=dict(type='str', required=False, choices=['file','metric','audit','heart']),
+    type=dict(type='str', required=True, choices=['file','metric','audit','heart']),
     force=dict(type='bool', required=False, default=False),
     modules=dict(type='dict', required=True, no_log=True),
-    mode=dict(type='str', required=False, choiches=['multiple', 'present', 'absent'], default='multiple')
+    mode=dict(type='str', required=False, choices=['multiple', 'present', 'absent'], default='multiple')
 )
 
 

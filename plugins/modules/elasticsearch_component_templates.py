@@ -2,19 +2,15 @@
 # Copyright: (c) 2023, BartoktIT
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 """Elasticsearch Component Templates Ansible module."""
-
 from __future__ import (absolute_import, division, print_function)
-
 __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: elasticsearch_component_template
+module: elasticsearch_component_templates
 
 short_description: This module allow to manage component templates of an Elasticsearch installation
 
-# If this is part of a collection, you need to use semantic versioning,
-# i.e. the version is of the form "2.5.0" and not "2.4".
 version_added: "0.0.1"
 
 author:

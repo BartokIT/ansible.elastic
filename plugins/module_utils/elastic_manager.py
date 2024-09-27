@@ -6,7 +6,7 @@ from pwd import getpwuid
 import re
 import requests
 import os
-
+__metaclass__ = type
 
 class ElasticManager:
     def __init__(self,

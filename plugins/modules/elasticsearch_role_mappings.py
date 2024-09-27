@@ -9,12 +9,10 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: elasticsearch_role_mapping
+module: elasticsearch_role_mappings
 
 short_description: This module allow to manage roless of an Elasticsearch installation
 
-# If this is part of a collection, you need to use semantic versioning,
-# i.e. the version is of the form "2.5.0" and not "2.4".
 version_added: "0.0.1"
 
 author:

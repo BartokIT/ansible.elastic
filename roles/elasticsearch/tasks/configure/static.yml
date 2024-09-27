@@ -8,7 +8,8 @@
 - name: Kernel parameters
   when: ('sysctl' in r_elasticsearch_configure_actions)
   block:
-    - ansible.posix.sysctl:
+    - name: Set systemctl parameter
+      ansible.posix.sysctl:
         name: vm.max_map_count
         value: '262144'
         sysctl_set: true
@@ -42,7 +43,7 @@
           -Xms{{ r_elasticsearch_jvm_initial_heap }}
           -Xmx{{ r_elasticsearch_jvm_maximum_heap }}
         dest: "{{ _r_elasticsearch_config_folder }}/jvm.options.d/heap.options"
-        mode: 0660
+        mode: '660'
         owner: root
         group: "{{ _r_elasticsearch_group }}"
       notify:
@@ -51,7 +52,7 @@
       ansible.builtin.template:
         src: elasticsearch.yml.j2
         dest: "{{ _r_elasticsearch_config_folder }}/elasticsearch.yml"
-        mode: 0660
+        mode: '660'
         owner: root
         group: "{{ _r_elasticsearch_group }}"
       notify:
@@ -74,7 +75,7 @@
         dest: "{{ r_elasticsearch_keystore_password_file }}"
         owner: elasticsearch
         group: root
-        mode: 0600
+        mode: '600'
 
     - name: Create dropin service folder
       ansible.builtin.file:
@@ -82,7 +83,7 @@
         path: /etc/systemd/system/{{ _r_elasticsearch_systemd_name }}.d
         group: root
         owner: root
-        mode: 0775
+        mode: '775'
 
     - name: Set environment variable for keystore password
       ansible.builtin.copy:
@@ -92,7 +93,7 @@
         dest: /etc/systemd/system/{{ _r_elasticsearch_systemd_name }}.d/keystore.conf
         group: root
         owner: root
-        mode: 0644
+        mode: '644'
 
 - name: SSL/TLS keystore management
   when:
@@ -133,4 +134,4 @@
     - ('systemd' in r_elasticsearch_configure_actions)
 
 - name: Flush handlers
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers

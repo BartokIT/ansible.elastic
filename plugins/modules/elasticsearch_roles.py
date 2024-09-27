@@ -9,12 +9,10 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: elasticsearch_role
+module: elasticsearch_roles
 
 short_description: This module allow to manage roless of an Elasticsearch installation
 
-# If this is part of a collection, you need to use semantic versioning,
-# i.e. the version is of the form "2.5.0" and not "2.4".
 version_added: "0.0.1"
 
 author:
@@ -37,7 +35,7 @@ extends_documentation_fragment:
 EXAMPLES = r'''
 # Ensure that the only component present in the cluster are the specified
 - name: Ensure that the only key present is the bootstrap.password with an unprotected keystore
-  bartokit.elastic.elasticsearch_role:
+  bartokit.elastic.elasticsearch_roles:
   components:
     template1:
         _meta:
@@ -85,7 +83,7 @@ class BartokITElasticsearchRole(BartokITAnsibleModule):
         """Call the constructor of the parent class."""
         super().__init__(parameter_name_with_mode='mode', parameter_name_with_items='roles',
                          argument_spec=argument_spec, supports_check_mode=False,
-                         log_file='ansible_elasticsearch_roles.log')
+                         log_file='ansible_elasticsearch_roless.log')
         self.__em = ElasticManager(self,
                                    rest_api_endpoint=self.params['api_endpoint'],
                                    api_username=self.params['user'],

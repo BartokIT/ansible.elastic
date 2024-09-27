@@ -1,15 +1,12 @@
 ---
-# vars file for elasticsearch
-_r_elasticsearch_systemd_name: elasticsearch.service
-
 _r_elasticsearch_actions_allowed:
- - install
- - configure
- - stop
- - upgrade
- - start
- - uninstall
- - restart_on_configuration_change
+  - install
+  - configure
+  - stop
+  - upgrade
+  - start
+  - uninstall
+  - restart_on_configuration_change
 
 _r_elasticsearch_configure_actions_allowed:
   - sysctl
@@ -28,3 +25,59 @@ _r_elasticsearch_configure_actions_allowed:
   - enforce_user_password
   - ingest_pipelines
   - logstash_pipelines
+
+# INSTALL variable
+
+## linux username and password
+_r_elasticsearch_username: elasticsearch
+_r_elasticsearch_group: elasticsearch
+
+# CONFIGURE variable
+
+_r_elasticsearch_api_username: ansible
+# part of configuration auto appended
+_r_elasticsearch_configuration:
+  network:
+    host: "0.0.0.0"
+  http:
+    host: "0.0.0.0"
+    port: 9200
+  cluster:
+    name: '{{ r_elasticsearch_cluster_name }}'
+    initial_master_nodes: "{{ r_elasticsearch_cluster_nodes | selectattr('roles', 'bartokit.elastic.contains', 'master') | map(attribute='name') | list }}"
+    routing:
+      allocation:
+        awareness:
+          attributes: site_id
+  node:
+    name: '{{ r_elasticsearch_node_name }}'
+    roles: >-
+      {{ (r_elasticsearch_cluster_nodes |
+      selectattr('host', 'equalto', ansible_fqdn) | first).roles | list }}
+  path:
+    logs: /var/log/elasticsearch
+    data: /var/lib/elasticsearch
+  discovery:
+    seed_hosts: "{{ r_elasticsearch_cluster_nodes | selectattr('roles', 'bartokit.elastic.contains', 'master') | map(attribute='host') | list }}"
+  xpack:
+    security:
+      enabled: true
+      enrollment:
+        enabled: true
+      http:
+        ssl:
+          enabled: true
+          verification_mode: certificate
+          keystore:
+            path: certs/elastic.p12
+          certificate_authorities: certs/ca.crt
+      transport:
+        ssl:
+          enabled: true
+          verification_mode: certificate
+          keystore:
+            path: certs/elastic.p12
+          certificate_authorities: certs/ca.crt
+
+# START/STOP variable
+_r_elasticsearch_systemd_name: elasticsearch.service

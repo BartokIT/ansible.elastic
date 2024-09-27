@@ -9,12 +9,10 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: elasticsearch_index_lifecycle_policy
+module: elasticsearch_index_lifecycle_policies
 
 short_description: This module allow to manage index templates of an Elasticsearch installation
 
-# If this is part of a collection, you need to use semantic versioning,
-# i.e. the version is of the form "2.5.0" and not "2.4".
 version_added: "0.0.3"
 
 author:
@@ -36,7 +34,7 @@ extends_documentation_fragment:
 EXAMPLES = r'''
 # Ensure that the only component present in the cluster are the specified
 - name: Create two templates
-  bartokit.elastic.elasticsearch_index_template:
+  bartokit.elastic.elasticsearch_index_lifecycle_policies:
   policies:
     policy1:
         _meta:

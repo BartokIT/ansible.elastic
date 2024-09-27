@@ -11,17 +11,25 @@ module: beat_keystore
 
 short_description: This module allow to manage the beats keystore.
 
-# If this is part of a collection, you need to use semantic versioning,
-# i.e. the version is of the form "2.5.0" and not "2.4".
 version_added: "0.0.1"
 
 description: This module allow to manage the beats keystore.
 
 options:
+    type:
+        description: choose the keystore to be managed
+        required: true
+        type: str
+        choices:
+          - file
+          - heart
+          - metric
+          - audit
     force:
         description: Force the overwrite of a key if it already exists.
         required: false
         type: bool
+        default: false
     credentials:
         description:
           - This is a key value dictionary containing the key of the keystore and the corresponde value.
@@ -35,6 +43,7 @@ options:
           - If absent the specified credentials will be removed.
         required: false
         type: str
+        default: multiple
         choices:
           - multiple
           - present
@@ -67,10 +76,10 @@ import logging
 
 # module's parameter
 module_args = dict(
-    type=dict(type='str', required=False, choices=['file','metric','audit','heart']),
+    type=dict(type='str', required=True, choices=['file','metric','audit','heart']),
     force=dict(type='bool', required=False, default=False),
     credentials=dict(type='dict', required=True, no_log=True),
-    mode=dict(type='str', required=False, choiches=['multiple', 'present', 'absent'], default='multiple')
+    mode=dict(type='str', required=False, choices=['multiple', 'present', 'absent'], default='multiple')
 )
 
 

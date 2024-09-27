@@ -27,6 +27,7 @@ r_elasticsearch_add_repository: true
 r_elasticsearch_systemd_enabled: true
 
 # generic configuration
+r_elasticsearch_enforce: true
 __r_elasticsearch_show_nolog: false   # only for debug purpose
 
 
@@ -40,11 +41,6 @@ _r_elasticsearch_password_mindigits: 2
 _r_elasticsearch_password_minspecialchars: 1
 _r_elasticsearch_password_specialchars: '!._@#'
 
-## linux username and password
-_r_elasticsearch_username: elasticsearch
-_r_elasticsearch_group: elasticsearch
-
-
 
 ## elasticsearch.yml configurations
 r_elasticsearch_node_name: ''
@@ -55,49 +51,6 @@ r_elasticsearch_cluster_nodes:
     roles:
       - master
 r_elasticsearch_cluster_name: 'es_cluster'
-
-_r_elasticsearch_configuration:
-  network:
-    host: "0.0.0.0"
-  http:
-    host: "0.0.0.0"
-    port: 9200
-  cluster:
-    name: '{{ r_elasticsearch_cluster_name }}'
-    initial_master_nodes: "{{ r_elasticsearch_cluster_nodes | selectattr('roles','bartokit.elastic.contains', 'master') | map(attribute='name') | list }}"
-    routing:
-      allocation:
-        awareness:
-          attributes: site_id
-  node:
-    name: '{{ r_elasticsearch_node_name }}'
-    roles: >-
-      {{ (r_elasticsearch_cluster_nodes |
-      selectattr('host', 'equalto', ansible_fqdn) | first).roles | list }}
-  path:
-    logs: /var/log/elasticsearch
-    data: /var/lib/elasticsearch
-  discovery:
-    seed_hosts: "{{ r_elasticsearch_cluster_nodes | selectattr('roles','bartokit.elastic.contains', 'master') | map(attribute='host') | list }}"
-  xpack:
-    security:
-      enabled: true
-      enrollment:
-        enabled: true
-      http:
-        ssl:
-          enabled: true
-          verification_mode: certificate
-          keystore:
-            path: certs/elastic.p12
-          certificate_authorities: certs/ca.crt
-      transport:
-        ssl:
-          enabled: true
-          verification_mode: certificate
-          keystore:
-            path: certs/elastic.p12
-          certificate_authorities: certs/ca.crt
 
 r_elasticsearch_configuration_ssl_certificate_authorities: ''
 r_elasticsearch_configuration: {}
@@ -118,8 +71,9 @@ r_elasticsearch_users_initial_elastic_password: bA3nb0g.Hyw
 r_elasticsearch_users_elastic_password: "{{ r_elasticsearch_users_initial_elastic_password }}"
 r_elasticsearch_api_password:
 r_elasticsearch_users: {}
+
 _r_elasticsearch_api_user:
-  ansible:
+  "{{ _r_elasticsearch_api_username }}":
     password: "{{ r_elasticsearch_api_password }}"
     metadata:
       reserved_to_automation: true
@@ -132,12 +86,10 @@ r_elasticsearch_component_templates: {}
 r_elasticsearch_index_templates: {}
 # ilm policies
 r_elasticsearch_ilm_policies: {}
-#pipelines
+# pipelines
 r_elasticsearch_ingest_pipelines: {}
-#logstash
+# logstash
 r_elasticsearch_logstash_pipelines: {}
 # roles
 r_elasticsearch_roles: {}
 r_elasticsearch_role_mappings: {}
-
-

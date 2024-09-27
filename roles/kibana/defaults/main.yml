@@ -10,13 +10,13 @@
 # - restart_on_configuration_change
 r_kibana_actions: []
 _r_kibana_actions_allowed:
- - install
- - configure
- - stop
- - upgrade
- - start
- - uninstall
- - restart_on_configuration_change
+  - install
+  - configure
+  - stop
+  - upgrade
+  - start
+  - uninstall
+  - restart_on_configuration_change
 
 # more granular configuration actions
 r_kibana_configure_actions: []
@@ -80,9 +80,6 @@ _r_kibana_configuration:
         fileName: /var/log/kibana/kibana.log
         layout:
           type: pattern
-
-
-
 
 r_kibana_configuration_ssl_certificate_authorities: ''
 r_kibana_configuration_ssl_key: ''

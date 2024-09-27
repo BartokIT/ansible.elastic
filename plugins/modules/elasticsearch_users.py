@@ -13,9 +13,7 @@ module: elasticsearch_users
 
 short_description: This module allow to manage user of an Elasticsearch installation
 
-# If this is part of a collection, you need to use semantic versioning,
-# i.e. the version is of the form "2.5.0" and not "2.4".
-version_added: "0.0.2"
+version_added: 0.0.2
 
 author:
     - BartoktIT (@BartokIT)
@@ -29,29 +27,7 @@ options:
           - 'The allowed keys for the subdictionary are: I(index_patterns), I(composed_of), I(data_stream), I(_meta), I(priority) or I(template).'
         required: true
         type: list
-        elements:
-            enabled:
-                type: bool
-                required false
-            email:
-                type: str
-                required: false
-            full_name:
-                type: str
-                required: false
-            username:
-                type: str
-                required: true
-            password:
-                type: str
-                required: false
-                no_log: true
-            metadata:
-                type: str
-                required: false
-            roles:
-                type= list
-                required: false
+        elements: str
 extends_documentation_fragment:
   - bartokit.elastic.login_options
 '''

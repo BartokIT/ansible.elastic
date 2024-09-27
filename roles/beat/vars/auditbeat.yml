@@ -120,8 +120,6 @@ _r_beat_configuration_schema:
     type: bool
   logging.to_files:
     type: bool
-  logging.to_files:
-    type: bool
   logging.level:
     type: string
     choices:

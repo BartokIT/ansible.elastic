@@ -66,17 +66,17 @@
           - beattest*
         composed_of:
           - beattest-ct
-      auditbeat-8.11.2:
+      auditbeat-8.13.2:
         index_patterns:
-          - auditbeat-8.11.2
+          - auditbeat-8.13.2
         composed_of: []
-      filebeat-8.11.2:
+      filebeat-8.13.2:
         index_patterns:
-          - filebeat-8.11.2
+          - filebeat-8.13.2
         composed_of: []
-      metricbeat-8.11.2:
+      metricbeat-8.13.2:
         index_patterns:
-          - metricbeat-8.11.2
+          - metricbeat-8.13.2
         composed_of: []
     r_elasticsearch_ilm_policies:
       beattest-ilm:

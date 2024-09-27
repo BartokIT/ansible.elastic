@@ -1,4 +1,4 @@
-elasticsearch
+bartokit.elastic.elasticsearch
 =========
 
 A role to manage Elasticsearch cluster for Red Hat-like machines.
@@ -15,9 +15,9 @@ This variable allow to specify a list of actions within the following:
 
 ```yaml
 r_elasticsearch_actions:
- - install
- - configure
- - stop
+ - install           # install the product
+ - configure         # configure files and resources of Elasticsearch
+ - stop              # stop the product
  - upgrade
  - start
  - uninstall

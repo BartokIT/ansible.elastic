@@ -9,12 +9,10 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: elasticsearch_ingest_pipeline
+module: elasticsearch_logstash_pipelines
 
 short_description: This module allow to managepipeline of an Elasticsearch installation
 
-# If this is part of a collection, you need to use semantic versioning,
-# i.e. the version is of the form "2.5.0" and not "2.4".
 version_added: "0.0.14"
 
 author:
@@ -42,8 +40,8 @@ EXAMPLES = r'''
         description: 'a new fresh pipeline'
         processors:
           - set:
-              description : "My optional processor description",
-              field: "my-keyword-field",
+              description : "My optional processor description"
+              field: "my-keyword-field"
               value: "foo"
 
 
@@ -81,7 +79,7 @@ class BartokITElasticsearchPipelines(BartokITAnsibleModule):
         """Call the constructor of the parent class."""
         super().__init__(parameter_name_with_mode='mode', parameter_name_with_items='pipelines',
                          argument_spec=argument_spec, supports_check_mode=False,
-                         log_file='ansible_elasticsearch_pipelines.log')
+                         log_file='ansible_elasticsearch_logstash_pipeliness.log')
         self.__em = ElasticManager(self,
                                    rest_api_endpoint=self.params['api_endpoint'],
                                    api_username=self.params['user'],
@@ -112,12 +110,12 @@ class BartokITElasticsearchPipelines(BartokITAnsibleModule):
 
     def read_key(self, key):
         """Get a component template."""
-        value = self.__em.get_pipeline(key)
+        value = self.__em.get_logstash_pipeline(key)
         return value
 
     def delete_key(self, key, current_value):
         """Delete component key."""
-        self.__em.delete_pipeline(key)
+        self.__em.delete_logstash_pipeline(key)
 
     def create_key(self, key, value):
         """Add a component template."""
@@ -126,7 +124,7 @@ class BartokITElasticsearchPipelines(BartokITAnsibleModule):
     def update_key(self, key, input_value, current_value):
         """Update a component template."""
         value_detach = copy.deepcopy(input_value)
-        self.__em.put_pipeline(key, **value_detach)
+        self.__em.put_logstash_pipeline(key, **value_detach)
 
     def __find_differences(self, d1, d2, path=""):
         for k in d1:
@@ -155,7 +153,7 @@ class BartokITElasticsearchPipelines(BartokITAnsibleModule):
 
     def list_current_keys(self, input_keys):
         """Return the list of pipeline actually present."""
-        components = self.__em.get_pipelines()
+        components = self.__em.get_logstash_pipelines()
         return components
 
 

@@ -1,6 +1,7 @@
 ---
 - name: Standalone | Prepare | Import repository
   hosts: all
+  gather_facts: false
   tasks:
     - name: Import a key from a url
       ansible.builtin.rpm_key:

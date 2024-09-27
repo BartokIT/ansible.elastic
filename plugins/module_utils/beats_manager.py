@@ -4,7 +4,7 @@ from grp import getgrgid
 import logging
 from pwd import getpwuid
 import os
-
+__metaclass__ = type
 
 class BeatManager:
     def __init__(self, ansible_module):
@@ -139,7 +139,3 @@ class BeatManager:
         # Run the command to aad a key to keystore
         rc, stdout, stderr = self.ansible_module.run_command(
             remove_command, check_rc=True)
-
-
-
- 

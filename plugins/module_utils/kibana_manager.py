@@ -5,7 +5,7 @@ from pwd import getpwuid
 import re
 import requests
 import os
-
+__metaclass__ = type
 
 class KibanaManager:
     def __init__(self,
@@ -97,4 +97,3 @@ class KibanaManager:
         delete_command = [self.__keystore_executable, "remove", key]
         rc, stdout, stderr = self.ansible_module.run_command(
             delete_command, check_rc=True)
-

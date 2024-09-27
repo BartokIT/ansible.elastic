@@ -8,9 +8,10 @@
     - name: Facts | Sanity | Assertion about node name
       ansible.builtin.assert:
         that:
-          - "{{ ansible_fqdn in (r_elasticsearch_cluster_nodes | map(attribute='host') | list) }}"
+          - ansible_fqdn in (r_elasticsearch_cluster_nodes | map(attribute='host') | list)
           - (r_elasticsearch_cluster_nodes | selectattr('host', '==', ansible_fqdn) | first).name | d(false, true)
         msg: Current host ({{ ansible_fqdn }}) is not present inside the cluster nodes list
+
     - name: Facts | Sanity | Assertion about api user password
       ansible.builtin.assert:
         that:
@@ -86,5 +87,5 @@
         - "vars"
 
 - name: Check the validity of the configuration
-  assert:
+  ansible.builtin.assert:
     that: "{{ r_elasticsearch_configuration is bartokit.elastic.validate_configuration(_r_elasticsearch_configuration_schema) }}"
