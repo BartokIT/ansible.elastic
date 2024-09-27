@@ -14,12 +14,14 @@ def dictoflist2flatlist(items, keyname='key'):
             result.append(item)
     return result
 
+
 def dictofdict2listofdict(items, keyname='key'):
     result = []
     for key in items.keys():
         items[key].update({keyname: key})
         result.append(items[key])
     return result
+
 
 def sort(items, sample_list=None):
     if sample_list is None:

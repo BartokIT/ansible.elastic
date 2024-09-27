@@ -137,7 +137,7 @@ class BartokITElasticsearchPipelines(BartokITAnsibleModule):
                     logging.debug("\n".join(result))
                     return True
             else:
-                logging.debug("%s%s as key not in d2\n" ,("%s: " % path if path else "", k))
+                logging.debug("%s%s as key not in d2\n", "%s: " % path if path else "", k)
                 return True
 
         return False

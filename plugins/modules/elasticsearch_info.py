@@ -106,9 +106,9 @@ class BartokITElasticsearchInfo(AnsibleModule):
                 if 'component_templates' in gather_subset or 'all' in gather_subset:
                     output_info['component_templates'] = em.get_component_templates()
             except requests.exceptions.Timeout as exctimeout:
-                self.exit_json(**{"error": "{}".format(exctimeout),"health":{"error":"timeout"}})
+                self.exit_json(**{"error": "{}".format(exctimeout), "health": {"error": "timeout"}})
             except Exception as exc:
-                self.exit_json(**{"error":"{}".format(exc)})
+                self.exit_json(**{"error": "{}".format(exc)})
             self.exit_json(**output_info)
         except Exception as e:
             self.fail_json(msg=str(e))

@@ -19,7 +19,9 @@ class BartokITAnsibleModule(AnsibleModule):
 
     """
 
-    def __init__(self, argument_spec, parameter_name_with_mode='mode', parameter_name_with_items='keys', items_type='dict', item_identifier_subkey_name='name', supports_check_mode=True, log_file=None):
+    def __init__(self, argument_spec, parameter_name_with_mode='mode',
+                 parameter_name_with_items='keys', items_type='dict',
+                 item_identifier_subkey_name='name', supports_check_mode=True, log_file=None):
         """
         Initialize the ansible modules.
 
@@ -30,7 +32,8 @@ class BartokITAnsibleModule(AnsibleModule):
                         present or not inside the resource
 
         """
-        super(BartokITAnsibleModule, self).__init__(argument_spec=argument_spec, supports_check_mode=supports_check_mode)
+        super(BartokITAnsibleModule, self).__init__(
+            argument_spec=argument_spec, supports_check_mode=supports_check_mode)
 
         self.__changed = True
         self.__parameter_name_with_mode = parameter_name_with_mode
@@ -61,7 +64,6 @@ class BartokITAnsibleModule(AnsibleModule):
             self.params[self.__parameter_name_with_items] = dictionary_from_list
         else:
             raise Exception("items type must be list or dict")
-
 
     def initialization(self, parameter_name_with_items, parameters):
         """Initialize the parameters."""
@@ -130,7 +132,8 @@ class BartokITAnsibleModule(AnsibleModule):
 
         # initialize the behaviour of the module
         if self.params[self.__parameter_name_with_mode] not in ['present', 'absent', 'multiple']:
-            raise Exception("Mode %s not know" % self.params[self.__parameter_name_with_mode])
+            raise Exception("Mode %s not know" %
+                            self.params[self.__parameter_name_with_mode])
         self.mode = self.params[self.__parameter_name_with_mode]
 
         diff_before_output = {}
@@ -152,7 +155,8 @@ class BartokITAnsibleModule(AnsibleModule):
         current_keys = self.list_current_keys(self.__keys)
 
         if self.mode == 'present':
-            self._to_be_added = list(set(self.list_input_keys()) - set(current_keys))
+            self._to_be_added = list(
+                set(self.list_input_keys()) - set(current_keys))
             self._to_be_updated = list(set(current_keys) &
                                        set(self.list_input_keys()))
             diff_before_keys = set(current_keys).intersection(
@@ -162,40 +166,50 @@ class BartokITAnsibleModule(AnsibleModule):
             diff_before_keys = set(current_keys).intersection(
                 set(self.list_input_keys()))
         else:
-            self._to_be_added = list(set(self.list_input_keys()) - set(current_keys))
-            self._to_be_removed = list(set(current_keys) - set(self.list_input_keys()))
+            self._to_be_added = list(
+                set(self.list_input_keys()) - set(current_keys))
+            self._to_be_removed = list(
+                set(current_keys) - set(self.list_input_keys()))
             self._to_be_updated = list(set(current_keys) &
                                        set(self.list_input_keys()))
             diff_before_keys = current_keys
 
         # log
         # pre management hook
-        self.__changed = True if self.pre_crud(current_keys) else self.__changed
+        self.__changed = True if self.pre_crud(
+            current_keys) else self.__changed
 
-        self._to_be_added and logging.debug('Keys requested for add are: %s', self._to_be_added)
-        self._to_be_removed and logging.debug('Keys requested for remove are: %s', self._to_be_removed)
-        self._to_be_updated and logging.debug('Keys requested for update are: %s', self._to_be_updated)
+        self._to_be_added and logging.debug(
+            'Keys requested for add are: %s', self._to_be_added)
+        self._to_be_removed and logging.debug(
+            'Keys requested for remove are: %s', self._to_be_removed)
+        self._to_be_updated and logging.debug(
+            'Keys requested for update are: %s', self._to_be_updated)
 
         # delete keys7
         if len(self._to_be_removed) > 0:
             self.__changed = True
             for key in self._to_be_removed:
                 current_key_value = self.read_key(key)
-                current_key_value = self.transform_key(key, current_key_value, 'current')
+                current_key_value = self.transform_key(
+                    key, current_key_value, 'current')
                 self.delete_key(key, current_key_value)
 
         # add missing keys
         if len(self._to_be_added) > 0:
             self.__changed = True
             for key in self._to_be_added:
-                input_key_value = self.transform_key(key, self.__keys[key], 'input')
+                input_key_value = self.transform_key(
+                    key, self.__keys[key], 'input')
                 self.create_key(key, input_key_value)
 
         # update key only if input value differ from current value
         for key in self._to_be_updated:
             current_key_value = self.read_key(key)
-            current_key_value = self.transform_key(key, current_key_value, 'current')
-            input_key_value = self.transform_key(key, self.__keys[key], 'input')
+            current_key_value = self.transform_key(
+                key, current_key_value, 'current')
+            input_key_value = self.transform_key(
+                key, self.__keys[key], 'input')
             different = self.compare_key(
                 key, input_key_value, current_key_value)
             if different:

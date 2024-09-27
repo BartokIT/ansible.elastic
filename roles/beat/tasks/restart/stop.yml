@@ -2,7 +2,7 @@
   systemd:
     name: "{{ _r_beat_systemd_name }}"
     state: stopped
-  notify: _r_beat_gather_healt_facts
+  notify: _r_beat_gather_health_facts
 
 - name: Flush handlers
   meta: flush_handlers

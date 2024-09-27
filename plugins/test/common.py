@@ -8,8 +8,10 @@ from collections.abc import MutableMapping
 from ansible import errors
 
 
-def flatten_dict(d: MutableMapping, schema: MutableMapping = {}, parent_key: str = '', sep: str = '.' ) -> MutableMapping:
+def flatten_dict(d: MutableMapping, schema: MutableMapping = None, parent_key: str = '', sep: str = '.') -> MutableMapping:
     items = []
+    if schema is None:
+        schema = {}
     for k, v in d.items():
         new_key = parent_key + sep + k if parent_key else k
         if new_key in schema:
@@ -70,7 +72,8 @@ def validate_configuration(configuration, schema):
             elif schema[found_schema_key]['type'] == 'string':
                 if 'choices' in schema[found_schema_key]:
                     if flatted_dict[key] not in schema[found_schema_key]['choices']:
-                        validation_errors += ["The key {} must be one of {} ({} found)".format(found_schema_key, "%s" % schema[found_schema_key]['choices'], flatted_dict[key])]
+                        validation_errors += ["The key {} must be one of {} ({} found)".format(found_schema_key, "%s" %
+                                              schema[found_schema_key]['choices'], flatted_dict[key])]
 
     if validation_errors:
         raise errors.AnsibleFilterError(validation_errors)

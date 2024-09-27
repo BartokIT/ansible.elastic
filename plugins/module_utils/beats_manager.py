@@ -6,6 +6,7 @@ from pwd import getpwuid
 import os
 __metaclass__ = type
 
+
 class BeatManager:
     def __init__(self, ansible_module):
         self.ansible_module = ansible_module
@@ -13,17 +14,17 @@ class BeatManager:
 
     # BEATS
     def get_beat_keystore_path(self, beattype):
-        return os.path.join("/var/lib/%sbeat/" % beattype, "%sbeat.keystore"% beattype)
+        return os.path.join("/var/lib/%sbeat/" % beattype, "%sbeat.keystore" % beattype)
 
     def is_beat_keystore_present(self, beattype):
         ''' Check for presence of beat keystore '''
         keystore_path = self.get_beat_keystore_path(beattype)
 
-        if beattype not in ['heart', 'file', 'metric','audit']:
+        if beattype not in ['heart', 'file', 'metric', 'audit']:
             raise Exception("Unsupported beat type")
         result = os.path.isfile(keystore_path)
         if not result:
-            logging.debug("Keystore %s is not present" % keystore_path)
+            logging.debug("Keystore %s is not present", keystore_path)
             return False
 
         return True
@@ -37,7 +38,7 @@ class BeatManager:
             return {
                 'exists': True,
                 'owner': getpwuid(keystore_stat.st_uid).pw_name,
-                'mode': "0%s" % oct(keystore_stat.st_mode) [-3:],
+                'mode': "0%s" % oct(keystore_stat.st_mode)[-3:],
                 'group': getgrgid(keystore_stat.st_gid).gr_name
             }
         else:
@@ -56,7 +57,7 @@ class BeatManager:
             create_command, check_rc=True)
 
         if 'created' not in stdout.lower():
-            logging.error("Impossible to create the keystore RC %s | STDOUT %s | STDERR %s}" % (rc, stdout, stderr))
+            logging.error("Impossible to create the keystore RC %s | STDOUT %s | STDERR %s}", rc, stdout, stderr)
             raise Exception("Impossible to create the keystore")
 
     def add_beat_keystore_key(self, beattype, key, value):
@@ -91,10 +92,10 @@ class BeatManager:
             return []
 
         data = []
-        list_command =  "{}beat keystore list".format(beattype)
+        list_command = "{}beat keystore list".format(beattype)
         rc, stdout, stderr = self.ansible_module.run_command(
             list_command, check_rc=True)
-        logging.debug("List command output RC %s | STDOUT %s | STDERR %s" % (rc, stdout.replace("\n","\\n"), stderr.replace("\n","\\n")))
+        logging.debug("List command output RC %s | STDOUT %s | STDERR %s", rc, stdout.replace("\n", "\\n"), stderr.replace("\n", "\\n"))
 
         for line in stdout.splitlines():
             data.append(line)
@@ -109,7 +110,7 @@ class BeatManager:
         rc, stdout, stderr = self.ansible_module.run_command(
             remove_command, check_rc=True)
 
-        enabled_modules= []
+        enabled_modules = []
         for line in stdout.splitlines():
             if line.strip() == 'Enabled:':
                 continue

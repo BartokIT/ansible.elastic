@@ -100,7 +100,6 @@ class BartokITKibanaKeystore(BartokITAnsibleModule):
         self.settings(compare_values=parameters['force'])
         return parameters[parameters_argument]
 
-
     def read_key(self, key):
         """Read keystore settings."""
         return self.__em.get_keystore_key(key)
@@ -118,7 +117,6 @@ class BartokITKibanaKeystore(BartokITAnsibleModule):
         """Overwrite keystore settings."""
         logging.debug("Updating key %s", key)
         return self.__em.update_keystore_key(key, input_value)
-
 
     def list_current_keys(self, input_keys):
         """Return the list of keys actually present."""

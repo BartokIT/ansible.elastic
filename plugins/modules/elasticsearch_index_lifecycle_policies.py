@@ -141,7 +141,7 @@ class BartokITElasticsearchILMPolicies(BartokITAnsibleModule):
         try:
             self.__em.put_ilm_policy(key, **value_detach)
         except requests.exceptions.HTTPError as err:
-            logging.error("%s" % err.text)
+            logging.error("%s", err.text)
             raise SystemExit(err)
 
     def __find_differences(self, d1, d2, path=""):
@@ -155,7 +155,7 @@ class BartokITElasticsearchILMPolicies(BartokITAnsibleModule):
                     logging.debug("\n".join(result))
                     return True
             else:
-                logging.debug("%s%s as key not in d2\n" ,("%s: " % path if path else "", k))
+                logging.debug("%s%s as key not in d2\n", "%s: " % path if path else "", k)
                 return True
 
         return False

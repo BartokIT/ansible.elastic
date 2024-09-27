@@ -8,7 +8,7 @@
 - name: Get health informations
   ansible.builtin.include_tasks: facts/health.yml
   listen:
-    - _r_beat_gather_healt_facts
+    - _r_beat_gather_health_facts
 
 
 - name: Set restart flag to true

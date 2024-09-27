@@ -1,11 +1,9 @@
 from __future__ import (absolute_import, division, print_function)
-from grp import getgrgid
 import logging
-from pwd import getpwuid
-import re
 import requests
 import os
 __metaclass__ = type
+
 
 class KibanaManager:
     def __init__(self,
@@ -41,17 +39,16 @@ class KibanaManager:
                 # try to guess elastic password and resubmit password
                 password = self.guess_elastic_default_password()
                 auth = ('elastic', password)
-                req = requests.request(
-                        method, api_url, params=parameters, json=body, auth=auth, verify=self._ssl_verify,
-                        timeout=10)
+                req = requests.request(method, api_url, params=parameters, json=body, auth=auth, verify=self._ssl_verify,
+                                       timeout=10)
             response = req.json()
             req.raise_for_status()
         except requests.exceptions.Timeout as exctimeout:
-            logging.error("{}".format(exctimeout))
+            logging.error("%s", exctimeout)
         except Exception as exc:
-            logging.error("{}".format(exc))
+            logging.error("%s", exc)
             if 'error' in response:
-                logging.error("Error: %s" % response['error'])
+                logging.error("Error: %s", response['error'])
             raise
 
         if json:
@@ -86,8 +83,7 @@ class KibanaManager:
     def update_keystore_key(self, key, value, keystore_password=None):
         """Overwrite keystore settings."""
         data = value
-        add_command = [self.__keystore_executable,
-                      "add", "--force", "--stdin", key]
+        add_command = [self.__keystore_executable, "add", "--force", "--stdin", key]
         rc, stdout, stderr = self.ansible_module.run_command(
             add_command, check_rc=True, data=data)
 

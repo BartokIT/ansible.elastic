@@ -84,9 +84,9 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
     def __init__(self, argument_spec):
         """Call the constructor of the parent class."""
         super(BartokITElasticsearchUsers, self).__init__(parameter_name_with_mode='mode', parameter_name_with_items='users',
-                         items_type='list', item_identifier_subkey_name='username',
-                         argument_spec=argument_spec, supports_check_mode=False,
-                         log_file='ansible_elasticsearch_users.log')
+                                                         items_type='list', item_identifier_subkey_name='username',
+                                                         argument_spec=argument_spec, supports_check_mode=False,
+                                                         log_file='ansible_elasticsearch_users.log')
         self.__em = ElasticManager(self,
                                    rest_api_endpoint=self.params['api_endpoint'],
                                    api_username=self.params['user'],
@@ -156,7 +156,6 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
         if self.__enforce_password:
             self.__em.set_user_password(key, input_value['password'])
 
-
     def __find_differences(self, d1, d2, path=""):
         for k in d1:
             if k in d2:
@@ -169,7 +168,7 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
                     logging.debug("\n".join(result))
                     return True
             else:
-                logging.debug("%s%s as key not in d2\n" ,("%s: " % path if path else "", k))
+                logging.debug("%s%s as key not in d2\n", "%s: " % path if path else "", k)
                 return True
 
         return False
@@ -191,11 +190,11 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
         components = self.__em.get_users()
         components_managed = self.__em.get_users(only_managed=True)
         differences = [value for value in input_keys if value in components_managed.keys()]
-        logging.debug("Managed users found %s" % differences)
+        logging.debug("Managed users found %s", differences)
         self.__managed_users = []
         if differences:
             for key in differences:
-                components[key]=components_managed[key]
+                components[key] = components_managed[key]
                 self.__managed_users.append(key)
         return components
 

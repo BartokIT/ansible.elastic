@@ -1,5 +1,5 @@
 ---
-- name: Facts | Healt| Populate service facts
+- name: Facts | Health| Populate service facts
   ansible.builtin.service_facts:
 
 - name: Facts | Installation | Installation info

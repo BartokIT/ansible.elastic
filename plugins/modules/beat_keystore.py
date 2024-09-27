@@ -76,7 +76,7 @@ import logging
 
 # module's parameter
 module_args = dict(
-    type=dict(type='str', required=True, choices=['file','metric','audit','heart']),
+    type=dict(type='str', required=True, choices=['file', 'metric', 'audit', 'heart']),
     force=dict(type='bool', required=False, default=False),
     credentials=dict(type='dict', required=True, no_log=True),
     mode=dict(type='str', required=False, choices=['multiple', 'present', 'absent'], default='multiple')
@@ -89,8 +89,8 @@ class BartokITElasticsearchBeatKeystore(BartokITAnsibleModule):
     def __init__(self, argument_spec):
         """Call the constructor of the parent class."""
         super(BartokITElasticsearchBeatKeystore, self).__init__(parameter_name_with_mode='mode', parameter_name_with_items='credentials',
-                         argument_spec=argument_spec, supports_check_mode=False,
-                         log_file='ansible_beat_keystore.log')
+                                                                argument_spec=argument_spec, supports_check_mode=False,
+                                                                log_file='ansible_beat_keystore.log')
         self.__em = BeatManager(self)
 
     def initialization(self, parameters_argument, parameters):
@@ -100,7 +100,7 @@ class BartokITElasticsearchBeatKeystore(BartokITAnsibleModule):
         Return the keys/values and set the behaviour of the base class
         """
         self.settings(compare_values=parameters['force'])
-        self.__beat_type=parameters['type']
+        self.__beat_type = parameters['type']
 
         return parameters[parameters_argument]
 
@@ -130,7 +130,7 @@ class BartokITElasticsearchBeatKeystore(BartokITAnsibleModule):
     def list_current_keys(self, input_keys):
         """Return the list of keys actually present."""
         current_keys = self.__em.list_beat_keystore_keys(self.__beat_type)
-        logging.debug("Keys present are: {}".format(current_keys))
+        logging.debug("Keys present are: %s", current_keys)
         return current_keys
 
 

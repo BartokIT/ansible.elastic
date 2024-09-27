@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 from __future__ import (absolute_import, division, print_function)
-from grp import getgrgid
 import logging
-from pwd import getpwuid
 import re
 import requests
 import os
 __metaclass__ = type
+
 
 class ElasticManager:
     def __init__(self,
@@ -42,17 +41,16 @@ class ElasticManager:
                 # try to guess elastic password and resubmit password
                 password = self.guess_elastic_default_password()
                 auth = ('elastic', password)
-                req = requests.request(
-                        method, api_url, params=parameters, json=body, auth=auth, verify=self._ssl_verify,
-                        timeout=10)
+                req = requests.request(method, api_url, params=parameters, json=body, auth=auth, verify=self._ssl_verify,
+                                       timeout=10)
             response = req.json()
             req.raise_for_status()
         except requests.exceptions.Timeout as exctimeout:
-            logging.error("{}".format(exctimeout))
+            logging.error("%s", exctimeout)
         except Exception as exc:
-            logging.error("{}".format(exc))
+            logging.error("%s", exc)
             if 'error' in response:
-                logging.error("Error: %s" % response['error'])
+                logging.error("Error: %s", response['error'])
             raise
 
         if json:
@@ -64,7 +62,7 @@ class ElasticManager:
     def guess_keystore_password(self):
         systemd_envfile = '/etc/systemd/system/elasticsearch.service.d/keystore.conf'
         if os.path.exists(systemd_envfile):
-            with open(systemd_envfile,'r') as f:
+            with open(systemd_envfile, 'r') as f:
                 envfile_content = f.readlines()
             for line in envfile_content:
                 if 'ES_KEYSTORE_PASSPHRASE_FILE' in line:
@@ -72,7 +70,7 @@ class ElasticManager:
                     m = re.search(".*ES_KEYSTORE_PASSPHRASE_FILE=(.*)\"", line)
                     if m:
                         password_file = m.group(1)
-                        with open(password_file,'r') as f:
+                        with open(password_file, 'r') as f:
                             keystore_password = f.read()
                             return keystore_password
         raise Exception("Impossible to guess elastic password")
@@ -118,9 +116,9 @@ class ElasticManager:
     def get_keystore_key(self, key, keystore_password=None):
         """Read keystore settings."""
         # removed expect due to bugs: https://github.com/blink1073/oct2py/issues/248
-        data=None
+        data = None
         if keystore_password is not None:
-            data=keystore_password
+            data = keystore_password
 
         read_command = [self.__keystore_executable, "show", key]
         rc, stdout, stderr = self.ansible_module.run_command(
@@ -267,12 +265,11 @@ class ElasticManager:
             if template['name'].startswith('.'):
                 if hidden:
                     templates_dict[template['name']] = template
-            elif template['index_template'].get('_meta',{}).get('managed', False):
+            elif template['index_template'].get('_meta', {}).get('managed', False):
                 if managed:
                     templates_dict[template['name']] = template
             else:
-               templates_dict[template['name']] = template
-
+                templates_dict[template['name']] = template
 
         return templates_dict
 
@@ -287,7 +284,8 @@ class ElasticManager:
         raise Exception(
             "Impossible to find the '{}' template requested".format(name))
 
-    def put_index_templates(self, name, index_patterns, composed_of=None, data_stream=None, template=None, _meta=None, priority=None, version=None, create=False):
+    def put_index_templates(self, name, index_patterns, composed_of=None, data_stream=None,
+                            template=None, _meta=None, priority=None, version=None, create=False):
         """Get all the component templates through APIs."""
         body = {'index_patterns': index_patterns}
 
@@ -327,7 +325,7 @@ class ElasticManager:
             if policy_name.startswith('.'):
                 if hidden:
                     ilm_policies_output[policy_name] = ilm_policies[policy_name]
-            elif ilm_policies[policy_name]['policy'].get('_meta',{}).get('managed', False):
+            elif ilm_policies[policy_name]['policy'].get('_meta', {}).get('managed', False):
                 if managed:
                     ilm_policies_output[policy_name] = ilm_policies[policy_name]
             else:
@@ -340,15 +338,15 @@ class ElasticManager:
         ilm_policy = self._api_call('_ilm/policy/{}'.format(name))
 
         for policy_name in ilm_policy.keys():
-                if policy_name == name:
-                    return ilm_policy[policy_name]
+            if policy_name == name:
+                return ilm_policy[policy_name]
         raise Exception(
             "Impossible to find the '{}' ILM policy requested".format(name))
 
     def put_ilm_policy(self, name, policy):
         """Create a ILM policy through APIs."""
-        body =  {'policy': policy}
-        logging.debug("Body: %s" % body)
+        body = {'policy': policy}
+        logging.debug("Body: %s", body)
         result = self._api_call('_ilm/policy/{}'.format(name),
                                 method='PUT', body=body, json=False)
         return result
@@ -365,7 +363,7 @@ class ElasticManager:
         users_output = {}
         users = self._api_call('_security/user')
         for user in users.keys():
-            if users[user].get('metadata',{}).get('_reserved', False):
+            if users[user].get('metadata', {}).get('_reserved', False):
                 if managed or only_managed:
                     users_output[user] = users[user]
             elif not only_managed:
@@ -378,21 +376,21 @@ class ElasticManager:
         user = self._api_call('_security/user/%s' % name)
 
         for policy_name in user.keys():
-                if policy_name == name:
-                    return user[policy_name]
+            if policy_name == name:
+                return user[policy_name]
         raise Exception(
             "Impossible to find the '{}' user requested".format(name))
 
     def put_user(self, username, **kwargs):
         """Create a user through APIs."""
-        body =  {}
+        body = {}
         if set(kwargs.keys()) - set(['enabled', 'email', 'full_name', 'password', 'metadata', 'roles']):
             raise Exception("Not valid user paramteres")
-        body=kwargs
+        body = kwargs
         if 'roles' not in body or body['roles'] is None:
             body['roles'] = []
 
-        logging.debug("Body: %s" % body)
+        logging.debug("Body: %s", body)
         result = self._api_call('_security/user/%s' % username,
                                 method='PUT', body=body, json=False)
         return result
@@ -406,7 +404,7 @@ class ElasticManager:
         Returns:
             _type_: _description_
         """
-        result = self._api_call('_security/user/%' % name,
+        result = self._api_call('_security/user/%s' % name,
                                 method='DELETE', json=False)
         return result
 
@@ -417,7 +415,7 @@ class ElasticManager:
             username (string): the username of the user which password will be changed
             password (string): the password to be set
         """
-        body={'password': password}
+        body = {'password': password}
         logging.debug("Set user for password: %s", username)
         result = self._api_call('_security/user/%s/_password' % username,
                                 method='PUT', body=body, json=True)
@@ -428,7 +426,7 @@ class ElasticManager:
         roles_output = {}
         roles = self._api_call('_security/role')
         for role in roles.keys():
-            if roles[role].get('metadata',{}).get('_reserved', False):
+            if roles[role].get('metadata', {}).get('_reserved', False):
                 if managed or only_managed:
                     roles_output[role] = roles[role]
             elif not only_managed:
@@ -441,18 +439,18 @@ class ElasticManager:
         role = self._api_call('_security/role/%s' % name)
 
         for policy_name in role.keys():
-                if policy_name == name:
-                    return role[policy_name]
+            if policy_name == name:
+                return role[policy_name]
         raise Exception(
             "Impossible to find the '{}' role requested".format(name))
 
     def put_role(self, name, **kwargs):
         """Create a role through APIs."""
-        body =  {}
+        body = {}
         if set(kwargs.keys()) - set(['applications', 'cluster', 'global', 'indices', 'metadata', 'run_as', 'remote_indices', 'transient_metadata']):
             raise Exception("Not valid role paramteres")
-        body=kwargs
-        logging.debug("Body: %s" % body)
+        body = kwargs
+        logging.debug("Body: %s", body)
         result = self._api_call('_security/role/%s' % name,
                                 method='PUT', body=body, json=False)
         return result
@@ -476,7 +474,7 @@ class ElasticManager:
         role_mappings_output = {}
         role_mappings = self._api_call('_security/role_mapping')
         for role_map in role_mappings.keys():
-            if role_mappings[role_map].get('metadata',{}).get('_reserved', False):
+            if role_mappings[role_map].get('metadata', {}).get('_reserved', False):
                 if managed or only_managed:
                     role_mappings_output[role_map] = role_mappings[role_map]
             elif not only_managed:
@@ -489,18 +487,18 @@ class ElasticManager:
         role_mapping = self._api_call('_security/role_mapping/%s' % name)
 
         for rm in role_mapping.keys():
-                if rm == name:
-                    return role_mapping[rm]
+            if rm == name:
+                return role_mapping[rm]
         raise Exception(
             "Impossible to find the '{}' role mapping requested".format(name))
 
     def put_role_mapping(self, name, **kwargs):
         """Create a role mapping through APIs."""
-        body =  {}
+        body = {}
         if set(kwargs.keys()) - set(['enabled', 'metadata', 'roles', 'role_templates', 'rules']):
             raise Exception("Not valid role paramteres")
-        body=kwargs
-        logging.debug("Body: %s" % body)
+        body = kwargs
+        logging.debug("Body: %s", body)
         result = self._api_call('_security/role_mapping/%s' % name,
                                 method='PUT', body=body, json=False)
         return result
@@ -529,7 +527,7 @@ class ElasticManager:
             if pipeline_name.startswith('.'):
                 if hidden:
                     pipelines_output[pipeline_name] = pipelines[pipeline_name]
-            elif pipelines[pipeline_name].get('_meta',{}).get('managed', False):
+            elif pipelines[pipeline_name].get('_meta', {}).get('managed', False):
                 if managed:
                     pipelines_output[pipeline_name] = pipelines[pipeline_name]
             else:
@@ -542,17 +540,17 @@ class ElasticManager:
         pipeline = self._api_call('_ingest/pipeline/{}'.format(name))
 
         for pipeline_name in pipeline.keys():
-                if pipeline_name == name:
-                    return pipeline[pipeline_name]
+            if pipeline_name == name:
+                return pipeline[pipeline_name]
         raise Exception(
             "Impossible to find the '{}' ingest pipeline requested".format(name))
 
     def put_pipeline(self, name, **kwargs):
         """Create a ILM policy through APIs."""
-        body =  {}
+        body = {}
         if set(kwargs.keys()) - set(['description', 'on_failure', 'processors', 'version', '_meta', 'deprecated']):
             raise Exception("Not valid pipeline parametres")
-        body=kwargs
+        body = kwargs
 
         result = self._api_call('_ingest/pipeline/{}'.format(name),
                                 method='PUT', body=body, json=False)
@@ -580,17 +578,17 @@ class ElasticManager:
         pipeline = self._api_call('_logstash/pipeline/{}'.format(name))
 
         for pipeline_name in pipeline.keys():
-                if pipeline_name == name:
-                    return pipeline[pipeline_name]
+            if pipeline_name == name:
+                return pipeline[pipeline_name]
         raise Exception(
             "Impossible to find the '{}' ingest pipeline requested".format(name))
 
     def put_logstash_pipeline(self, name, **kwargs):
         """Create a logstash pipeline through APIs."""
-        body =  {}
+        body = {}
         if set(kwargs.keys()) - set(['description', 'last_modified', 'pipeline', 'pipeline_metadata', 'pipeline_settings', 'username']):
             raise Exception("Not valid pipeline parametres")
-        body=kwargs
+        body = kwargs
 
         result = self._api_call('_logstash/pipeline/{}'.format(name),
                                 method='PUT', body=body, json=False)
