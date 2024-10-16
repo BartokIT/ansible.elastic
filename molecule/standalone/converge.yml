@@ -125,10 +125,10 @@
     - name: Test the installation, configuration and product start
       ansible.builtin.set_fact:
         r_kibana_actions:
-          # - install
+          - install
           - configure
           - start
-          # - restart_on_configuration_change
+          - restart_on_configuration_change
         r_kibana_configure_actions:
           - folders
           - main_files
