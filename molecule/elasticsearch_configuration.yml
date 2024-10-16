@@ -138,3 +138,16 @@
         password: unknown.1234
         roles:
           - kibana_system
+    r_elasticsearch_ingest_pipelines:
+      pipeline1:
+        processors:
+          - append:
+              field: "field1"
+              value:
+                - "value1"
+        pipeline2:
+            processors:
+              - append:
+                  field: "field2"
+                  value:
+                    - "value2"
