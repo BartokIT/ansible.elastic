@@ -31,7 +31,7 @@
 
     - name: Install | Install Elasticsearch
       ansible.builtin.dnf:
-        name: '{{ r_elasticsearch_rpm_name }} == {{ r_elasticsearch_version }}'
+        name: '{{ r_elasticsearch_rpm_name }}-{{ r_elasticsearch_version }}'
         state: present
       notify:
         - _r_elasticsearch_gather_installation_facts

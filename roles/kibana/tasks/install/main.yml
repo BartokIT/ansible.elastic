@@ -28,7 +28,7 @@
 
     - name: Install | Install Kibana
       ansible.builtin.dnf:
-        name: '{{ r_kibana_rpm_name }} == {{ r_kibana_version }}'
+        name: '{{ r_kibana_rpm_name }}-{{ r_kibana_version }}'
         state: present
       notify:
         - _r_kibana_gather_installation_facts

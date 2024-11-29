@@ -6,7 +6,7 @@
 
 - name: Cluster configuration
   ansible.builtin.set_fact:
-    r_elasticsearch_version: '8.13.2'
+    r_elasticsearch_version: '8.16.1-1'
     r_elasticsearch_cluster_name: molecule_cluster
     r_elasticsearch_node_rack: rotating
     r_elasticsearch_cluster_nodes: >-
@@ -66,17 +66,17 @@
           - beattest*
         composed_of:
           - beattest-ct
-      auditbeat-8.13.2:
+      auditbeat-8.16.1:
         index_patterns:
-          - auditbeat-8.13.2
+          - auditbeat-8.16.1
         composed_of: []
-      filebeat-8.13.2:
+      filebeat-8.16.1:
         index_patterns:
-          - filebeat-8.13.2
+          - filebeat-8.16.1
         composed_of: []
-      metricbeat-8.13.2:
+      metricbeat-8.16.1:
         index_patterns:
-          - metricbeat-8.13.2
+          - metricbeat-8.16.1
         composed_of: []
     r_elasticsearch_ilm_policies:
       beattest-ilm:

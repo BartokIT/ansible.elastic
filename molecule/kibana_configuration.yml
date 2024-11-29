@@ -16,7 +16,7 @@
 
 - name: Cluster configuration
   ansible.builtin.set_fact:
-    r_kibana_version: '8.13.2'
+    r_kibana_version: '8.16.1-1'
     r_kibana_cluster_name: molecule_cluster
     r_kibana_node_rack: rotating
     r_kibana_elasticsearch_nodes: >-

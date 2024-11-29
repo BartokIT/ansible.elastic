@@ -33,7 +33,7 @@
 
     - name: Install | Install Beat
       ansible.builtin.package:
-        name: '{{ r_beat_rpm_name }} == {{ r_beat_version }}'
+        name: '{{ r_beat_rpm_name }}-{{ r_beat_version }}'
         state: present
       notify:
         - _r_beat_gather_installation_facts

@@ -8,9 +8,9 @@
 - name: Create automation user
   bartokit.elastic.elasticsearch_users:
     user: 'elastic'
-    password: "xxxxxx"
+    password: "{{ r_elasticsearch_users_elastic_password }}"
     ssl_verify: false
-    users: "{{ _r_elasticsearch_api_user | bartokit.elastic.dictofdict2listofdict('username') }}"
+    users: "{{ {_r_elasticsearch_api_username:_r_elasticsearch_api_user}  | bartokit.elastic.dictofdict2listofdict('username') }}"
     mode: present
   run_once: true
   when: ('initial' in r_elasticsearch_configure_actions)

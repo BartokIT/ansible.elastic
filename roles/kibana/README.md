@@ -30,6 +30,7 @@ Example Playbook
 
 This example install and configure an Elasticsearch cluster:
 
+```yaml
     - name: Install and configure Elasticsearch
       hosts: all
       gather_facts: false
@@ -69,7 +70,7 @@ This example install and configure an Elasticsearch cluster:
               - ssl
               - enforce_keystore
               - component_template
-
+```
 
 
 License

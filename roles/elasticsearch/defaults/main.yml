@@ -73,7 +73,7 @@ r_elasticsearch_api_password:
 r_elasticsearch_users: {}
 
 _r_elasticsearch_api_user:
-  "{{ _r_elasticsearch_api_username }}":
+    username: "{{ _r_elasticsearch_api_username }}"
     password: "{{ r_elasticsearch_api_password }}"
     metadata:
       reserved_to_automation: true
