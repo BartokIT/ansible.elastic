@@ -23,9 +23,10 @@ description: This module allow to manage spaces of an Kibana installation
 options:
     spaces:
         description:
-          - This is a key value dictionary containing as key the name of the spaces and as value the specifications
-          - 'The allowed keys for the subdictionary are: I(_meta) and/or I(template).'
-          - 'The template key allow only three keys: I(settings), I(mapping) and I(aliases).'
+          - This is a key value dictionary containing as key the id of the space and as value the specifications
+          - 'The allowed keys for the subdictionary are: I(color), I(description),  I(disabledFeatures),'
+          - 'I(imageUrl), I(initials), I(name) and I(solution).'          
+
         required: true
         type: dict
 extends_documentation_fragment:
@@ -34,22 +35,18 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 # Ensure that the only component present in the cluster are the specified
-- name: Ensure that the only key present is the bootstrap.password with an unprotected keystore
+- name: Ensure that the space definied is present
   bartokit.elastic.kibana_spaces:
-  components:
-    template1:
-        _meta:
-            author: 'BartokIT'
-    template2:
-        template:
-            mappings:
-                properties:
-                order_date:
-                    type: 'date'
-                    format: 'dd-MM-yyyy'
-            settings:
-                number_of_shards: 1
-
+    user: elastic
+    password: strongpassword123.
+    mode: multiple
+    spaces
+      firstspace:
+        description: The first space
+        initials: FS
+      secondspace:
+        description: The second space
+        initials: SS
 '''
 
 RETURN = r'''
