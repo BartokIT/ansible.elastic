@@ -27,6 +27,7 @@ _r_kibana_configure_actions_allowed:
   - keystore
   - ssl
   - spaces
+  - data_views
 _r_kibana_triggered_restart: false
 
 # ---- installation variables ----
@@ -114,3 +115,4 @@ _r_kibana_api_user:
 # configuration 
 r_kibana_enforce: false
 r_kibana_spaces: {}
+r_kibana_dataviews: {}

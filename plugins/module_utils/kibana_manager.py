@@ -125,10 +125,9 @@ class KibanaManager:
         """Create a space through APIs."""
         body = {}
         if set(kwargs.keys()) - set(['color', 'description', 'disabledFeatures', 'imageUrl', 'initials', 'name','solution']):
-            raise Exception("Not valid pipeline parametres")
+            raise Exception("Not valid space parametres")
         body = kwargs
         body['id'] = space_id
-        logging.debug("Body: %s", body)
         result = self._api_call('api/spaces/space',
                                 method='POST', body=body, json=True)
         logging.debug("%s" %result)
@@ -137,10 +136,9 @@ class KibanaManager:
         """Update a space through APIs."""
         body = {}
         if set(kwargs.keys()) - set(['color', 'description', 'disabledFeatures', 'imageUrl', 'initials', 'name','solution']):
-            raise Exception("Not valid pipeline parametres")
+            raise Exception("Not valid space parametres")
         body = kwargs
         body['id'] = space_id
-        logging.debug("Body: %s", body)
         result = self._api_call('api/spaces/space/{}'.format(space_id),
                                 method='PUT', body=body, json=True)
 
@@ -153,43 +151,45 @@ class KibanaManager:
     def get_data_views(self, reserved=False):
         """Get all the data views through APIs."""
         data_views_output = {}
+        data_views_id_map = {}
         data_views = self._api_call('api/data_views')
 
-        for data_view in data_views['data_views']:
-            if data_view.get('_reserved', False):
-              if reserved:
-                data_views_output[data_view['id']] = data_view
-            else:
-                data_views_output[data_view['id']] = data_view
+        for data_view in data_views['data_view']:
+            data_views_output[data_view['id']] = data_view
+            # data_views_id_map[data_view['name']] = data_view['id']
 
         return data_views_output
 
-    def get_data_view(self, space_id):
-        """Get specific space"""
-        space = self._api_call('api/spaces/space/{}'.format(space_id))
-
-        if space_id == space['id']:
-            return space
+    def get_data_view(self, dataview_id):
+        """Get specific data view"""
+        data_view = self._api_call('api/data_views/data_view/{}'.format(dataview_id))
+        if dataview_id == data_view['data_view']['id']:
+            del data_view['data_view']['fields']
+            return data_view
         raise Exception(
-            "Impossible to find the '{}' space requested".format(space_id))
+            "Impossible to find the '{}' data view requested".format(dataview_id))
     
-    def put_data_view(self, space_id, **kwargs):
-        """Create a space through APIs."""
+    def put_data_view(self, dataview_id, **kwargs):
+        """Create a data view through APIs."""
         body = {}
-        if set(kwargs.keys()) - set(['color', 'description', 'disabledFeatures', 'imageUrl', 'initials', 'name','solution']):
+        if set(kwargs['data_view'].keys()) - set(['allowNoIndex', 'fieldAttrs', 'fields', 'fieldFormats', 'name', 'namespaces', 'runtimeFieldMap','sourceFilters', 'timeFieldName', 'title', 'typeMeta']):
             raise Exception("Not valid pipeline parametres")
         body = kwargs
-        body['id'] = space_id
-        result = self._api_call('api/spaces/space',
+        body['data_view']['id'] = dataview_id
+        result = self._api_call('api/data_views/data_view',
                                 method='POST', body=body, json=True)
-        logging.debug("%s" %result)
 
-    def update_data_view(self, space_id, **kwargs):
+
+    def update_data_view(self, dataview_id, **kwargs):
         """Update a space through APIs."""
         body = {}
-        if set(kwargs.keys()) - set(['color', 'description', 'disabledFeatures', 'imageUrl', 'initials', 'name','solution']):
+        if set(kwargs['data_view'].keys()) - set(['allowNoIndex', 'fieldAttrs', 'fields', 'fieldFormats', 'name', 'namespaces', 'runtimeFieldMap','sourceFilters', 'timeFieldName', 'title', 'typeMeta']):
             raise Exception("Not valid pipeline parametres")
         body = kwargs
-        body['id'] = space_id
-        result = self._api_call('api/spaces/space/{}'.format(space_id),
-                                method='PUT', body=body, json=True)
+        result = self._api_call('api/data_views/data_view/{}'.format(dataview_id),
+                                method='POST', body=body, json=True)
+ 
+    def delete_data_view(self, dataview_id):
+        """Delete a data view through APIs."""
+        result = self._api_call('api/data_views/data_view/{}'.format(dataview_id),
+                                method='DELETE', json=False)

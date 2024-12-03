@@ -41,8 +41,27 @@
       testspace:
         name: Linux space
         initials: LX
-        description: A test space for linux administrators      
-        
+        description: A test space for linux administrators
+    r_kibana_data_views:
+      beatsdv1:
+        title: '*beat*'
+        name: data view test
+      beatsdv2:
+        title: '*beat*'
+        name: data view test 2
+        namespaces:
+          - testspace
+          - default
+      beatsdv3:
+        title: '*beat*'
+        name: data view test 3
+        namespaces:
+          - default
+      beatsdv4:
+        title: '*beat*'
+        name: data view test 4
+        namespaces:
+          - testspace
     r_kibana_configuration:
       elasticsearch:
         username: kibana_system

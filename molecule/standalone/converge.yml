@@ -132,6 +132,7 @@
           - main_files
           - ssl
           - spaces
+          - data_views
         #   - enforce_keystore
         #   - component_template
         #   - index_template
