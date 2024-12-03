@@ -4,3 +4,13 @@
     that:
       - r_kibana_info.started
     msg: "Please start first the product"
+
+- name: Manage Kibana spaces
+  bartokit.elastic.kibana_spaces:
+    user: '{{ _r_kibana_api_username }}'
+    password: "{{ r_kibana_api_password }}"
+    ssl_verify: false
+    spaces: "{{ r_kibana_spaces }}"
+    mode: "{{ (r_kibana_enforce | bool) | ternary('multiple','present') }}"
+  run_once: true
+  when: ('spaces' in r_kibana_configure_actions)

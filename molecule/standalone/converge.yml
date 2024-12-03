@@ -131,6 +131,7 @@
           - folders
           - main_files
           - ssl
+          - spaces
         #   - enforce_keystore
         #   - component_template
         #   - index_template

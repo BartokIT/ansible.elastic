@@ -17,6 +17,7 @@
 - name: Cluster configuration
   ansible.builtin.set_fact:
     r_kibana_version: '8.16.1-1'
+    r_kibana_enforce: true
     r_kibana_cluster_name: molecule_cluster
     r_kibana_node_rack: rotating
     r_kibana_elasticsearch_nodes: >-
@@ -36,6 +37,12 @@
     r_kibana_configuration_ssl_key: "{{ _converge_ssl_key.content | b64decode }}"
     r_kibana_configuration_ssl_certificate: "{{ _converge_ca_certificate.content | b64decode }}"
     r_kibana_api_password: 'ansiblepassword'
+    r_kibana_spaces:
+      testspace:
+        name: Linux space
+        initials: LX
+        description: A test space for linux administrators      
+        
     r_kibana_configuration:
       elasticsearch:
         username: kibana_system
