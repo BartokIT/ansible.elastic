@@ -42,6 +42,10 @@
         name: Linux space
         initials: LX
         description: A test space for linux administrators
+      testspace2:
+        name: Linux space 2
+        initials: L2
+        description: A test space for linux administrators
     r_kibana_data_views:
       beatsdv1:
         title: '*beat*'
@@ -52,6 +56,7 @@
         namespaces:
           - testspace
           - default
+          - testspace2
       beatsdv3:
         title: '*beat*'
         name: data view test 3

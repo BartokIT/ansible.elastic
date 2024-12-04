@@ -128,7 +128,16 @@ class BartokITKibanaDataViews(BartokITAnsibleModule):
     def update_key(self, key, input_value, current_value):
         """Update a data_views."""
         value_detach = copy.deepcopy(input_value)
-        self.__km.update_data_view(key, **value_detach)
+        current_value['data_view']['namespaces'].sort()
+        input_value['data_view']['namespaces'].sort()
+        # It isn't possible to modify namespaces, you can only drop and recreate
+        if current_value['data_view']['namespaces'] != input_value['data_view']['namespaces']:
+            logging.debug(current_value['data_view']['namespaces'])
+            self.__km.delete_data_view(key)
+            self.__km.put_data_view(key, **value_detach)
+        else:
+            del value_detach['data_view']['namespaces']
+            self.__km.update_data_view(key, **value_detach)
 
     def __find_differences(self, d1, d2, path=""):
         for k in d1:
