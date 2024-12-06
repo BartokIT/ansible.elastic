@@ -1,0 +1,23 @@
+---
+- name: Facts | Perform basic setup
+  ansible.builtin.setup:
+    gather_subset:
+      - min
+  when: ansible_fqdn is not defined
+
+- name: Facts | Actions that will be performed
+  ansible.builtin.debug:
+    msg: "{{ r_logstash_actions }}"
+
+- name: Facts | Include installation facts gather
+  ansible.builtin.include_tasks: facts/installation.yml
+
+- name: Facts | Include variable sanity checks
+  ansible.builtin.include_tasks: facts/sanity.yml
+
+- name: Facts | Include installation facts gather
+  ansible.builtin.include_tasks: facts/installation.yml
+
+- name: Facts | Include health facts gather
+  ansible.builtin.include_tasks: facts/health.yml
+  when: r_logstash_info.started

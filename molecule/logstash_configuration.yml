@@ -1,0 +1,120 @@
+---
+- name: Get ca certificate
+  ansible.builtin.slurp:
+    path: /etc/pki/tls/certs/ca-certificate.pem
+  register: _converge_ssl_ca_certificate
+
+- name: Get key
+  ansible.builtin.slurp:
+    path: /etc/pki/tls/private/logstash.key
+  register: _converge_ssl_key
+
+- name: Get certificate
+  ansible.builtin.slurp:
+    path: /etc/pki/tls/certs/logstash.pem
+  register: _converge_ca_certificate
+
+- name: Cluster configuration
+  ansible.builtin.set_fact:
+    r_logstash_version: '8.16.1-1'
+    r_logstash_enforce: true
+    r_logstash_cluster_name: molecule_cluster
+    r_logstash_node_rack: rotating
+    r_logstash_elasticsearch_nodes: >-
+      {%- filter list -%}
+        [{%- for node in groups.cluster -%}
+          'https://{{ node }}:9200',
+      {%- endfor -%}]{%- endfilter -%}
+    r_logstash_users_initial_elastic_password: bA3nb0g.Hyw
+    r_logstash_keystore_password: 'adfs8NSM2nc.ug'
+    r_logstash_keystore:
+      keystore.seed: 'J=Z4Y50EUvoAUS?^rQ_@'
+      xpack.security.http.ssl.keystore.secure_password: 'XC9sxbnkTzCP9aTEc74LfQ'
+      xpack.security.transport.ssl.keystore.secure_password: XC9sxbnkTzCP9aTEc74LfQ
+      xpack.security.transport.ssl.truststore.secure_password: XC9sxbnkTzCP9aTEc74LfQ
+      # test.secure.key: passwd1
+    r_logstash_configuration_ssl_certificate_authorities: "{{ _converge_ssl_ca_certificate.content | b64decode }}"
+    r_logstash_configuration_ssl_key: "{{ _converge_ssl_key.content | b64decode }}"
+    r_logstash_configuration_ssl_certificate: "{{ _converge_ca_certificate.content | b64decode }}"
+    r_logstash_api_password: 'ansiblepassword'
+    r_logstash_spaces:
+      testspace:
+        name: Linux space
+        initials: LX
+        description: A test space for linux administrators
+      testspace2:
+        name: Linux space 2
+        initials: L2
+        description: A test space for linux administrators
+    r_logstash_data_views:
+      beatsdv1:
+        title: '*beat*'
+        name: data view test
+      beatsdv2:
+        title: '*beat*'
+        name: data view test 2
+        namespaces:
+          - testspace
+          - default
+          - testspace2
+      beatsdv3:
+        title: '*beat*'
+        name: data view test 3
+        namespaces:
+          - default
+      beatsdv4:
+        title: '*beat*'
+        name: data view test 4
+        namespaces:
+          - testspace
+    r_logstash_configuration:
+      elasticsearch:
+        username: logstash_system
+        password: unknown.1234
+        ssl:
+          certificateAuthorities: /etc/logstash/ca-certificate.pem
+      server:
+        publicBaseUrl: https://localhost:5601/
+        host: "0.0.0.0"
+        ssl:
+          enabled: true
+          certificate: /etc/logstash/logstash.pem
+          key: /etc/logstash/logstash.key
+          supportedProtocols:
+            - TLSv1.3
+            - TLSv1.2
+          cipherSuites:
+            - "ECDHE-RSA-AES256-GCM-SHA384"
+            - "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"
+            - "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384"
+            - "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256"
+            - "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256"
+            - "TLS_RSA_WITH_AES_256_GCM_SHA384"
+            - "TLS_RSA_WITH_AES_128_GCM_SHA256"
+            - "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+            - "TLS_AES_256_GCM_SHA384"
+            - "TLS_AES_128_GCM_SHA256"
+            - "TLS_CHACHA20_POLY1305_SHA256"
+            - "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"
+            - "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+            - "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384"
+            - "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256"
+            - "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
+            - "TLS_RSA_WITH_AES_256_CBC_SHA256"
+            - "TLS_RSA_WITH_AES_128_CBC_SHA256"
+      xpack:
+        encryptedSavedObjects:
+          encryptionKey: 0b8f42d021e388b4ee314977ee2af522
+        reporting:
+          encryptionKey: 623cb14bb42259ac0be7c53b7fac1d44
+          csv:
+            maxSizeBytes: 2097152000
+          queue:
+            timeout: 1800000
+        security:
+          encryptionKey: 02fa78f4e9e83fecfaf4084ec5672409
+
+      monitoring:
+        logstash:
+          collection:
+            enabled: false

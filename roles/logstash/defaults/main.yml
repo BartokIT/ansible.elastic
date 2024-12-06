@@ -1,0 +1,116 @@
+---
+# ---- run behaviour modification ----
+# action allowed in r_logstash_actions
+# - install
+# - configure
+# - stop
+# - upgrade
+# - start
+# - uninstall
+# - restart_on_configuration_change
+r_logstash_actions: []
+_r_logstash_actions_allowed:
+  - install
+  - configure
+  - stop
+  - upgrade
+  - start
+  - uninstall
+  - restart_on_configuration_change
+
+# more granular configuration actions
+r_logstash_configure_actions: []
+_r_logstash_configure_actions_allowed:
+  - folders
+  - sysctl
+  - main_files
+  - keystore
+  - ssl
+_r_logstash_triggered_restart: false
+
+# ---- installation variables ----
+r_logstash_version: '8.11.2'
+r_logstash_rpm_name: logstash
+r_logstash_info:
+  installed: false
+  version: ''
+r_logstash_add_repository: true
+
+# start && stop
+_r_logstash_systemd_name: logstash.service
+
+# generic configuration
+__r_logstash_show_nolog: false   # only for debug purpose
+
+
+# static configuration
+_r_logstash_config_folder: /etc/logstash
+
+## linux username and password
+_r_logstash_username: logstash
+_r_logstash_group: logstash
+
+
+
+## elasticsearch.yml configurations
+r_logstash_node_name: ''
+r_logstash_node_rack: ''
+r_logstash_cluster_nodes:
+  - host: '{{ ansible_fqdn }}'
+    name: '{{ ansible_fqdn }}'
+    roles:
+      - master
+r_logstash_cluster_name: 'es_cluster'
+
+_r_logstash_configuration:
+  elasticsearch:
+    hosts: "{{ r_logstash_elasticsearch_nodes }}"
+  server:
+    name: '{{ r_logstash_node_name }}'
+    host: '{{ r_logstash_node_name }}'
+  path:
+    data: /var/lib/logstash
+  logging:
+    root:
+      appenders:
+        - logstash
+    appenders:
+      logstash:
+        type: file
+        fileName: /var/log/logstash/logstash.log
+        layout:
+          type: pattern
+
+r_logstash_configuration_ssl_certificate_authorities: ''
+r_logstash_configuration_ssl_key: ''
+r_logstash_configuration_ssl_certificate: ''
+r_logstash_configuration: {}
+
+## keystore settings
+r_logstash_keystore_password:
+r_logstash_keystore_password_file: "{{ _r_logstash_config_folder }}/keystore.password"
+r_logstash_keystore:
+_r_logstash_keystore: []
+## password quality settings
+_r_logstash_password_minlength: 12
+_r_logstash_password_minuppercase: 3
+_r_logstash_password_minlowercase: 3
+_r_logstash_password_mindigits: 2
+_r_logstash_password_minspecialchars: 1
+_r_logstash_password_specialchars: '!._@#'
+
+## jvm setting
+r_logstash_jvm_initial_heap: 1g
+r_logstash_jvm_maximum_heap: 1g
+
+# admin user and password
+_r_logstash_api_username: ansible
+r_logstash_api_password: ansible
+_r_logstash_api_user:
+    username: "{{ _r_logstash_api_username }}"
+    password: "{{ r_logstash_api_password }}"
+
+# configuration
+r_logstash_enforce: false
+r_logstash_spaces: {}
+r_logstash_dataviews: {}

@@ -1,0 +1,8 @@
+- name: Start the logstash service
+  systemd:
+    name: "{{ _r_logstash_systemd_name }}"
+    state: started
+  notify: _r_logstash_gather_installation_facts
+
+- name: Flush handlers
+  meta: flush_handlers

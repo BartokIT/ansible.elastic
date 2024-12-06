@@ -1,0 +1,126 @@
+---
+# vars file for elasticsearch
+_r_logstash_configuration_schema:
+  node.name:
+    type: string
+  path.data:
+    type: string
+  pipeline.id:
+    type: string
+  pipeline.workers:
+    type: int
+  pipeline.batch.size:
+    type: int
+  pipeline.batch.delay:
+    type: int
+  pipeline.unsafe_shutdown:
+    type: bool
+  pipeline.plugin_classloaders:
+    type: bool
+  pipeline.ordered:
+    type: string
+    choices:
+      - 'auto'
+      - 'true'
+      - 'false'
+  pipeline.ecs_compatibility:
+    type: string
+    choices:
+      - 'disabled'
+      - 'v1'
+      - 'v8'
+  path.config:
+    type: string
+  config.string:
+    type: string
+  config.test_and_exit:
+    type: bool
+  config.reload.automatic:
+    type: bool
+  config.reload.interval:
+    type: string
+  config.debug:
+    type: bool
+  config.support_escapes:
+    type: bool
+  config.field_reference.escape_style:
+    type: bool
+  modules:
+    type: list
+  queue.type:
+    type: string
+    choices:
+      - memory
+      - persisted
+  path.queue:
+    type: string
+  queue.page_capacity:
+    type: string
+  queue.max_events:
+    type: int
+  queue.max_bytes:
+    type: string
+  queue.checkpoint.acks:
+    type: int
+  queue.checkpoint.writes:
+    type: int
+  queue.checkpoint.retry:
+    type: bool
+  queue.drain:
+    type: bool
+  dead_letter_queue.enable:
+    type: bool
+  dead_letter_queue.max_bytes:
+    type: string
+  dead_letter_queue.storage_policy:
+    type: string
+    choices:
+      - drop_newer
+      - drop_older
+  path.dead_letter_queue:
+    type: string
+  api.enabled:
+    type: bool
+  api.environment:
+    type: string
+  api.http.host:
+    type: string
+  api.http.port:
+    type: string
+  api.ssl.enabled:
+    type: bool
+  api.ssl.keystore.path:
+    type: string
+  api.ssl.keystore.password:
+    type: string
+  api.ssl.supported_protocols:
+    type: string
+  api.auth.type:
+    type: string
+  api.auth.basic.username:
+    type: string
+  api.auth.basic.password:
+    type: string
+  api.auth.basic.password_policy.mode:
+    type: string
+  log.level:
+    type: string
+    choices:
+      - fatal
+      - error
+      - warn
+      - info
+      - debug
+      - trace
+  log.format:
+    type: string
+  pipeline.separate_logs:
+    type: bool
+  path.plugins:
+    type: string
+  allow_superuser:
+    type: bool
+  event_api.tags.illegal:
+    type: string
+  pipeline.buffer.type:
+    type: string

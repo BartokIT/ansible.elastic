@@ -1,0 +1,64 @@
+---
+# action assert
+
+- name: Check for allowed actions
+  assert:
+    that:
+      - r_logstash_actions | list | difference(_r_logstash_actions_allowed) | length < 1
+    msg: >-
+      The following actions are not allowed:
+      {{ r_logstash_actions | difference(_r_logstash_actions_allowed) }}
+
+- name: Check for configuration actions
+  assert:
+    that:
+      - r_logstash_configure_actions | list | difference(_r_logstash_configure_actions_allowed) | length < 1
+    msg: >-
+      The following configuration actions are not allowed:
+      {{ r_logstash_configure_actions | difference(_r_logstash_configure_actions_allowed) }}
+
+# configuration assert
+- name: Sanity check configuration variables
+  when: ('configure' in r_logstash_actions)
+  block:
+    - name: Facts | Sanity | Assertion about node name
+      ansible.builtin.assert:
+        that:
+          - "{{ ansible_fqdn in (r_logstash_cluster_nodes | map(attribute='host') | list) }}"
+        msg: Current host ({{ ansible_fqdn }}) is not present inside the cluster nodes list
+
+    - name: Facts | Sanity | Set elastic node
+      ansible.builtin.set_fact:
+        r_logstash_node_name: "{{ (r_logstash_cluster_nodes | selectattr('host', '==', ansible_fqdn) | first).name }}"
+        r_logstash_node_rack: "{{ (r_logstash_cluster_nodes | selectattr('host', '==', ansible_fqdn) | first).rack | d(omit) }}"
+
+    - name: Facts | Sanity | Combine elasticsearch configurations with defaults
+      ansible.builtin.set_fact:
+        r_logstash_keystore: "{{ r_logstash_keystore | combine(_r_logstash_keystore, recursive=True) }}"
+        r_logstash_configuration: "{{ _r_logstash_configuration | combine(r_logstash_configuration, recursive=True) }}"
+      no_log: "{{ not (__r_logstash_show_nolog | bool) }}"
+
+    - name: Facts | Sanity | Assertion about ssl parameters
+      ansible.builtin.assert:
+        that:
+          - r_logstash_configuration.server.ssl.key is truthy
+          - r_logstash_configuration.server.ssl.certificate is truthy
+          - r_logstash_configuration_ssl_key is truthy
+          - r_logstash_configuration_ssl_certificate is truthy
+        msg: SSL enabled but not all configurations set
+      when: r_logstash_configuration.server.ssl.enabled | d(false) | bool
+
+# validation of the configuration
+- name: Include variables
+  ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ r_logstash_version | regex_replace('^([0-9])\\.([0-9]*).*', '\\1.\\2') }}.yml"
+        - main.yml
+      paths:
+        - "vars"
+
+- name: Check the validity of the configuration
+  assert:
+    that: "{{ r_logstash_configuration is bartokit.elastic.validate_configuration(_r_logstash_configuration_schema) }}"

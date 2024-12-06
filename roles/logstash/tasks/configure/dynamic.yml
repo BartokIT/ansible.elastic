@@ -1,0 +1,26 @@
+---
+- name: Check that Elasticsearch is started
+  ansible.builtin.assert:
+    that:
+      - r_logstash_info.started
+    msg: "Please start first the product"
+
+- name: Manage logstash spaces
+  bartokit.elastic.logstash_spaces:
+    user: '{{ _r_logstash_api_username }}'
+    password: "{{ r_logstash_api_password }}"
+    ssl_verify: false
+    spaces: "{{ r_logstash_spaces }}"
+    mode: "{{ (r_logstash_enforce | bool) | ternary('multiple','present') }}"
+  run_once: true
+  when: ('spaces' in r_logstash_configure_actions)
+
+- name: Manage logstash dataviews
+  bartokit.elastic.logstash_dataviews:
+    user: '{{ _r_logstash_api_username }}'
+    password: "{{ r_logstash_api_password }}"
+    ssl_verify: false
+    data_views: "{{ r_logstash_data_views }}"
+    mode: "{{ (r_logstash_enforce | bool) | ternary('multiple','present') }}"
+  run_once: true
+  when: ('data_views' in r_logstash_configure_actions)

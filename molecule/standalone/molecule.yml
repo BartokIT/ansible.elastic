@@ -11,6 +11,7 @@ lint: |
   ansible-lint
 platforms:
   - name: elastic
+    hostname: elastic
     image: registry.access.redhat.com/ubi8/ubi-init
     groups:
       - cluster
@@ -18,14 +19,15 @@ platforms:
     volume_mounts:
       - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
     command: "/usr/sbin/init"
-    tmpfs:
-      - /run
+    # tmpfs:
+    #   - /run
     pre_build_image: true
     exposed_ports:
       - 9200/tcp
     published_ports:
       - 0.0.0.0:9200:9200/tcp
   - name: kibana
+    hostname: kibana
     image: registry.access.redhat.com/ubi8/ubi-init
     groups:
       - kibanas
@@ -37,10 +39,11 @@ platforms:
     volume_mounts:
       - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
     command: "/usr/sbin/init"
-    tmpfs:
-      - /run
+    # tmpfs:
+    #   - /run
     pre_build_image: true
   - name: beat
+    hostname: beat
     image: registry.access.redhat.com/ubi8/ubi-init
     groups:
       - beats
@@ -48,20 +51,32 @@ platforms:
     volume_mounts:
       - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
     command: "/usr/sbin/init"
-    tmpfs:
-      - /run
+    # tmpfs:
+    #   - /run
     pre_build_image: true
-  - name: beat2
-    image: registry.access.redhat.com/ubi7/ubi-init
+  - name: logstash
+    hostname: logstash
+    image: registry.access.redhat.com/ubi8/ubi-init
     groups:
-      - beats
+      - logstash
     network: molecule-elastic-standalone-test
     volume_mounts:
       - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
     command: "/usr/sbin/init"
-    tmpfs:
-      - /run
+    # tmpfs:
+    #   - /run
     pre_build_image: true
+  # - name: beat2
+  #   image: registry.access.redhat.com/ubi7/ubi-init
+  #   groups:
+  #     - beats
+  #   network: molecule-elastic-standalone-test
+  #   volume_mounts:
+  #     - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+  #   command: "/usr/sbin/init"
+  #   tmpfs:
+  #     - /run
+  #   pre_build_image: true
 provisioner:
   name: ansible
   options:

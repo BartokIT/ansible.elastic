@@ -3,19 +3,25 @@
   hosts: all
   gather_facts: false
   tasks:
-    - name: Import a key from a url
-      ansible.builtin.rpm_key:
-        state: present
-        key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+      - name: Remove UBI repo
+        ansible.builtin.file:
+          path: /etc/yum.repos.d/ubi.repo
+          state: absent
+      - name: Enable ELK
+        ansible.builtin.command: dnf config-manager --set-enabled DEV_ELK_stack_8_x
+#     - name: Import a key from a url
+#       ansible.builtin.rpm_key:
+#         state: present
+#         key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
 
-    - name: Add multiple repositories into the same file (2/2)
-      ansible.builtin.yum_repository:
-        name: elastic8
-        description: Elasticsearch repository for 8.x packages
-        file: elasticsearch
-        baseurl: https://artifacts.elastic.co/packages/8.x/yum
-        enabled: true
-        gpgcheck: false
+#     - name: Add multiple repositories into the same file (2/2)
+#       ansible.builtin.yum_repository:
+#         name: elastic8
+#         description: Elasticsearch repository for 8.x packages
+#         file: elasticsearch
+#         baseurl: https://artifacts.elastic.co/packages/8.x/yum
+#         enabled: true
+#         gpgcheck: false
 
 - name: Standalone | Prepare | Create prepare_certificates
   hosts: all[0]
@@ -42,12 +48,18 @@
           privatekey_path: /etc/pki/tls/private/beat.key
           subject_alt_name:
             - "DNS:beat"
-      beat2:
-        - name: beat2
-          certificate_path: /etc/pki/tls/certs/beat2.pem
-          privatekey_path: /etc/pki/tls/private/beat2.key
+      logstash:
+        - name: logstash
+          certificate_path: /etc/pki/tls/certs/logstash.pem
+          privatekey_path: /etc/pki/tls/private/logstash.key
           subject_alt_name:
-            - "DNS:beat2"
+            - "DNS:logstash"
+      # beat2:
+      #   - name: beat2
+      #     certificate_path: /etc/pki/tls/certs/beat2.pem
+      #     privatekey_path: /etc/pki/tls/private/beat2.key
+      #     subject_alt_name:
+      #       - "DNS:beat2"
 
   tasks:
     - name: Install python cryptography
