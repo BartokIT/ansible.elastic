@@ -1,0 +1,26 @@
+---
+DOCUMENTATION:
+  name: starts_like_item_in
+  author: Ansible Core
+  version_added: "0.0.3"
+  short_description: This test check if the variable start like at least one item inside the list.
+  description:
+    - This test check if the variable start like at least one item inside the list.
+  options:
+    _input:
+      description: The variable to chck
+      type: string
+      required: True
+    items:
+      description: The list
+      type: list
+      required: True
+EXAMPLES: |
+  - name: Check if a configuration is valid
+    ansible.builtin.debug:
+      msg: "{{ item is bartokit.elastic.starts_like_item_in(item_list) }}"
+    vars:
+      item: go
+      item_list
+        - goofy
+        - donald

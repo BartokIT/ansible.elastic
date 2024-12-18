@@ -1,0 +1,29 @@
+---
+DOCUMENTATION:
+  name: validate_configuration
+  author: Ansible Core
+  version_added: "0.0.3"
+  short_description: Validate a yaml against provided schema
+  description:
+    - This test plugin checks if the provided yaml representing a product configuration is valid.
+    - The schema is provided in form of a dictionary where value type is present
+  options:
+    _input:
+      description: List of elements to to validate.
+      type: dict
+      elements: raw
+      required: True
+    schema:
+      description: Configuration scheda
+      type: dict
+      required: True
+EXAMPLES: |
+  - name: Check if a configuration is valid
+    ansible.builtin.debug:
+      msg: "{{ example_conf is bartokit.elastic.validate_configuration(schema) }}"
+    vars:
+      example_conf:
+        goofy: 1
+      schema:
+        goofy:
+          type: int

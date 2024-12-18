@@ -13,7 +13,7 @@ module: elasticsearch_users
 
 short_description: This module allow to manage user of an Elasticsearch installation
 
-version_added: 0.0.2
+version_added: 0.0.4
 
 author:
     - BartoktIT (@BartokIT)

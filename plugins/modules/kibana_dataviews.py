@@ -13,7 +13,7 @@ module: kibana_dataviews
 
 short_description: This module allow to manage data_views of an Kibana installation
 
-version_added: "0.0.1"
+version_added: "0.1.0"
 
 author:
     - BartoktIT (@BartokIT)

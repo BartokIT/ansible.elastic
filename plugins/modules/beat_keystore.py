@@ -11,7 +11,7 @@ module: beat_keystore
 
 short_description: This module allow to manage the beats keystore.
 
-version_added: "0.0.1"
+version_added: "0.0.5"
 
 description: This module allow to manage the beats keystore.
 

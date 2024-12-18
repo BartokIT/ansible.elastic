@@ -13,7 +13,7 @@ module: elasticsearch_index_templates
 
 short_description: This module allow to manage index templates of an Elasticsearch installation
 
-version_added: "0.0.2"
+version_added: "0.0.3"
 
 author:
     - BartoktIT (@BartokIT)

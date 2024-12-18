@@ -11,7 +11,7 @@ module: beat_modules
 
 short_description: This module allow to manage the beat modules.
 
-version_added: "0.0.1"
+version_added: "0.0.5"
 
 description: This module allow to manage the elasticsearch keystore.
 

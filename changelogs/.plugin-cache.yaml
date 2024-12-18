@@ -1,0 +1,135 @@
+objects:
+  role:
+    elasticsearch:
+      description: Main entry point for the elasticsearch role
+      name: elasticsearch
+      version_added: null
+plugins:
+  become: {}
+  cache: {}
+  callback: {}
+  cliconf: {}
+  connection: {}
+  filter:
+    after:
+      description: merge a list with another after a specific element
+      name: after
+      version_added: '2.12'
+    dictofdict2listofdict:
+      description: transform a dictionary containing a dictionary to a list of dict
+      name: dictofdict2listofdict
+      version_added: 0.0.1
+    dictoflist2flatlist:
+      description: transform a dictionary containing a list to a common list
+      name: dictoflist2flatlist
+      version_added: '2.12'
+    sortlike:
+      description: sort a list like another list
+      name: sortlike
+      version_added: '2.12'
+  httpapi: {}
+  inventory: {}
+  lookup: {}
+  module:
+    beat_index_management_setup:
+      description: This module allow to create beat base index structure
+      name: beat_index_management_setup
+      namespace: ''
+      version_added: 0.1.1
+    beat_keystore:
+      description: This module allow to manage the beats keystore.
+      name: beat_keystore
+      namespace: ''
+      version_added: 0.0.5
+    beat_modules:
+      description: This module allow to manage the beat modules.
+      name: beat_modules
+      namespace: ''
+      version_added: 0.0.5
+    elasticsearch_component_templates:
+      description: This module allow to manage component templates of an Elasticsearch
+        installation
+      name: elasticsearch_component_templates
+      namespace: ''
+      version_added: 0.0.1
+    elasticsearch_index_lifecycle_policies:
+      description: This module allow to manage index lifecycle policies of an Elasticsearch
+        installation
+      name: elasticsearch_index_lifecycle_policies
+      namespace: ''
+      version_added: 0.0.3
+    elasticsearch_index_templates:
+      description: This module allow to manage index templates of an Elasticsearch
+        installation
+      name: elasticsearch_index_templates
+      namespace: ''
+      version_added: 0.0.3
+    elasticsearch_info:
+      description: This module extract informations from an elasticsearch installation
+      name: elasticsearch_info
+      namespace: ''
+      version_added: 0.0.1
+    elasticsearch_ingest_pipelines:
+      description: This module allow to managepipeline of an Elasticsearch installation
+      name: elasticsearch_ingest_pipelines
+      namespace: ''
+      version_added: 0.0.14
+    elasticsearch_keystore:
+      description: This module allow to manage the elasticsearch keystore.
+      name: elasticsearch_keystore
+      namespace: ''
+      version_added: 0.0.1
+    elasticsearch_logstash_pipelines:
+      description: This module allow to managepipeline of an Elasticsearch installation
+      name: elasticsearch_logstash_pipelines
+      namespace: ''
+      version_added: 0.0.14
+    elasticsearch_role_mappings:
+      description: This module allow to manage roless of an Elasticsearch installation
+      name: elasticsearch_role_mappings
+      namespace: ''
+      version_added: 0.0.13
+    elasticsearch_roles:
+      description: This module allow to manage roless of an Elasticsearch installation
+      name: elasticsearch_roles
+      namespace: ''
+      version_added: 0.0.13
+    elasticsearch_users:
+      description: This module allow to manage user of an Elasticsearch installation
+      name: elasticsearch_users
+      namespace: ''
+      version_added: 0.0.4
+    kibana_dataviews:
+      description: This module allow to manage data_views of an Kibana installation
+      name: kibana_dataviews
+      namespace: ''
+      version_added: 0.1.0
+    kibana_keystore:
+      description: This module allow to manage the kibana keystore.
+      name: kibana_keystore
+      namespace: ''
+      version_added: 0.0.12
+    kibana_spaces:
+      description: This module allow to manage spaces of an Kibana installation
+      name: kibana_spaces
+      namespace: ''
+      version_added: 0.1.0
+  netconf: {}
+  shell: {}
+  strategy: {}
+  test:
+    contains:
+      description: This test check if the variable is contained in a list
+      name: contains
+      version_added: 0.0.3
+    starts_like_item_in:
+      description: This test check if the variable start like at least one item inside
+        the list.
+      name: starts_like_item_in
+      version_added: 0.0.3
+    validate_configuration:
+      description: Validate a yaml against provided schema
+      name: validate_configuration
+      version_added: 0.0.3
+  vars: {}
+version: 0.0.19

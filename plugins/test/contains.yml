@@ -1,0 +1,26 @@
+---
+DOCUMENTATION:
+  name: contains
+  author: Ansible Core
+  version_added: "0.0.3"
+  short_description: This test check if the variable is contained in a list
+  description:
+    - This test check if the variable is contained in a list
+  options:
+    _input:
+      description: The variable to chck
+      type: string
+      required: True
+    items:
+      description: The list
+      type: list
+      required: True
+EXAMPLES: |
+  - name: Check if an item is contained
+    ansible.builtin.debug:
+      msg: "{{ item is bartokit.elastic.contained(item_list) }}"
+    vars:
+      item: goofy
+      item_list
+        - goofy
+        - donald

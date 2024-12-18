@@ -13,7 +13,7 @@ module: kibana_spaces
 
 short_description: This module allow to manage spaces of an Kibana installation
 
-version_added: "0.0.1"
+version_added: "0.1.0"
 
 author:
     - BartoktIT (@BartokIT)
@@ -25,7 +25,7 @@ options:
         description:
           - This is a key value dictionary containing as key the id of the space and as value the specifications
           - 'The allowed keys for the subdictionary are: I(color), I(description),  I(disabledFeatures),'
-          - 'I(imageUrl), I(initials), I(name) and I(solution).'          
+          - 'I(imageUrl), I(initials), I(name) and I(solution).'
 
         required: true
         type: dict

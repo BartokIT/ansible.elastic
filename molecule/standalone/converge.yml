@@ -157,7 +157,7 @@
       ansible.builtin.set_fact:
         r_logstash_actions:
           - install
-          # - configure
+          - configure
           # - start
           # - restart_on_configuration_change
         r_logstash_configure_actions:

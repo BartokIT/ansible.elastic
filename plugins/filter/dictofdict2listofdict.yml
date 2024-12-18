@@ -1,7 +1,7 @@
 DOCUMENTATION:
   name: dictofdict2listofdict
   author: BartokIT
-  version_added: "2.12"
+  version_added: "0.0.1"
   short_description: transform a dictionary containing a dictionary to a list of dict
   description:
     -  transform a dictionary containing a a dictionary to a list of dict

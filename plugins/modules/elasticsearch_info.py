@@ -105,6 +105,8 @@ class BartokITElasticsearchInfo(AnsibleModule):
                     output_info['cluster_health'] = em.get_cluster_health_info()
                 if 'component_templates' in gather_subset or 'all' in gather_subset:
                     output_info['component_templates'] = em.get_component_templates()
+                if 'index_templates' in gather_subset or 'all' in gather_subset:
+                    output_info['index_templates'] = em.get_index_templates(beats=True)
             except requests.exceptions.Timeout as exctimeout:
                 self.exit_json(**{"error": "{}".format(exctimeout), "health": {"error": "timeout"}})
             except Exception as exc:
