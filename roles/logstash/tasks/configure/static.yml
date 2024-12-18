@@ -44,6 +44,29 @@
       notify:
         _r_logstash_configuration_changed
 
+    - name: Write pipelines.yml configuration file
+      ansible.builtin.template:
+        src: pipelines.yml.j2
+        dest: "{{ _r_logstash_config_folder }}/pipelines.yml"
+        mode: 0660
+        owner: root
+        group: "{{ _r_logstash_group }}"
+      notify:
+        _r_logstash_configuration_changed
+
+    - name: Write confd configuration file
+      ansible.builtin.template:
+        src: conf_d.yml.j2
+        dest: "{{ _r_logstash_config_folder }}/conf.d/{{ __r_logstash_confd_item.key }}.conf"
+        mode: 0660
+        owner: root
+        group: "{{ _r_logstash_group }}"
+      loop: "{{ r_logstash_pipelines_confd | dict2items }}"
+      loop_control:
+        loop_var: __r_logstash_confd_item
+      notify:
+        _r_logstash_configuration_changed
+
 - name: Keystore management
   when:
     - r_logstash_keystore_password | d(false, true)
