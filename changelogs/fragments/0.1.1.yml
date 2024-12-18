@@ -1,5 +1,0 @@
----
-ancestor: 0.1.0
-release_notes: added support for beat module setup
-major_changes:
-  - elastic role - added a task to perform setup of beats index setup

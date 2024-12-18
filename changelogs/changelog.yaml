@@ -89,3 +89,15 @@ releases:
       - fixed role mapping module plugin idempotency
       - fixed role module plugin drop role
     release_date: '2024-12-18'
+  0.1.1:
+    changes:
+      major_changes:
+      - elastic role - added a task to perform setup of beats index setup
+      release_summary: added support for beat module setup
+    fragments:
+    - 0.1.1.yml
+    modules:
+    - description: This module allow to create beat base index structure
+      name: beat_index_management_setup
+      namespace: ''
+    release_date: '2024-12-18'
