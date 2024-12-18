@@ -56,6 +56,15 @@
   run_once: true
   when: ('index_template' in r_elasticsearch_configure_actions)
 
+- name: Manage beats index management
+  bartokit.elastic.beat_index_management_setup:
+    user: '{{ _r_elasticsearch_api_username }}'
+    password: "{{ r_elasticsearch_api_password }}"
+    ssl_verify: false
+    beats: "{{ r_elasticsearch_beat_index_management_setup }}"
+  run_once: true
+  when: ('beats_index_management' in r_elasticsearch_configure_actions)
+
 - name: Manage ingest pipelines
   bartokit.elastic.elasticsearch_ingest_pipelines:
     user: '{{ _r_elasticsearch_api_username }}'

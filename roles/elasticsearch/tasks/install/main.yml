@@ -36,5 +36,16 @@
       notify:
         - _r_elasticsearch_gather_installation_facts
 
+- name: Install | Install Beats
+  ansible.builtin.dnf:
+    name: >-
+      {{ _r_elasticsearch_loop_beat.name }}
+      {%- if _r_elasticsearch_loop_beat.version is defined -%}-{{ _r_elasticsearch_loop_beat.version }}{%- endif -%}
+    state: present
+  loop: '{{ r_elasticsearch_beat_index_management_setup }}'
+  loop_control:
+    loop_var: _r_elasticsearch_loop_beat
+
+
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers

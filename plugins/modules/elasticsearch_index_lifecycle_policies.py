@@ -11,14 +11,14 @@ DOCUMENTATION = r'''
 ---
 module: elasticsearch_index_lifecycle_policies
 
-short_description: This module allow to manage index templates of an Elasticsearch installation
+short_description: This module allow to manage index lifecycle policies of an Elasticsearch installation
 
 version_added: "0.0.3"
 
 author:
     - BartoktIT (@BartokIT)
 
-description: This module allow to manage index templates of an Elasticsearch installation
+description: This module allow to manage index lifecycle policies of an Elasticsearch installation
 
 options:
     policies:

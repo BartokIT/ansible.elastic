@@ -84,6 +84,7 @@ _r_elasticsearch_api_user:
 r_elasticsearch_component_templates: {}
 # index templates
 r_elasticsearch_index_templates: {}
+r_elasticsearch_beat_index_management_setup: {}
 # ilm policies
 r_elasticsearch_ilm_policies: {}
 # pipelines

@@ -25,6 +25,7 @@ _r_elasticsearch_configure_actions_allowed:
   - enforce_user_password
   - ingest_pipelines
   - logstash_pipelines
+  - beats_index_management
 
 # INSTALL variable
 

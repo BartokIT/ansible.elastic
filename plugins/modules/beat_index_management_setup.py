@@ -9,22 +9,24 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: elasticsearch_ingest_pipelines
+module: beat_index_management_setup
 
-short_description: This module allow to managepipeline of an Elasticsearch installation
+short_description: This module allow to create beat base index structure
 
-version_added: "0.0.14"
+version_added: "0.1.1"
 
 author:
     - BartoktIT (@BartokIT)
 
-description: This module allow to manage pipeline of an Elasticsearch installation
+description: >-
+  This module call the setup for the beat agent creating
+  related index template and index lifecycle policies
 
 options:
-    templates:
+    beats:
         description:
-          - This is a key value dictionary containing as key the name of the component template and as value the specifications
-          - 'The allowed keys for the subdictionary are: I(index_patterns), I(composed_of), I(data_stream), I(_meta), I(priority) or I(template).'
+          - This is a list containing the names of the beat wich setup is performed
+          - The list must be a dictionary with a name key containing the name of the beat (metricbeat, filebeat, etc. )
         required: true
         type: dict
 extends_documentation_fragment:
@@ -33,23 +35,16 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 # Ensure that the only component present in the cluster are the specified
-- name: Create two templates
-  bartokit.elastic.elasticsearch_pipeline:
-  pipelines:
-    pipeline1:
-        description: 'a new fresh pipeline'
-        processors:
-          - set:
-              description : "My optional processor description"
-              field: "my-keyword-field"
-              value: "foo"
-
+- name: Perform metricbeat setup
+  bartokit.elastic.beat_index_management_setup:
+    beats:
+      - name: metricbeat
 '''
 
 RETURN = r'''
 # These are examples of possible return values, and in general should use other names for return values.
-  pipelines:
-    description: The list of the pipelines present in the cluster
+  beats:
+    description: The list of the beats with setup performed
     type: list
     returned: always
 '''
