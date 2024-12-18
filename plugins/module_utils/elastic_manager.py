@@ -256,17 +256,28 @@ class ElasticManager:
         return result
 
     # ------------------ Index template methods------------------------
-    def get_index_templates(self, hidden=False, managed=False):
+    def get_index_templates(self, hidden=False, managed=False, beats=False, only_beats=False):
         """Get all the component templates through APIs."""
         templates_dict = {}
         templates_list = self._api_call('_index_template')['index_templates']
 
         for template in templates_list:
-            if template['name'].startswith('.'):
-                if hidden:
+            if template['name'].startswith('metricbeat') or \
+                 template['name'].startswith('filebeat') or \
+                 template['name'].startswith('heartbeat') or \
+                 template['name'].startswith('auditbeat') or \
+                 template['name'].startswith('packetbeat') or \
+                 template['name'].startswith('winlogbeat') or \
+                 template['name'].startswith('functionbeat'):
+                if beats or only_beats:
                     templates_dict[template['name']] = template
+                    if only_beats:
+                        continue
             elif template['index_template'].get('_meta', {}).get('managed', False):
                 if managed:
+                    templates_dict[template['name']] = template
+            elif template['name'].startswith('.'):
+                if hidden:
                     templates_dict[template['name']] = template
             else:
                 templates_dict[template['name']] = template
@@ -315,14 +326,24 @@ class ElasticManager:
         return result
 
     # ------------------Index management policy methods------------------------
-    def get_ilm_policies(self, hidden=False, managed=False):
+    def get_ilm_policies(self, hidden=False, managed=False, beats=False, only_beats=False):
         """Get all the _ilm policies  templates through APIs."""
         ilm_policies_output = {}
         ilm_policies = self._api_call('_ilm/policy')
 
         for policy_name in ilm_policies.keys():
-
-            if policy_name.startswith('.'):
+            if policy_name.startswith('metricbeat') or \
+               policy_name.startswith('filebeat') or \
+               policy_name.startswith('heartbeat') or \
+               policy_name.startswith('auditbeat') or \
+               policy_name.startswith('packetbeat') or \
+               policy_name.startswith('winlogbeat') or \
+               policy_name.startswith('functionbeat'):
+                if beats or only_beats:
+                    ilm_policies_output[policy_name] = ilm_policies[policy_name]
+                    if only_beats:
+                        continue
+            elif policy_name.startswith('.'):
                 if hidden:
                     ilm_policies_output[policy_name] = ilm_policies[policy_name]
             elif ilm_policies[policy_name]['policy'].get('_meta', {}).get('managed', False):

@@ -191,7 +191,15 @@ class BartokITElasticsearchIndexTemplate(BartokITAnsibleModule):
 
     def list_current_keys(self, input_keys):
         """Return the list of components template actually present."""
-        components = self.__em.get_index_templates()
+        components = self.__em.get_index_templates(hidden=False, managed=False, beats=False)
+        components_managed = self.__em.get_index_templates(hidden=False, managed=False, beats=False, only_beats=True)
+
+        differences = [value for value in input_keys if value in components_managed.keys()]
+        self.__managed_users = []
+        if differences:
+            for key in differences:
+                components[key] = components_managed[key]
+                self.__managed_users.append(key)
         return components
 
 

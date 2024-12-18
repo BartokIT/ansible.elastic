@@ -52,6 +52,9 @@
         template:
           settings:
             index.lifecycle.name: beattest-ilm
+    r_elasticsearch_beat_index_management_setup:
+      - name: metricbeat
+      - name: filebeat
     r_elasticsearch_index_templates:
       template1:
         index_patterns:

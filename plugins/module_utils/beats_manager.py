@@ -4,15 +4,45 @@ from grp import getgrgid
 import logging
 from pwd import getpwuid
 import os
+import re
 __metaclass__ = type
 
 
 class BeatManager:
-    def __init__(self, ansible_module):
+    def __init__(self, ansible_module, api_username=None, api_password=None, rest_api_endpoint=None, kibana_endpoint=None, ssl_verify=False):
         self.ansible_module = ansible_module
+        self.__elastic_endpoints = rest_api_endpoint
+        self.__kibana_endpoint = kibana_endpoint
+        self.__api_username = api_username
+        self.__api_password = api_password
+        self.__ssl_verify = ssl_verify
         logging.debug("----- Manager initializated ---------")
 
-    # BEATS
+    def get_beat_version(self, beattype):
+        rc, stdout, stderr = self.ansible_module.run_command(
+            "%s version" % beattype, check_rc=True)
+        pattern = r".+beat version (\d+\.\d+\.\d+) \(.+\)"
+        m = re.match(pattern,stdout)
+        if m:
+            return m.group(1)
+        else:
+            return ''
+
+
+    #region Setup index-management
+    def do_index_management_setup(self, beattype):
+        setup_command=["%s" % beattype, "setup", "--E", 'output.elasticsearch.hosts=[%s]' % self.__elastic_endpoints,
+                       "-E", "output.elasticsearch.username=%s" % self.__api_username,
+                       "-E", "output.elasticsearch.password=%s" % self.__api_password,
+                       "-E", "setup.ilm.overwrite=true", "--index-management"]
+        if not self.__ssl_verify:
+            setup_command.append("-E")
+            setup_command.append('output.elasticsearch.ssl.verification_mode=none')
+        rc, stdout, stderr = self.ansible_module.run_command(
+            setup_command, check_rc=True)
+
+    #endregion
+    #region Keystore method
     def get_beat_keystore_path(self, beattype):
         return os.path.join("/var/lib/%sbeat/" % beattype, "%sbeat.keystore" % beattype)
 
@@ -100,7 +130,9 @@ class BeatManager:
         for line in stdout.splitlines():
             data.append(line)
         return data
+    #endregion
 
+    #region Modules method
     def list_beat_modules(self, beattype):
         ''' List enabled beat modules'''
 
@@ -140,3 +172,4 @@ class BeatManager:
         # Run the command to aad a key to keystore
         rc, stdout, stderr = self.ansible_module.run_command(
             remove_command, check_rc=True)
+    #endregion
