@@ -1,0 +1,43 @@
+DOCUMENTATION:
+  name: dictofdict2listofdict
+  author: BartokIT
+  version_added: "2.12"
+  short_description: transform a dictionary containing a dictionary to a list of dict
+  description:
+    -  transform a dictionary containing a a dictionary to a list of dict
+  positional: items
+  options:
+    items:
+      description: The original dictionary containing a subdict
+      type: dict
+      required: true
+    keyname:
+      description: The name injected into the item of the list dictionary
+      type: string
+      required: false
+
+EXAMPLES: |
+  # dictionary
+  vars:
+    original:
+      one:
+        oval1: 1
+        oval2: 2
+      two:
+        oval3: 3
+
+  - name: A unique dictionary
+    debug:
+      msg: "{{ original | bartokit.elastic.dictofdict2listofdict(keyname='parent')}}"
+
+  # prints
+  original:
+    - oval1: 1
+      oval2: 2
+      parent: one
+    - oval3: 3
+      parent: two
+RETURN:
+  _value:
+    description: The list.
+    type: list

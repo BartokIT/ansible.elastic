@@ -23,7 +23,7 @@ def dictofdict2listofdict(items, keyname='key'):
     return result
 
 
-def sort(items, sample_list=None):
+def sort_like(items, sample_list=None):
     if sample_list is None:
         sample_list = []
     """Sort element of a list like another list."""
@@ -44,7 +44,7 @@ class FilterModule(object):
     def filters(self):
         """Return filteres."""
         return {
-            'sort': sort,
+            'sortlike': sort_like,
             'after': after,
             'dictoflist2flatlist': dictoflist2flatlist,
             'dictofdict2listofdict': dictofdict2listofdict

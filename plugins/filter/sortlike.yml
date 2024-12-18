@@ -1,0 +1,44 @@
+DOCUMENTATION:
+  name: sortlike
+  author: BartokIT
+  version_added: "2.12"
+  short_description: sort a list like another list
+  description:
+    - the input list will be sorted placing the items in the same order of the other
+    - only elements in common with the other list will be included
+  positional: items
+  options:
+    items:
+      description: The original list
+      type: list
+      required: true
+    sample_list:
+      description: The ordered list to be used as model
+      type: list
+      required: false
+
+EXAMPLES: |
+  # list to be merged
+  vars:
+    original:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+    sample_list:
+      - 2
+      - 1
+      - 4
+      - 3
+
+  # the result will be a list with
+  # [2,1,4,3]
+  - name: The sorted list
+    debug:
+      msg: "{{ original | bartokit.elastic.sortlike(sample_list)}}"
+
+RETURN:
+  _value:
+    description: The ordered list.
+    type: list

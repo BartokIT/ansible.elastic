@@ -1,0 +1,42 @@
+DOCUMENTATION:
+  name: after
+  author: BartokIT
+  version_added: "2.12"
+  short_description: merge a list with another after a specific element
+  description:
+    - merge a list with another after a specific element
+  positional: items
+  options:
+    items:
+      description: The original list
+      type: list
+      required: true
+    element:
+      description: The element of the original list after wich the other list will be inserted
+      type: list
+      required: true
+    elements:
+      description: The list to be inserted
+      type: list
+      required: true
+
+EXAMPLES: |
+  # list to be merged
+  vars:
+    original:
+      - 1
+      - 2
+      - 5
+      - 6
+    to_be_added:
+      - 3
+      - 4
+
+  - name: A unique list
+    debug:
+      msg: "{{ original | bartokit.elastic.after(3, to_be_added)}}"
+
+RETURN:
+  _value:
+    description: The merged list.
+    type: list

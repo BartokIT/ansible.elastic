@@ -1,0 +1,44 @@
+DOCUMENTATION:
+  name: dictoflist2flatlist
+  author: BartokIT
+  version_added: "2.12"
+  short_description: transform a dictionary containing a list to a common list
+  description:
+    -  transform a dictionary containing a list to a common list
+  positional: items
+  options:
+    items:
+      description: The original dictionary containing lists
+      type: dict
+      required: true
+    keyname:
+      description: The name injected into the element of the list dictionary
+      type: string
+      required: false
+
+EXAMPLES: |
+  # dictionary
+  vars:
+    original:
+      one:
+        - val: 1
+        - val: 2
+      two:
+        - val: 3
+
+  - name: A unique dictionary
+    debug:
+      msg: "{{ original | bartokit.elastic.dictoflist2flatlist(keyname='parent')}}"
+
+  # prints
+  original:
+    - val: 1
+      parent: one
+    - val: 2
+      parent: one
+    - val: 3
+      parent: two
+RETURN:
+  _value:
+    description: The list.
+    type: list
