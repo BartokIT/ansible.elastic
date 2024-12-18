@@ -99,6 +99,7 @@ The configuration flow is controlled by the `r_elasticsearch_configure_actions` 
   - enforce_user_password
   - ingest_pipelines
   - logstash_pipelines
+  - beats_index_management
 
 ### Main file configuration
 
@@ -123,7 +124,7 @@ This is the example playbook:
           - stop
           - start
 
-License
+# License
 -------
 
 GLP3

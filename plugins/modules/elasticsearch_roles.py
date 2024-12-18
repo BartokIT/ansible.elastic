@@ -11,14 +11,14 @@ DOCUMENTATION = r'''
 ---
 module: elasticsearch_roles
 
-short_description: This module allow to manage roless of an Elasticsearch installation
+short_description: This module allow to manage roles of an Elasticsearch installation
 
 version_added: "0.0.13"
 
 author:
     - BartoktIT (@BartokIT)
 
-description: This module allow to manage roless of an Elasticsearch installation
+description: This module allow to manage roles of an Elasticsearch installation
 
 options:
     roles:
@@ -83,7 +83,7 @@ class BartokITElasticsearchRole(BartokITAnsibleModule):
         """Call the constructor of the parent class."""
         super().__init__(parameter_name_with_mode='mode', parameter_name_with_items='roles',
                          argument_spec=argument_spec, supports_check_mode=False,
-                         log_file='ansible_elasticsearch_roless.log')
+                         log_file='ansible_elasticsearch_roles.log')
         self.__em = ElasticManager(self,
                                    rest_api_endpoint=self.params['api_endpoint'],
                                    api_username=self.params['user'],

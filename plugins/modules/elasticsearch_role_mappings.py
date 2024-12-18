@@ -11,14 +11,14 @@ DOCUMENTATION = r'''
 ---
 module: elasticsearch_role_mappings
 
-short_description: This module allow to manage roless of an Elasticsearch installation
+short_description: This module allow to manage roles of an Elasticsearch installation
 
 version_added: "0.0.13"
 
 author:
     - BartoktIT (@BartokIT)
 
-description: This module allow to manage roless of an Elasticsearch installation
+description: This module allow to manage roles of an Elasticsearch installation
 
 options:
     roles:
