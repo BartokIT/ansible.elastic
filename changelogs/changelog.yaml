@@ -101,3 +101,15 @@ releases:
       name: beat_index_management_setup
       namespace: ''
     release_date: '2024-12-18'
+  0.1.2:
+    changes:
+      major_changes:
+      - added metricbeat dashboard task in kibana role
+      release_summary: added first beat setup feature
+    fragments:
+    - 1-beat-dashboard-setup.yml
+    modules:
+    - description: This module allow to import beat dashboards into kibana
+      name: beat_dashboards_setup
+      namespace: ''
+    release_date: '2024-12-18'

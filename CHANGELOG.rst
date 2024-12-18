@@ -4,6 +4,24 @@ Bartokit.Elasticsearch Release Notes
 
 .. contents:: Topics
 
+v0.1.2
+======
+
+Release Summary
+---------------
+
+added first beat setup feature
+
+Major Changes
+-------------
+
+- added metricbeat dashboard task in kibana role
+
+New Modules
+-----------
+
+- bartokit.elastic.beat_dashboards_setup - This module allow to import beat dashboards into kibana
+
 v0.1.1
 ======
 

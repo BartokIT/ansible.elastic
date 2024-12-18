@@ -31,6 +31,11 @@ plugins:
   inventory: {}
   lookup: {}
   module:
+    beat_dashboards_setup:
+      description: This module allow to import beat dashboards into kibana
+      name: beat_dashboards_setup
+      namespace: ''
+      version_added: 0.1.2
     beat_index_management_setup:
       description: This module allow to create beat base index structure
       name: beat_index_management_setup
@@ -132,4 +137,4 @@ plugins:
       name: validate_configuration
       version_added: 0.0.3
   vars: {}
-version: 0.1.1
+version: 0.1.2
