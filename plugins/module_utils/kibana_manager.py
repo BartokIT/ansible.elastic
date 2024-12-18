@@ -216,4 +216,9 @@ class KibanaManager:
                     dashboards_id_map[title]['namespaces'].append(namespace)
         return dashboards_output, dashboards_id_map
 
+    def delete_dashboard(self, dashboard_namespace, dashboard_id):
+        """Delete a dashboard through APIs."""
+        result = self._api_call('s/{}/api/dashboards/dashboard/{}'.format(dashboard_namespace, dashboard_id),
+                                method='DELETE', json=False)
+
     # endregion

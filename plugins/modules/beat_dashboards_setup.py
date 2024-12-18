@@ -65,7 +65,7 @@ module_args = dict(
     password=dict(type='str', required=False, default='', no_log=True),
     api_endpoint=dict(type='str', required=False, default='https://localhost:5601'),
     ssl_verify=dict(type='bool', required=False, default=True),
-    mode=dict(type='str', required=False, choiches=['present'], default='present'),
+    mode=dict(type='str', required=False, choices=['multiple', 'present', 'absent'], default='multiple'),
     dashboards=dict(type='dict', required=True)
 )
 
@@ -105,24 +105,31 @@ class BartokITIMBeatsSetup(BartokITAnsibleModule):
             return value
 
     def read_key(self, key):
-        """Get a beat index management."""
+        """Get a dashboards."""
         return self.__dashboard_map_cache[key]
 
     def delete_key(self, key, current_value):
-        """Delete index management key."""
-        pass
+        """Delete dashboards key."""
+        for item in current_value['ids']:
+            self.__km.delete_dashboard(item['namespace'],item['id'])
 
     def create_key(self, key, value):
-        """Add a nanespaces."""
+        """Add a dashboards."""
         for ns in value['namespaces']:
             self.__bm.import_dashboard(key, ns)
 
     def update_key(self, key, input_value, current_value):
         """Update dashboards."""
-        for cns in input_value['namespaces']:
-            found = False
-            if cns not in current_value['namespaces']:
-                self.__bm.import_dashboard(key, cns)
+        to_be_deleted = set(current_value['namespaces']) - set(input_value['namespaces'])
+        to_be_added = set(input_value['namespaces']) - set(current_value['namespaces'])
+
+        for cns in to_be_added:
+            self.__bm.import_dashboard(key, cns)
+        for cns in to_be_deleted:
+            for item in current_value['ids']:
+                if item['namespace'] == cns:
+                    self.__km.delete_dashboard(item['namespace'],item['id'])
+
 
     def __find_differences(self, d1, d2, path=""):
         for k in d1:

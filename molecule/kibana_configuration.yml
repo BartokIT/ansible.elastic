@@ -71,7 +71,10 @@
       '[Metricbeat System] Host overview ECS':
         namespaces:
           - default
-          - testspace
+      # '[Metricbeat System] Overview ECS':
+      #   namespaces:
+      #     - default
+      #     - testspace
     r_kibana_configuration:
       elasticsearch:
         username: kibana_system
