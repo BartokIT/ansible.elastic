@@ -85,12 +85,12 @@ plugins:
       namespace: ''
       version_added: 0.0.14
     elasticsearch_role_mappings:
-      description: This module allow to manage roless of an Elasticsearch installation
+      description: This module allow to manage roles of an Elasticsearch installation
       name: elasticsearch_role_mappings
       namespace: ''
       version_added: 0.0.13
     elasticsearch_roles:
-      description: This module allow to manage roless of an Elasticsearch installation
+      description: This module allow to manage roles of an Elasticsearch installation
       name: elasticsearch_roles
       namespace: ''
       version_added: 0.0.13
@@ -132,4 +132,4 @@ plugins:
       name: validate_configuration
       version_added: 0.0.3
   vars: {}
-version: 0.0.19
+version: 0.1.1
