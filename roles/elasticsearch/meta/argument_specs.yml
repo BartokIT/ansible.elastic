@@ -35,6 +35,7 @@ argument_specs:
           - ssl
           - component_template
           - index_template
+          - beats_index_management
           - ilm_policies
           - users
           - roles
