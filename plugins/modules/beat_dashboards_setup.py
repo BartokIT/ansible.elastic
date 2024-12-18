@@ -13,7 +13,7 @@ module: beat_dashboards_setup
 
 short_description: This module allow to import beat dashboards into kibana
 
-version_added: "0.1.1"
+version_added: "0.1.2"
 
 author:
     - BartoktIT (@BartokIT)
