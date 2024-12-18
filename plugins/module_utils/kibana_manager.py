@@ -59,7 +59,8 @@ class KibanaManager:
         else:
             return req
 
-    # ------------------ Kibana keystore methods------------------------
+
+    # region Kibana keystore methods
     def list_keystore_password(self):
         list_command = "{} list".format(self.__keystore_executable)
         rc, stdout, stderr = self.ansible_module.run_command(
@@ -96,8 +97,8 @@ class KibanaManager:
         delete_command = [self.__keystore_executable, "remove", key]
         rc, stdout, stderr = self.ansible_module.run_command(
             delete_command, check_rc=True)
-
-    # ------------------ Spaces methods------------------------
+    # endregion
+    # region Spaces methods
     def get_spaces(self, reserved=False):
         """Get all the spaces through APIs."""
         spaces_output = {}
@@ -120,7 +121,7 @@ class KibanaManager:
             return space
         raise Exception(
             "Impossible to find the '{}' space requested".format(space_id))
-    
+
     def put_space(self, space_id, **kwargs):
         """Create a space through APIs."""
         body = {}
@@ -147,7 +148,8 @@ class KibanaManager:
         result = self._api_call('api/spaces/space/{}'.format(space_id),
                                 method='DELETE', json=False)
 
-    # ------------------ Data view methods------------------------
+    # endregion
+    # region Data view methods
     def get_data_views(self, reserved=False):
         """Get all the data views through APIs."""
         data_views_output = {}
@@ -168,7 +170,7 @@ class KibanaManager:
             return data_view
         raise Exception(
             "Impossible to find the '{}' data view requested".format(dataview_id))
-    
+
     def put_data_view(self, dataview_id, **kwargs):
         """Create a data view through APIs."""
         body = {}
@@ -188,8 +190,30 @@ class KibanaManager:
         body = kwargs
         result = self._api_call('api/data_views/data_view/{}'.format(dataview_id),
                                 method='POST', body=body, json=True)
- 
+
     def delete_data_view(self, dataview_id):
         """Delete a data view through APIs."""
         result = self._api_call('api/data_views/data_view/{}'.format(dataview_id),
                                 method='DELETE', json=False)
+    # endregion
+
+    # region Dashboards
+    def get_dashboards(self):
+        """Get all the dashboards through APIs."""
+        dashboards_output = {}
+        dashboards_id_map = {}
+        spaces=self.get_spaces(reserved=True)
+
+        for space in spaces.keys():
+            dashboards = self._api_call('s/%s/api/dashboards/dashboard' % space)
+            for dashboard in dashboards['items']:
+                title = dashboard['attributes']['title']
+                dashboards_output[dashboard['id']]=dashboard
+                if title not in dashboards_id_map:
+                    dashboards_id_map[title] = {'ids':[], 'namespaces':[]}
+                for namespace in dashboard['namespaces']:
+                    dashboards_id_map[title]['ids'].append({'id': dashboard['id'], 'namespace': namespace})
+                    dashboards_id_map[title]['namespaces'].append(namespace)
+        return dashboards_output, dashboards_id_map
+
+    # endregion

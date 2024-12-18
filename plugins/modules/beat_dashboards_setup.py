@@ -1,0 +1,165 @@
+#!/usr/bin/python
+# Copyright: (c) 2023, BartoktIT
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+"""Elasticsearch Component Templates Ansible module."""
+
+from __future__ import (absolute_import, division, print_function)
+
+__metaclass__ = type
+
+DOCUMENTATION = r'''
+---
+module: beat_dashboards_setup
+
+short_description: This module allow to import beat dashboards into kibana
+
+version_added: "0.1.1"
+
+author:
+    - BartoktIT (@BartokIT)
+
+description: >-
+  This module call the setup for the beat agent creating
+  related dashboard
+
+options:
+    beats:
+        description:
+          - This is a dict with key as names of the dashboards wich setup is performed
+          - The dict must be a dictionary with a namespaces name key containing a list where dashboard need to be imported
+        required: true
+        type: dict
+extends_documentation_fragment:
+  - bartokit.elastic.login_options
+'''
+
+EXAMPLES = r'''
+# Ensure that the only component present in the cluster are the specified
+- name: Perform metricbeat setup
+  bartokit.elastic.beat_index_management_setup:
+    dashboards:
+      '[Metricbeat System] Containers overview ECS':
+         namespaces:
+           - default
+           - testspace
+'''
+
+RETURN = r'''
+# These are examples of possible return values, and in general should use other names for return values.
+  beats:
+    description: The list of the dashboards with setup performed
+    type: list
+    returned: always
+'''
+
+import copy
+from ..module_utils.base_module import BartokITAnsibleModule
+from ..module_utils.kibana_manager import KibanaManager
+from ..module_utils.beats_manager import BeatManager
+import logging
+
+
+# module's parameter
+module_args = dict(
+    user=dict(type='str', required=False, default='elastic'),
+    password=dict(type='str', required=False, default='', no_log=True),
+    api_endpoint=dict(type='str', required=False, default='https://localhost:5601'),
+    ssl_verify=dict(type='bool', required=False, default=True),
+    mode=dict(type='str', required=False, choiches=['present'], default='present'),
+    dashboards=dict(type='dict', required=True)
+)
+
+
+class BartokITIMBeatsSetup(BartokITAnsibleModule):
+    """A class for an Ansible module that manage setup of beats."""
+
+    def __init__(self, argument_spec):
+        """Call the constructor of the parent class."""
+        super().__init__(parameter_name_with_mode='mode', parameter_name_with_items='dashboards',
+                         argument_spec=argument_spec, supports_check_mode=False,
+                         items_type='dict', log_file='beat_dashboards_setup.log')
+
+        self.__km = KibanaManager(self,
+                                   rest_api_endpoint=self.params['api_endpoint'],
+                                   api_username=self.params['user'],
+                                   api_password=self.params['password'],
+                                   ssl_verify=self.params['ssl_verify'])
+        self.__bm = BeatManager(self,
+                                   kibana_endpoint=self.params['api_endpoint'],
+                                   api_username=self.params['user'],
+                                   api_password=self.params['password'],
+                                   ssl_verify=self.params['ssl_verify'])
+        self.__dashboard_map_cache = {}
+    def initialization(self, parameter_name_with_items, parameters):
+        """Initialize the base class."""
+
+        return parameters[parameter_name_with_items]
+
+    def transform_key(self, key, value, key_type):
+        """Perform value sanitization"""
+        if key_type == 'input':
+            value_copy = copy.deepcopy(value)
+            return value_copy
+
+        else:
+            return value
+
+    def read_key(self, key):
+        """Get a beat index management."""
+        return self.__dashboard_map_cache[key]
+
+    def delete_key(self, key, current_value):
+        """Delete index management key."""
+        pass
+
+    def create_key(self, key, value):
+        """Add a nanespaces."""
+        for ns in value['namespaces']:
+            self.__bm.import_dashboard(key, ns)
+
+    def update_key(self, key, input_value, current_value):
+        """Update dashboards."""
+        for cns in input_value['namespaces']:
+            found = False
+            if cns not in current_value['namespaces']:
+                self.__bm.import_dashboard(key, cns)
+
+    def __find_differences(self, d1, d2, path=""):
+        for k in d1:
+            if k in d2:
+                if isinstance(d1[k], dict):
+                    if self.__find_differences(d1[k], d2[k], "%s -> %s" % (path, k) if path else k):
+                        return True
+                elif d1[k] != d2[k]:
+                    result = ["%s: " % path, " - %s : %s" % (k, d1[k]) , " + %s : %s" % (k, d2[k])]
+                    logging.debug("\n".join(result))
+                    return True
+            else:
+                logging.debug("%s%s as key not in d2\n", "%s: " % path if path else "", k)
+                return True
+
+        return False
+
+    def compare_key(self, key, input_value, current_value):
+        """ Compare two keys """
+
+        difference_found = self.__find_differences(input_value, current_value)
+        if difference_found:
+            logging.debug("Found differences for key %s", key)
+        return difference_found
+
+    def list_current_keys(self, input_keys):
+        """Return the list of index management actually present."""
+        _, dashboard_name_id_map  = self.__km.get_dashboards()
+        self.__dashboard_map_cache = dashboard_name_id_map
+        return dashboard_name_id_map
+
+
+def main():
+    """Run module execution."""
+    BartokITIMBeatsSetup(argument_spec=module_args).run()
+
+
+if __name__ == '__main__':
+    main()
+

@@ -5,6 +5,9 @@ import logging
 from pwd import getpwuid
 import os
 import re
+import json
+import shutil
+import tempfile
 __metaclass__ = type
 
 
@@ -16,6 +19,7 @@ class BeatManager:
         self.__api_username = api_username
         self.__api_password = api_password
         self.__ssl_verify = ssl_verify
+        self.__metribceat_object_folder = '/usr/share/metricbeat/kibana/7'
         logging.debug("----- Manager initializated ---------")
 
     def get_beat_version(self, beattype):
@@ -29,7 +33,7 @@ class BeatManager:
             return ''
 
 
-    #region Setup index-management
+    #region Setup methods
     def do_index_management_setup(self, beattype):
         setup_command=["%s" % beattype, "setup", "--E", 'output.elasticsearch.hosts=[%s]' % self.__elastic_endpoints,
                        "-E", "output.elasticsearch.username=%s" % self.__api_username,
@@ -41,7 +45,65 @@ class BeatManager:
         rc, stdout, stderr = self.ansible_module.run_command(
             setup_command, check_rc=True)
 
+    def get_dashboard_list_with_file(self):
+        """
+        List the dashboard available with the
+        """
+        self.__dashboard_folder = "%s/dashboard" % self.__metribceat_object_folder.rstrip('/')
+        files = os.listdir(self.__dashboard_folder)
+        dashboards = {}
+        # get each file and directory
+        for filename in files:
+            complete_path="%s/%s" % (self.__dashboard_folder.rstrip('/'), filename)
+            with open(complete_path, 'r') as jf:
+                data = json.load(jf)
+                dashboards[data['attributes']['title']] = complete_path
+        return dashboards
+
+    def import_dashboard(self, name, namespace):
+        """
+        List the dashboard available with the
+        """
+        dbs = self.get_dashboard_list_with_file()
+        dashboard_filename = dbs.get(name,'')
+        if not dashboard_filename:
+            raise Exception("Dashboard %s not found" % name)
+        referenced_objects = {}
+        with open(dashboard_filename, 'r') as df:
+            data = json.load(df)
+            referenced_objects = data['references']
+        with tempfile.TemporaryDirectory() as temp_dir:
+            basic_structure = '7'
+            base_tmp_folder = '%s/%s' % (temp_dir, basic_structure)
+            os.makedirs('%s/dashboard' % base_tmp_folder)
+            shutil.copy(dashboard_filename, '%s/dashboard' % base_tmp_folder)
+            for object_spec in referenced_objects:
+                object_tmp_folder = "%s/%s" % (base_tmp_folder, object_spec['type'])
+                object_original_folder = "%s/%s" % (self.__metribceat_object_folder, object_spec['type'])
+                if not os.path.exists(object_tmp_folder):
+                  os.mkdir(object_tmp_folder)
+                shutil.copy("%s/%s.json" % (object_original_folder, object_spec['id']), "%s/%s.json" % (object_tmp_folder,object_spec['id']))
+            self._do_dashboard_setup('metricbeat', namespace, temp_dir)
+
+    def _do_dashboard_setup(self, beattype, namespace, foldername):
+        """
+        Perform dashboard setup for metribeat
+        """
+        setup_command=["%s" % beattype, "setup",
+                       "-E", "output.elasticsearch.username=%s" % self.__api_username,
+                       "-E", "output.elasticsearch.password=%s" % self.__api_password,
+                       "-E", "setup.kibana.space.id=%s" % namespace,
+                       "-E", "setup.kibana.host=%s" % self.__kibana_endpoint,
+                       "-E", "setup.dashboards.directory=%s" % foldername,
+                       "--dashboards"]
+        if not self.__ssl_verify:
+            setup_command.append("-E")
+            setup_command.append('setup.kibana.ssl.verification_mode=none')
+        rc, stdout, stderr = self.ansible_module.run_command(
+           setup_command, check_rc=True)
+
     #endregion
+
     #region Keystore method
     def get_beat_keystore_path(self, beattype):
         return os.path.join("/var/lib/%sbeat/" % beattype, "%sbeat.keystore" % beattype)
