@@ -114,6 +114,10 @@ _r_logstash_configuration_schema:
       - trace
   log.format:
     type: string
+  log.format.json.fix_duplicate_message_fields:
+    type: bool
+  path.logs:
+    type: string
   pipeline.separate_logs:
     type: bool
   path.plugins:
@@ -124,3 +128,44 @@ _r_logstash_configuration_schema:
     type: string
   pipeline.buffer.type:
     type: string
+  xpack.management.enabled:
+    type: bool
+  xpack.management.elasticsearch.hosts:
+    type: string
+  xpack.management.elasticsearch.username:
+    type: string
+  xpack.management.elasticsearch.password:
+    type: string
+  xpack.management.logstash.poll_interval:
+    type: string
+  xpack.management.pipeline.id:
+    type: list
+  xpack.management.elasticsearch.proxy:
+    type: string
+  xpack.management.elasticsearch.ssl.ca_trusted_fingerprint:
+    type: string
+  xpack.management.elasticsearch.ssl.certificate_authority:
+    type: string
+  xpack.management.elasticsearch.ssl.truststore.path:
+    type: string
+  xpack.management.elasticsearch.ssl.truststore.password:
+    type: string
+  xpack.management.elasticsearch.ssl.keystore.path:
+    type: string
+  xpack.management.elasticsearch.ssl.keystore.password:
+    type: string
+  xpack.management.elasticsearch.ssl.certificate:
+    type: string
+  xpack.management.elasticsearch.ssl.key:
+    type: string
+  xpack.management.elasticsearch.ssl.verification_mode:
+    type: string
+  xpack.management.elasticsearch.ssl.cipher_suites:
+    type: string
+  xpack.management.elasticsearch.cloud_id:
+    type: string
+  xpack.management.elasticsearch.cloud_auth:
+    type: string
+  xpack.management.elasticsearch.api_key:
+    type: string
+

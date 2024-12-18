@@ -21,21 +21,11 @@
 - name: Sanity check configuration variables
   when: ('configure' in r_logstash_actions)
   block:
-    - name: Facts | Sanity | Assertion about node name
-      ansible.builtin.assert:
-        that:
-          - "{{ ansible_fqdn in (r_logstash_cluster_nodes | map(attribute='host') | list) }}"
-        msg: Current host ({{ ansible_fqdn }}) is not present inside the cluster nodes list
-
-    - name: Facts | Sanity | Set elastic node
-      ansible.builtin.set_fact:
-        r_logstash_node_name: "{{ (r_logstash_cluster_nodes | selectattr('host', '==', ansible_fqdn) | first).name }}"
-        r_logstash_node_rack: "{{ (r_logstash_cluster_nodes | selectattr('host', '==', ansible_fqdn) | first).rack | d(omit) }}"
-
     - name: Facts | Sanity | Combine elasticsearch configurations with defaults
       ansible.builtin.set_fact:
         r_logstash_keystore: "{{ r_logstash_keystore | combine(_r_logstash_keystore, recursive=True) }}"
         r_logstash_configuration: "{{ _r_logstash_configuration | combine(r_logstash_configuration, recursive=True) }}"
+        r_logstash_pipelines: "{{ _r_logstash_pipelines | combine(r_logstash_pipelines, recursive=True) }}"
       no_log: "{{ not (__r_logstash_show_nolog | bool) }}"
 
     - name: Facts | Sanity | Assertion about ssl parameters
