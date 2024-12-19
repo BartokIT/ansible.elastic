@@ -113,3 +113,11 @@ releases:
       name: beat_dashboards_setup
       namespace: ''
     release_date: '2024-12-18'
+  0.1.3:
+    changes:
+      bugfixes:
+      - fixed beat_dashboards_setup module bug that delete also custom dashboards
+      release_summary: beat_dashboards_setup delete dashboard bug fixed
+    fragments:
+    - 2_fix_setup-dashboard.yml
+    release_date: '2024-12-19'

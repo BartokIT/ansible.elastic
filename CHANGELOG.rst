@@ -4,6 +4,19 @@ Bartokit.Elasticsearch Release Notes
 
 .. contents:: Topics
 
+v0.1.3
+======
+
+Release Summary
+---------------
+
+beat_dashboards_setup delete dashboard bug fixed
+
+Bugfixes
+--------
+
+- fixed beat_dashboards_setup module bug that delete also custom dashboards
+
 v0.1.2
 ======
 

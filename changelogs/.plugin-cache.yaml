@@ -137,4 +137,4 @@ plugins:
       name: validate_configuration
       version_added: 0.0.3
   vars: {}
-version: 0.1.2
+version: 0.1.3
