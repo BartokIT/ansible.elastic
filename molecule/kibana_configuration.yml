@@ -69,6 +69,7 @@
           - testspace
     r_kibana_metricbeat_dashboards:
       '[Metricbeat System] Host overview ECS':
+        beat: metricbeat
         namespaces:
           - default
       # '[Metricbeat System] Overview ECS':

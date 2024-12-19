@@ -106,6 +106,7 @@
           - ilm_policies
           - users
           - initial
+          - beats_index_management
 
     - name: Replace this task with one that validates your content
       ansible.builtin.include_role:
