@@ -23,4 +23,13 @@
     data_views: "{{ r_kibana_data_views }}"
     mode: "{{ (r_kibana_enforce | bool) | ternary('multiple','present') }}"
   run_once: true
-  when: ('data_views' in r_kibana_configure_actions)  
+  when: ('data_views' in r_kibana_configure_actions)
+
+- name: Manage Beat dashboards
+  bartokit.elastic.beat_dashboards_setup:
+    user: '{{ _r_kibana_api_username }}'
+    password: "{{ r_kibana_api_password }}"
+    ssl_verify: false
+    dashboards: "{{ r_kibana_metricbeat_dashboards }}"
+  run_once: true
+  when: ('beat_dashboards' in r_kibana_configure_actions)

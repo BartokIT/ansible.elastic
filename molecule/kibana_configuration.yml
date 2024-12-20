@@ -67,6 +67,14 @@
         name: data view test 4
         namespaces:
           - testspace
+    r_kibana_metricbeat_dashboards:
+      '[Metricbeat System] Host overview ECS':
+        namespaces:
+          - default
+      # '[Metricbeat System] Overview ECS':
+      #   namespaces:
+      #     - default
+      #     - testspace
     r_kibana_configuration:
       elasticsearch:
         username: kibana_system
