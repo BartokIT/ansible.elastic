@@ -132,20 +132,9 @@ class BartokITIMBeatsSetup(BartokITAnsibleModule):
 
 
     def __find_differences(self, d1, d2, path=""):
-        for k in d1:
-            if k in d2:
-                if isinstance(d1[k], dict):
-                    if self.__find_differences(d1[k], d2[k], "%s -> %s" % (path, k) if path else k):
-                        return True
-                elif d1[k] != d2[k]:
-                    result = ["%s: " % path, " - %s : %s" % (k, d1[k]) , " + %s : %s" % (k, d2[k])]
-                    logging.debug("\n".join(result))
-                    return True
-            else:
-                logging.debug("%s%s as key not in d2\n", "%s: " % path if path else "", k)
-                return True
-
-        return False
+        d1['namespaces'].sort()
+        d2['namespaces'].sort()
+        return d1['namespaces'] != d2['namespaces']
 
     def compare_key(self, key, input_value, current_value):
         """ Compare two keys """
@@ -158,8 +147,10 @@ class BartokITIMBeatsSetup(BartokITAnsibleModule):
     def list_current_keys(self, input_keys):
         """Return the list of index management actually present."""
         _, dashboard_name_id_map  = self.__km.get_dashboards()
+        metricbeat_dashboard_available = self.__bm.get_dashboard_list_with_file()
+        metricbeat_dashboard_imported = set(dashboard_name_id_map.keys()).intersection(set(metricbeat_dashboard_available.keys()))
         self.__dashboard_map_cache = dashboard_name_id_map
-        return dashboard_name_id_map
+        return metricbeat_dashboard_imported
 
 
 def main():
