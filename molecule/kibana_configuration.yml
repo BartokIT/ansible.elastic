@@ -67,9 +67,13 @@
         name: data view test 4
         namespaces:
           - testspace
-    r_kibana_metricbeat_dashboards:
+    r_kibana_beat_dashboards:
       '[Metricbeat System] Host overview ECS':
         beat: metricbeat
+        namespaces:
+          - default
+      '[Filebeat Apache] Access and error logs ECS':
+        beat: filebeat
         namespaces:
           - default
       # '[Metricbeat System] Overview ECS':

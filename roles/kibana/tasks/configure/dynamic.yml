@@ -30,6 +30,6 @@
     user: '{{ _r_kibana_api_username }}'
     password: "{{ r_kibana_api_password }}"
     ssl_verify: false
-    dashboards: "{{ r_kibana_metricbeat_dashboards }}"
+    dashboards: "{{ r_kibana_beat_dashboards }}"
   run_once: true
   when: ('beat_dashboards' in r_kibana_configure_actions)

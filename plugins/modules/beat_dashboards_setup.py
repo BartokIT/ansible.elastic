@@ -116,7 +116,7 @@ class BartokITIMBeatsSetup(BartokITAnsibleModule):
     def create_key(self, key, value):
         """Add a dashboards."""
         for ns in value['namespaces']:
-            self.__bm.import_dashboard(key, ns)
+            self.__bm.import_dashboard(value['beat'], key, ns)
 
     def update_key(self, key, input_value, current_value):
         """Update dashboards."""
@@ -145,12 +145,18 @@ class BartokITIMBeatsSetup(BartokITAnsibleModule):
         return difference_found
 
     def list_current_keys(self, input_keys):
-        """Return the list of index management actually present."""
+        """Return the list of beats management actually present."""
+        beattypes =  list(set([input_keys[dashboard]['beat'] for dashboard in input_keys.keys()]))
         _, dashboard_name_id_map  = self.__km.get_dashboards()
-        metricbeat_dashboard_available = self.__bm.get_dashboard_list_with_file()
-        metricbeat_dashboard_imported = set(dashboard_name_id_map.keys()).intersection(set(metricbeat_dashboard_available.keys()))
+        beat_dashboard_imported = []
+        for beattype in beattypes:
+            beat_dashboard_available = self.__bm.get_dashboard_list_with_id(beattype)
+            beat_intersected = set(dashboard_name_id_map.keys()).intersection(set(beat_dashboard_available.keys()))
+            beat_dashboard_imported.extend(list(beat_intersected))
+
+
         self.__dashboard_map_cache = dashboard_name_id_map
-        return metricbeat_dashboard_imported
+        return beat_dashboard_imported
 
 
 def main():
