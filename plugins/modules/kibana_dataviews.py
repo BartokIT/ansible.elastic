@@ -104,16 +104,14 @@ class BartokITKibanaDataViews(BartokITAnsibleModule):
         """Perform value sanitization"""
         if key_type == 'input':
             value = {'data_view':value}
-        if 'default' not in value['data_view'].get('namespaces', {}):
-            if 'namespaces' not in value['data_view']:
-                value['data_view']['namespaces']=[]
-            value['data_view']['namespaces'].append('default')
+        if not value['data_view'].get('namespaces', False):
+            value['data_view']['namespaces']=['default']
         return value
 
     def read_key(self, key):
         """Get a data_views."""
         # dvid = self.__dataviews_map[key]
-        value = self.__km.get_data_view(key)
+        value = self.__km.get_data_view(key, self._data_views_cache[key]['namespaces'])
         return value
 
     def delete_key(self, key, current_value):
@@ -171,9 +169,10 @@ class BartokITKibanaDataViews(BartokITAnsibleModule):
 
     def list_current_keys(self, input_keys):
         """Return the list of components template actually present."""
-        data_views = self.__km.get_data_views()
+        self._data_views_cache = self.__km.get_data_views()
+        # TODO: exclude filebeat-*, metrice, etc..
         # self.__dataviews_cache, self.__dataviews_map = data_views
-        return data_views
+        return self._data_views_cache
 
 
 def main():

@@ -154,17 +154,18 @@ class KibanaManager:
         """Get all the data views through APIs."""
         data_views_output = {}
         data_views_id_map = {}
-        data_views = self._api_call('api/data_views')
+        spaces=self.get_spaces(reserved=True)
 
-        for data_view in data_views['data_view']:
-            data_views_output[data_view['id']] = data_view
+        for space in spaces.keys():
+            data_views = self._api_call('s/%s/api/data_views' % space)
+            for data_view in data_views['data_view']:
+                data_views_output[data_view['id']] = data_view
             # data_views_id_map[data_view['name']] = data_view['id']
-
         return data_views_output
 
-    def get_data_view(self, dataview_id):
+    def get_data_view(self, dataview_id, namespaces=None):
         """Get specific data view"""
-        data_view = self._api_call('api/data_views/data_view/{}'.format(dataview_id))
+        data_view = self._api_call('s/{}/api/data_views/data_view/{}'.format(namespaces[0], dataview_id,))
         if dataview_id == data_view['data_view']['id']:
             del data_view['data_view']['fields']
             return data_view
