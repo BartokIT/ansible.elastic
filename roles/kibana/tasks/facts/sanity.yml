@@ -1,7 +1,7 @@
 ---
 # action assert
 
-- name: Check for allowed actions
+- name: Facts | Sanity | Check for allowed actions
   assert:
     that:
       - r_kibana_actions | list | difference(_r_kibana_actions_allowed) | length < 1
@@ -9,7 +9,7 @@
       The following actions are not allowed:
       {{ r_kibana_actions | difference(_r_kibana_actions_allowed) }}
 
-- name: Check for configuration actions
+- name: Facts | Sanity | Check for configuration actions
   assert:
     that:
       - r_kibana_configure_actions | list | difference(_r_kibana_configure_actions_allowed) | length < 1
@@ -18,7 +18,7 @@
       {{ r_kibana_configure_actions | difference(_r_kibana_configure_actions_allowed) }}
 
 # configuration assert
-- name: Sanity check configuration variables
+- name: Facts | Sanity | Sanity check configuration variables
   when: ('configure' in r_kibana_actions)
   block:
     - name: Facts | Sanity | Assertion about node name
@@ -49,7 +49,7 @@
       when: r_kibana_configuration.server.ssl.enabled | d(false) | bool
 
 # validation of the configuration
-- name: Include variables
+- name: Facts | Sanity | Include variables
   ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
   vars:
     params:
@@ -59,6 +59,6 @@
       paths:
         - "vars"
 
-- name: Check the validity of the configuration
+- name: Facts | Sanity | Check the validity of the configuration
   assert:
     that: "{{ r_kibana_configuration is bartokit.elastic.validate_configuration(_r_kibana_configuration_schema) }}"
