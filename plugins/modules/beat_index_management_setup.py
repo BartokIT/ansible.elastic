@@ -87,10 +87,6 @@ class BartokITIMBeatsSetup(BartokITAnsibleModule):
                                    api_password=self.params['password'],
                                    ssl_verify=self.params['ssl_verify'])
 
-    def initialization(self, parameter_name_with_items, parameters):
-        """Initialize the base class."""
-        return parameters[parameter_name_with_items]
-
     def transform_key(self, key, value, key_type):
         """Perform value sanitization"""
         if key_type == 'input':

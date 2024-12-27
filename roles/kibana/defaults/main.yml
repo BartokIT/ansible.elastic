@@ -117,3 +117,9 @@ _r_kibana_api_user:
 r_kibana_enforce: false
 r_kibana_spaces: {}
 r_kibana_dataviews: {}
+r_kibana_data_views_skip_regexp:
+  - 'filebeat.*'
+  - 'metricbeat.*'
+  - 'auditbeat.*'
+  - 'heartbeat.*'
+  - 'winlogbeat.*'

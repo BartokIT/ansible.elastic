@@ -3,6 +3,7 @@
 """A module containing base Ansible module class."""
 from __future__ import (absolute_import, division, print_function)
 import copy
+import re
 from ansible.module_utils.basic import AnsibleModule
 import logging
 __metaclass__ = type
@@ -47,9 +48,11 @@ class BartokITAnsibleModule(AnsibleModule):
         logging.basicConfig(filename='/tmp/' + log_file,
                             level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
-    def settings(self, compare_values=True, keys_to_be_skipped=None):
+    def settings(self, compare_values=True, keys_to_be_skipped=None, exclude_skipped_only_if_not_present=False):
         """Set the module behaviour."""
         self.__compare_values = compare_values
+        self.__keys_to_be_skipped = keys_to_be_skipped
+        self.exclude_skipped_only_if_not_present=exclude_skipped_only_if_not_present
 
     def __list_or_dict_support(self, parameters):
         """Convert list or dictionary."""
@@ -66,7 +69,8 @@ class BartokITAnsibleModule(AnsibleModule):
             raise Exception("items type must be list or dict")
 
     def initialization(self, parameter_name_with_items, parameters):
-        """Initialize the parameters."""
+        """Initialize the parameters and also the behaviour of the module."""
+        self.settings(compare_values=True)
         return parameters[parameter_name_with_items]
 
     # CRUD METHOD
@@ -94,8 +98,8 @@ class BartokITAnsibleModule(AnsibleModule):
         """Execute actions before the manage of the keys."""
         return False
 
-    def pre_crud(self, current_keys):
-        """Execute actions before the manage of the keys."""
+    def pre_crud(self, current_keys, input_keys=None):
+        """Execute actions before keys create, update or delete."""
         return False
 
     def post_crud(self):
@@ -115,13 +119,26 @@ class BartokITAnsibleModule(AnsibleModule):
         else:
             return False
 
+    def filter_list_of_current_keys(self, input_keys):
+        """Eventually filter current keys"""
+        # TODO: add parameter to manage also input
+        current_keys = self.list_current_keys(input_keys)
+        if self.__keys_to_be_skipped:
+            for current_key in current_keys.copy():
+                for key_regex in self.__keys_to_be_skipped:
+                    if ((current_key in input_keys and not self.exclude_skipped_only_if_not_present) or \
+                        (current_key not in input_keys)) and re.match(key_regex, current_key):
+                        del current_keys[current_key]
+        return current_keys
+
+
     def list_current_keys(self, input_keys):
         """Return the list of keys actually present."""
         return []
 
     def list_input_keys(self):
         """Return the list of keys in input."""
-        return self.__keys.keys()  # type: ignore
+        return self.__input_keys.keys()  # type: ignore
 
     def describe_info_for_output(self):
         """Return information to print"""
@@ -145,14 +162,14 @@ class BartokITAnsibleModule(AnsibleModule):
         logging.debug("Start list transformation call")
         self.__list_or_dict_support(self.params)
         logging.debug("Start initialization call")
-        self.__keys = self.initialization(
+        self.__input_keys = self.initialization(
             self.__parameter_name_with_items, self.params)
 
         diff_before_output = copy.deepcopy(self.describe_info_for_output())
         self.__changed = self.pre_run()
 
         # store current keys to avoid get continuosly
-        current_keys = self.list_current_keys(self.__keys)
+        current_keys = self.filter_list_of_current_keys(self.__input_keys)
 
         if self.mode == 'present':
             self._to_be_added = list(
@@ -200,7 +217,7 @@ class BartokITAnsibleModule(AnsibleModule):
             self.__changed = True
             for key in self._to_be_added:
                 input_key_value = self.transform_key(
-                    key, self.__keys[key], 'input')
+                    key, self.__input_keys[key], 'input')
                 self.create_key(key, input_key_value)
 
         # update key only if input value differ from current value
@@ -209,7 +226,7 @@ class BartokITAnsibleModule(AnsibleModule):
             current_key_value = self.transform_key(
                 key, current_key_value, 'current')
             input_key_value = self.transform_key(
-                key, self.__keys[key], 'input')
+                key, self.__input_keys[key], 'input')
             different = self.compare_key(
                 key, input_key_value, current_key_value)
             if different:
@@ -220,7 +237,7 @@ class BartokITAnsibleModule(AnsibleModule):
         if self.post_crud():
             self.__changed = True
 
-        after_run_keys = self.list_current_keys(self.__keys)
+        after_run_keys = self.filter_list_of_current_keys(self.__input_keys)
         if self.mode == 'present':
             diff_after_keys = set(after_run_keys).intersection(
                 set(self.list_input_keys()))

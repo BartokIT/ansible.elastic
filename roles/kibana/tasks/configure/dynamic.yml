@@ -20,6 +20,7 @@
     user: '{{ _r_kibana_api_username }}'
     password: "{{ r_kibana_api_password }}"
     ssl_verify: false
+    skip_regexps: "{{ r_kibana_data_views_skip_regexp }}"
     data_views: "{{ r_kibana_data_views }}"
     mode: "{{ (r_kibana_enforce | bool) | ternary('multiple','present') }}"
   run_once: true
