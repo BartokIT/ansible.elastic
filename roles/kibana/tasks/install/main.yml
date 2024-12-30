@@ -33,5 +33,13 @@
       notify:
         - _r_kibana_gather_installation_facts
 
+- name: Install | Install Beats
+  ansible.builtin.dnf:
+    name: '{{ __r_kibana_beat_item }}-{{ r_kibana_version }}'
+    state: present
+  loop: "{{ r_kibana_beat_dashboards | dict2items | map(attribute='value.beat') | unique }}"
+  loop_control:
+    loop_var: __r_kibana_beat_item
+
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers

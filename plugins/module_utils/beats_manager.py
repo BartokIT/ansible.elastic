@@ -19,7 +19,7 @@ class BeatManager:
         self.__api_username = api_username
         self.__api_password = api_password
         self.__ssl_verify = ssl_verify
-        self.__metribceat_object_folder = '/usr/share/metricbeat/kibana/7'
+        self.__beat_share_folder_parent = '/usr/share/'
         logging.debug("----- Manager initializated ---------")
 
     def get_beat_version(self, beattype):
@@ -45,49 +45,67 @@ class BeatManager:
         rc, stdout, stderr = self.ansible_module.run_command(
             setup_command, check_rc=True)
 
-    def get_dashboard_list_with_file(self):
+    def get_dashboard_list_with_id(self, beattype):
         """
         List the dashboard available with the
         """
-        self.__dashboard_folder = "%s/dashboard" % self.__metribceat_object_folder.rstrip('/')
-        files = os.listdir(self.__dashboard_folder)
+        beat_object_folder = "%s/%s/kibana" % (self.__beat_share_folder_parent.rstrip('/'), beattype)
         dashboards = {}
-        # get each file and directory
-        for filename in files:
-            complete_path="%s/%s" % (self.__dashboard_folder.rstrip('/'), filename)
-            with open(complete_path, 'r') as jf:
-                data = json.load(jf)
-                dashboards[data['attributes']['title']] = complete_path
+        for version in ['7','8']:
+            dashboard_folder = "%s/%s/dashboard" % (beat_object_folder, version)
+            logging.debug("Searching dashboard in path: %s" % dashboard_folder)
+            if os.path.exists(dashboard_folder):
+                files = os.listdir(dashboard_folder)
+                # get each file and directory
+                for filename in files:
+                    complete_path="%s/%s" % (dashboard_folder.rstrip('/'), filename)
+                    with open(complete_path, 'r') as jf:
+                        data = json.load(jf)
+                        dashboards[data['attributes']['title']] = {'id': data['id'], 'folder': dashboard_folder, 'filename': complete_path}
         return dashboards
 
-    def import_dashboard(self, name, namespace):
+    def _copy_object(self, beattype, object_id, object_type, object_parent_folder, object_temporary_folder):
         """
-        List the dashboard available with the
+        Recursively traverse the object to get referenced objects and copy to the temporary folder
         """
-        dbs = self.get_dashboard_list_with_file()
-        dashboard_filename = dbs.get(name,'')
-        if not dashboard_filename:
+        original_filename = "%s/%s/%s.json" % (object_parent_folder, object_type, object_id)
+        temporary_filename = "%s/%s/%s.json" % (object_temporary_folder, object_type, object_id)
+        if not os.path.exists(os.path.dirname(temporary_filename)):
+            os.makedirs(os.path.dirname(temporary_filename))
+        shutil.copy(original_filename, temporary_filename)
+        logging.debug("Copied object %s %s" % (object_type, object_id))
+
+        # open the object to extract the references
+        referenced_objects = []
+        with open(original_filename, 'r') as of:
+            data = json.load(of)
+            if data.get('references', False):
+                referenced_objects = data['references']
+
+        for ref_object in referenced_objects:
+            if not ref_object['name'].startswith('kibanaSavedObjectMeta'):
+                self._copy_object(beattype, ref_object['id'], ref_object['type'], object_parent_folder, object_temporary_folder)
+
+
+    def import_dashboard(self, beattype, name, namespace):
+        """
+        Import the dashboard available with the beat package
+        """
+        # get all dashboards
+        dbs = self.get_dashboard_list_with_id(beattype)
+        dashboard_info = dbs.get(name,'')
+        if not dashboard_info:
             raise Exception("Dashboard %s not found" % name)
-        referenced_objects = {}
-        with open(dashboard_filename, 'r') as df:
-            data = json.load(df)
-            referenced_objects = data['references']
-        with tempfile.TemporaryDirectory() as temp_dir:
-            basic_structure = '7'
-            base_tmp_folder = '%s/%s' % (temp_dir, basic_structure)
-            os.makedirs('%s/dashboard' % base_tmp_folder)
-            shutil.copy(dashboard_filename, '%s/dashboard' % base_tmp_folder)
-            for object_spec in referenced_objects:
-                object_tmp_folder = "%s/%s" % (base_tmp_folder, object_spec['type'])
-                object_original_folder = "%s/%s" % (self.__metribceat_object_folder, object_spec['type'])
-                if not os.path.exists(object_tmp_folder):
-                  os.mkdir(object_tmp_folder)
-                shutil.copy("%s/%s.json" % (object_original_folder, object_spec['id']), "%s/%s.json" % (object_tmp_folder,object_spec['id']))
-            self._do_dashboard_setup('metricbeat', namespace, temp_dir)
+        objects_parent_folder = os.path.dirname(dashboard_info['folder'])
+        version_parent_folder = os.path.basename(objects_parent_folder)
+
+        self._copy_object(beattype, dashboard_info['id'],'dashboard', objects_parent_folder, '/tmp/fbt/%s' % version_parent_folder)
+        self._do_dashboard_setup(beattype, namespace, '/tmp/fbt')
+
 
     def _do_dashboard_setup(self, beattype, namespace, foldername):
         """
-        Perform dashboard setup for metribeat
+        Perform dashboard setup for beat
         """
         setup_command=["%s" % beattype, "setup",
                        "-E", "output.elasticsearch.username=%s" % self.__api_username,
@@ -99,8 +117,11 @@ class BeatManager:
         if not self.__ssl_verify:
             setup_command.append("-E")
             setup_command.append('setup.kibana.ssl.verification_mode=none')
+
         rc, stdout, stderr = self.ansible_module.run_command(
            setup_command, check_rc=True)
+        if 'error importing' in stdout:
+            raise Exception(stdout)
 
     #endregion
 
