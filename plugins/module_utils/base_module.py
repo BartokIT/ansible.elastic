@@ -45,6 +45,9 @@ class BartokITAnsibleModule(AnsibleModule):
         self._to_be_added = []
         self._to_be_removed = []
         self._to_be_updated = []
+        self.__compare_values = True
+        self.__keys_to_be_skipped = []
+        self.exclude_skipped_only_if_not_present = False
         logging.basicConfig(filename='/tmp/' + log_file,
                             level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
@@ -128,6 +131,7 @@ class BartokITAnsibleModule(AnsibleModule):
                 for key_regex in self.__keys_to_be_skipped:
                     if ((current_key in input_keys and not self.exclude_skipped_only_if_not_present) or \
                         (current_key not in input_keys)) and re.match(key_regex, current_key):
+                        logging.debug("Removing key %s" % current_key)
                         del current_keys[current_key]
         return current_keys
 

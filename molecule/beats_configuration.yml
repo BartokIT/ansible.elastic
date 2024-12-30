@@ -1,7 +1,7 @@
 ---
 - name: Beat configuration
   ansible.builtin.set_fact:
-    r_beat_version: 8.16.1-1
+    r_beat_version: 8.17.0-1
     filebeat:
       r_beat_modules:
         auditd:

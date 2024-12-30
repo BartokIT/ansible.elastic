@@ -16,7 +16,7 @@
 
 - name: Cluster configuration
   ansible.builtin.set_fact:
-    r_logstash_version: '8.16.1-1'
+    r_logstash_version: '8.17.0-1'
     r_logstash_enforce: true
     r_logstash_cluster_name: molecule_cluster
     r_logstash_node_rack: rotating

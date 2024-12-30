@@ -72,6 +72,7 @@ module_args = dict(
     api_endpoint=dict(type='str', required=False, default='https://localhost:9200'),
     ssl_verify=dict(type='bool', required=False, default=True),
     mode=dict(type='str', required=False, choiches=['multiple', 'present', 'absent'], default='multiple'),
+    skip_regexps=dict(type='list', required=False, default=[]),
     templates=dict(type='dict', required=True)
 )
 
@@ -91,12 +92,10 @@ class BartokITElasticsearchIndexTemplate(BartokITAnsibleModule):
                                    ssl_verify=self.params['ssl_verify'])
 
     def initialization(self, parameter_name_with_items, parameters):
-        """
-        Initialize the module.
-
-        Return the keys/values and set the behaviour of the base class
-        """
+        """Initialize the parameters and also the behaviour of the module."""
+        self.settings(compare_values=True, keys_to_be_skipped=parameters['skip_regexps'], exclude_skipped_only_if_not_present=True)
         return parameters[parameter_name_with_items]
+
 
     def pre_crud(self, current_keys):
         # Remove from the list the key managed by the system
@@ -186,15 +185,7 @@ class BartokITElasticsearchIndexTemplate(BartokITAnsibleModule):
 
     def list_current_keys(self, input_keys):
         """Return the list of components template actually present."""
-        components = self.__em.get_index_templates(hidden=False, managed=False, beats=False)
-        components_managed = self.__em.get_index_templates(hidden=False, managed=False, beats=False, only_beats=True)
-
-        differences = [value for value in input_keys if value in components_managed.keys()]
-        self.__managed_users = []
-        if differences:
-            for key in differences:
-                components[key] = components_managed[key]
-                self.__managed_users.append(key)
+        components = self.__em.get_index_templates(hidden=False, managed=False, beats=True)
         return components
 
 

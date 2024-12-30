@@ -74,7 +74,7 @@ class BartokITIMBeatsSetup(BartokITAnsibleModule):
         """Call the constructor of the parent class."""
         super().__init__(parameter_name_with_mode='mode', parameter_name_with_items='beats',
                          argument_spec=argument_spec, supports_check_mode=False,
-                         items_type='list', log_file='beat_index_management_setup.log')
+                         items_type='list', log_file='ansible_beat_index_management_setup.log')
 
         self.__em = ElasticManager(self,
                                    rest_api_endpoint=self.params['api_endpoint'],

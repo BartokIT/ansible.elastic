@@ -1,0 +1,3 @@
+minor_changes:
+ - added support for all beats (except winlogbeat) dashbaord import
+ - improved dataview management

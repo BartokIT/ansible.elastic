@@ -90,8 +90,6 @@ class BartokITKibanaDataViews(BartokITAnsibleModule):
                                    api_username=self.params['user'],
                                    api_password=self.params['password'],
                                    ssl_verify=self.params['ssl_verify'])
-        self.__dataviews_map = {}
-        self.__dataviews_cache = {}
 
     def initialization(self, parameter_name_with_items, parameters):
         """Initialize the parameters and also the behaviour of the module."""
@@ -172,8 +170,6 @@ class BartokITKibanaDataViews(BartokITAnsibleModule):
     def list_current_keys(self, input_keys):
         """Return the list of components template actually present."""
         self._data_views_cache = self.__km.get_data_views()
-        # TODO: exclude filebeat-*, metrice, etc..
-        # self.__dataviews_cache, self.__dataviews_map = data_views:
         return self._data_views_cache
 
 

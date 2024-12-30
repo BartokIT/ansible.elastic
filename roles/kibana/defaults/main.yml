@@ -123,3 +123,5 @@ r_kibana_data_views_skip_regexp:
   - 'auditbeat.*'
   - 'heartbeat.*'
   - 'winlogbeat.*'
+  - 'packetbeat.*'
+  - 'functionbeat.*'

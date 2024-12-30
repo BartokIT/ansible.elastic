@@ -1,11 +1,11 @@
 ---
-- name: Check that Elasticsearch is installed
+- name: Configure | Static | Check that Elasticsearch is installed
   ansible.builtin.assert:
     that:
       - r_elasticsearch_info.installed
     msg: "Please install first the product"
 
-- name: Kernel parameters
+- name: Configure | Static | Kernel parameters
   when: ('sysctl' in r_elasticsearch_configure_actions)
   block:
     - name: Set systemctl parameter
@@ -16,10 +16,10 @@
         state: present
         reload: true
 
-- name: Folder management
+- name: Configure | Static | Folder management
   when: ('folders' in r_elasticsearch_configure_actions)
   block:
-    - name: Create needed folders
+    - name: Configure | Static | Create needed folders
       ansible.builtin.file:
         state: directory
         path: "{{ _r_elasticsearch_loop_folders.path }}"
@@ -34,10 +34,10 @@
       loop_control:
         loop_var: _r_elasticsearch_loop_folders
 
-- name: Main configuration files
+- name: Configure | Static | Main configuration files
   when: ('main_files' in r_elasticsearch_configure_actions )
   block:
-    - name: Configure jvm heap settings
+    - name: Configure | Static | Configure jvm heap settings
       ansible.builtin.copy:
         content: |-
           -Xms{{ r_elasticsearch_jvm_initial_heap }}
@@ -48,7 +48,8 @@
         group: "{{ _r_elasticsearch_group }}"
       notify:
         _r_elasticsearch_configuration_changed
-    - name: Write elasticsearch.yml configuration file
+
+    - name: Configure | Static | Write elasticsearch.yml configuration file
       ansible.builtin.template:
         src: elasticsearch.yml.j2
         dest: "{{ _r_elasticsearch_config_folder }}/elasticsearch.yml"
@@ -58,18 +59,18 @@
       notify:
         _r_elasticsearch_configuration_changed
 
-- name: Keystore management
+- name: Configure | Static | Keystore management
   when:
     - r_elasticsearch_keystore_password | d(false, true)
     - ('keystore' in r_elasticsearch_configure_actions)
   block:
-    - name: Manage keystore
+    - name: Configure | Static | Manage keystore
       bartokit.elastic.elasticsearch_keystore:
         force: "{{  'enforce_keystore' in r_elasticsearch_configure_actions }}"
         credentials: "{{ r_elasticsearch_keystore }}"
         password: "{{ r_elasticsearch_keystore_password | d(omit) }}"
 
-    - name: Put keystore password in a file
+    - name: Configure | Static | Put keystore password in a file
       ansible.builtin.copy:
         content: "{{ r_elasticsearch_keystore_password }}"
         dest: "{{ r_elasticsearch_keystore_password_file }}"
@@ -77,7 +78,7 @@
         group: root
         mode: '600'
 
-    - name: Create dropin service folder
+    - name: Configure | Static | Create dropin service folder
       ansible.builtin.file:
         state: directory
         path: /etc/systemd/system/{{ _r_elasticsearch_systemd_name }}.d
@@ -85,7 +86,7 @@
         owner: root
         mode: '775'
 
-    - name: Set environment variable for keystore password
+    - name: Configure | Static | Set environment variable for keystore password
       ansible.builtin.copy:
         content: |-
           [Service]
@@ -95,14 +96,14 @@
         owner: root
         mode: '644'
 
-- name: SSL/TLS keystore management
+- name: Configure | Static | SSL/TLS keystore management
   when:
     - ('ssl' in r_elasticsearch_configure_actions)
     - r_elasticsearch_configuration.xpack.security.enabled | bool
     - r_elasticsearch_configuration.xpack.security.http.ssl.enabled | bool or
       r_elasticsearch_configuration.xpack.security.transport.ssl.enabled | bool
   block:
-    - name: Create the PKCS12 http file
+    - name: Configure | Static | Create the PKCS12 http file
       community.crypto.openssl_pkcs12:
         action: export
         path: "{{ _r_elasticsearch_config_folder }}/{{ r_elasticsearch_configuration.xpack.security.http.ssl.keystore.path }}"
@@ -117,7 +118,7 @@
         group: "{{ _r_elasticsearch_group }}"
         mode: '0660'
 
-    - name: Write the CA certificate
+    - name: Configure | Static | Write the CA certificate
       ansible.builtin.copy:
         content: "{{ r_elasticsearch_configuration_ssl_certificate_authorities }}"
         dest: "{{ _r_elasticsearch_config_folder }}/{{ r_elasticsearch_configuration.xpack.security.transport.ssl.certificate_authorities }}"

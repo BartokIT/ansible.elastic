@@ -1,11 +1,11 @@
 ---
-- name: Check that Elasticsearch is started
+- name: Configure | Dynamic | Check that Elasticsearch is started
   ansible.builtin.assert:
     that:
       - r_elasticsearch_info.started
     msg: "Please start first the product"
 
-- name: Create automation user
+- name: Configure | Dynamic | Create automation user
   bartokit.elastic.elasticsearch_users:
     user: 'elastic'
     password: "{{ r_elasticsearch_users_elastic_password }}"
@@ -15,7 +15,7 @@
   run_once: true
   when: ('initial' in r_elasticsearch_configure_actions)
 
-- name: Manage users
+- name: Configure | Dynamic | Manage users
   bartokit.elastic.elasticsearch_users:
     user: '{{ _r_elasticsearch_api_username }}'
     password: "{{ r_elasticsearch_api_password }}"
@@ -26,17 +26,18 @@
   run_once: true
   when: ('users' in r_elasticsearch_configure_actions)
 
-- name: Manage ILM polices
+- name: Configure | Dynamic | Manage ILM polices
   bartokit.elastic.elasticsearch_index_lifecycle_policies:
     user: '{{ _r_elasticsearch_api_username }}'
     password: "{{ r_elasticsearch_api_password }}"
     ssl_verify: false
+    skip_regexps: "{{ r_elasticsearch_ilm_policies_skip_regexp }}"
     policies: "{{ r_elasticsearch_ilm_policies }}"
     mode: "{{ (r_elasticsearch_enforce | bool) | ternary('multiple','present') }}"
   run_once: true
   when: ('ilm_policies' in r_elasticsearch_configure_actions)
 
-- name: Manage component template
+- name: Configure | Dynamic | Manage component template
   bartokit.elastic.elasticsearch_component_templates:
     user: '{{ _r_elasticsearch_api_username }}'
     password: "{{ r_elasticsearch_api_password }}"
@@ -46,17 +47,18 @@
   run_once: true
   when: ('component_template' in r_elasticsearch_configure_actions)
 
-- name: Manage index template
+- name: Configure | Dynamic | Manage index template
   bartokit.elastic.elasticsearch_index_templates:
     user: '{{ _r_elasticsearch_api_username }}'
     password: "{{ r_elasticsearch_api_password }}"
     ssl_verify: false
+    skip_regexps: "{{ r_elasticsearch_index_templates_skip_regexp }}"
     templates: "{{ r_elasticsearch_index_templates }}"
     mode: "{{ (r_elasticsearch_enforce | bool) | ternary('multiple','present') }}"
   run_once: true
   when: ('index_template' in r_elasticsearch_configure_actions)
 
-- name: Manage beats index management
+- name: Configure | Dynamic | Manage beats index management
   bartokit.elastic.beat_index_management_setup:
     user: '{{ _r_elasticsearch_api_username }}'
     password: "{{ r_elasticsearch_api_password }}"
@@ -65,7 +67,7 @@
   run_once: true
   when: ('beats_index_management' in r_elasticsearch_configure_actions)
 
-- name: Manage ingest pipelines
+- name: Configure | Dynamic | Manage ingest pipelines
   bartokit.elastic.elasticsearch_ingest_pipelines:
     user: '{{ _r_elasticsearch_api_username }}'
     password: "{{ r_elasticsearch_api_password }}"
@@ -75,7 +77,7 @@
   run_once: true
   when: ('ingest_pipelines' in r_elasticsearch_configure_actions)
 
-- name: Manage logstash pipelines
+- name: Configure | Dynamic | Manage logstash pipelines
   bartokit.elastic.elasticsearch_logstash_pipelines:
     user: '{{ _r_elasticsearch_api_username }}'
     password: "{{ r_elasticsearch_api_password }}"
@@ -85,7 +87,7 @@
   run_once: true
   when: ('logstash_pipelines' in r_elasticsearch_configure_actions)
 
-- name: Manage roles
+- name: Configure | Dynamic | Manage roles
   bartokit.elastic.elasticsearch_roles:
     user: '{{ _r_elasticsearch_api_username }}'
     password: "{{ r_elasticsearch_api_password }}"
@@ -95,7 +97,7 @@
   run_once: true
   when: ('roles' in r_elasticsearch_configure_actions)
 
-- name: Manage role mappings
+- name: Configure | Dynamic | Manage role mappings
   bartokit.elastic.elasticsearch_role_mappings:
     user: '{{ _r_elasticsearch_api_username }}'
     password: "{{ r_elasticsearch_api_password }}"

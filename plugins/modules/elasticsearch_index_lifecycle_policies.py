@@ -70,6 +70,7 @@ module_args = dict(
     password=dict(type='str', required=False, default='', no_log=True),
     api_endpoint=dict(type='str', required=False, default='https://localhost:9200'),
     ssl_verify=dict(type='bool', required=False, default=True),
+    skip_regexps=dict(type='list', required=False, default=[]),
     mode=dict(type='str', required=False, choiches=['multiple', 'present', 'absent'], default='multiple'),
     policies=dict(type='dict', required=True)
 )
@@ -89,30 +90,10 @@ class BartokITElasticsearchILMPolicies(BartokITAnsibleModule):
                                    api_password=self.params['password'],
                                    ssl_verify=self.params['ssl_verify'])
 
-    def initialization(self, parameters_argument, parameters):
-        """
-        Initialize the module.
-
-        Return the keys/values and set the behaviour of the base class
-        """
-        self.settings(compare_values=parameters['force'])
-        return parameters[parameters_argument]
-
     def initialization(self, parameter_name_with_items, parameters):
-        """Initialize the base class."""
+        """Initialize the parameters and also the behaviour of the module."""
+        self.settings(compare_values=True, keys_to_be_skipped=parameters['skip_regexps'], exclude_skipped_only_if_not_present=True)
         return parameters[parameter_name_with_items]
-
-    def pre_crud(self, current_keys):
-        # Remove from the list the key managed by the system
-        for ckey in current_keys.keys():
-            if ckey in ['behavioral_analytics-events-default', 'synthetics', 'ilm-history', 'metrics', 'logs']:
-                if ckey in self._to_be_added:
-                    self._to_be_added.remove(ckey)
-                if ckey in self._to_be_removed:
-                    self._to_be_removed.remove(ckey)
-                if ckey in self._to_be_updated:
-                    self._to_be_updated.remove(ckey)
-        return False
 
     def transform_key(self, key, value, key_type):
         """Perform value sanitization"""
@@ -170,7 +151,7 @@ class BartokITElasticsearchILMPolicies(BartokITAnsibleModule):
 
     def list_current_keys(self, input_keys):
         """Return the list of ILM policies actually present."""
-        components = self.__em.get_ilm_policies()
+        components = self.__em.get_ilm_policies(beats=True)
         return components
 
 
