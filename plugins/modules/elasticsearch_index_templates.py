@@ -90,17 +90,12 @@ class BartokITElasticsearchIndexTemplate(BartokITAnsibleModule):
                                    api_password=self.params['password'],
                                    ssl_verify=self.params['ssl_verify'])
 
-    def initialization(self, parameters_argument, parameters):
+    def initialization(self, parameter_name_with_items, parameters):
         """
         Initialize the module.
 
         Return the keys/values and set the behaviour of the base class
         """
-        self.settings(compare_values=parameters['force'])
-        return parameters[parameters_argument]
-
-    def initialization(self, parameter_name_with_items, parameters):
-        """Initialize the base class."""
         return parameters[parameter_name_with_items]
 
     def pre_crud(self, current_keys):

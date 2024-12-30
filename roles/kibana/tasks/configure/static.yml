@@ -1,11 +1,11 @@
 ---
-- name: Check that Elasticsearch is installed
+- name: Configure | Static | Check that Elasticsearch is installed
   ansible.builtin.assert:
     that:
       - r_kibana_info.installed
     msg: "Please install first the product"
 
-- name: Kernel parameters
+- name: Configure | Static | Kernel parameters
   when: ('sysctl' in r_kibana_configure_actions)
   block:
     - ansible.posix.sysctl:
@@ -15,10 +15,10 @@
         state: present
         reload: true
 
-- name: Folder management
+- name: Configure | Static | Folder management
   when: ('folders' in r_kibana_configure_actions)
   block:
-    - name: Create needed folders
+    - name: Configure | Static | Create needed folders
       ansible.builtin.file:
         state: directory
         path: "{{ _r_kibana_loop_folders.path }}"
@@ -31,10 +31,10 @@
       loop_control:
         loop_var: _r_kibana_loop_folders
 
-- name: Main configuration files
+- name: Configure | Static | Main configuration files
   when: ('main_files' in r_kibana_configure_actions )
   block:
-    - name: Write elasticsearch.yml configuration file
+    - name: Configure | Static | Write elasticsearch.yml configuration file
       ansible.builtin.template:
         src: kibana.yml.j2
         dest: "{{ _r_kibana_config_folder }}/kibana.yml"
@@ -44,22 +44,22 @@
       notify:
         _r_kibana_configuration_changed
 
-- name: Keystore management
+- name: Configure | Static | Keystore management
   when:
     - r_kibana_keystore_password | d(false, true)
     - ('keystore' in r_kibana_configure_actions)
   block:
-    - name: Manage keystore
+    - name: Configure | Static | Manage keystore
       bartokit.elastic.kibana_keystore:
         force: "{{  'enforce_keystore' in r_kibana_configure_actions }}"
         credentials: "{{ r_kibana_keystore }}"
 
-- name: SSL/TLS keystore management
+- name: Configure | Static | SSL/TLS keystore management
   when:
     - ('ssl' in r_kibana_configure_actions)
     - r_kibana_configuration.server.ssl.enabled | default(false) | bool
   block:
-    - name: Write the ssl key
+    - name: Configure | Static | Write the ssl key
       ansible.builtin.copy:
         content: "{{ r_kibana_configuration_ssl_key }}"
         dest: "{{ r_kibana_configuration.server.ssl.key }}"
@@ -67,7 +67,7 @@
         group: "{{ _r_kibana_group }}"
         mode: '0640'
 
-    - name: Write the ssl key
+    - name: Configure | Static | Write the ssl key
       ansible.builtin.copy:
         content: "{{ r_kibana_configuration_ssl_certificate }}"
         dest: "{{ r_kibana_configuration.server.ssl.certificate }}"
@@ -75,7 +75,7 @@
         group: "{{ _r_kibana_group }}"
         mode: '0640'
 
-    - name: Write the CA certificate
+    - name: Configure | Static | Write the CA certificate
       ansible.builtin.copy:
         content: "{{ r_kibana_configuration_ssl_certificate_authorities }}"
         dest: "{{ r_kibana_configuration.elasticsearch.ssl.certificateAuthorities }}"

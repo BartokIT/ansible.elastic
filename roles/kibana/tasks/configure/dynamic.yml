@@ -1,11 +1,11 @@
 ---
-- name: Check that Elasticsearch is started
+- name: Configure | Dynamic | Check that Elasticsearch is started
   ansible.builtin.assert:
     that:
       - r_kibana_info.started
     msg: "Please start first the product"
 
-- name: Manage Kibana spaces
+- name: Configure | Dynamic | Manage Kibana spaces
   bartokit.elastic.kibana_spaces:
     user: '{{ _r_kibana_api_username }}'
     password: "{{ r_kibana_api_password }}"
@@ -15,17 +15,18 @@
   run_once: true
   when: ('spaces' in r_kibana_configure_actions)
 
-- name: Manage Kibana dataviews
+- name: Configure | Dynamic | Manage Kibana dataviews
   bartokit.elastic.kibana_dataviews:
     user: '{{ _r_kibana_api_username }}'
     password: "{{ r_kibana_api_password }}"
     ssl_verify: false
+    skip_regexps: "{{ r_kibana_data_views_skip_regexp }}"
     data_views: "{{ r_kibana_data_views }}"
     mode: "{{ (r_kibana_enforce | bool) | ternary('multiple','present') }}"
   run_once: true
   when: ('data_views' in r_kibana_configure_actions)
 
-- name: Manage Beat dashboards
+- name: Configure | Dynamic | Manage Beat dashboards
   bartokit.elastic.beat_dashboards_setup:
     user: '{{ _r_kibana_api_username }}'
     password: "{{ r_kibana_api_password }}"

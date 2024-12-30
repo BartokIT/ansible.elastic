@@ -1,4 +1,4 @@
-- name: Start the kibana service
+- name: Start | Start the kibana service
   systemd:
     name: "{{ _r_kibana_systemd_name }}"
     state: started

@@ -47,6 +47,9 @@
         initials: L2
         description: A test space for linux administrators
     r_kibana_data_views:
+      filebeat-*:
+        title: 'filebeat-*'
+        name: filebeat dataview
       beatsdv1:
         title: '*beat*'
         name: data view test

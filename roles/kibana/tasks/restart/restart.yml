@@ -1,10 +1,10 @@
-- name: Stop Elasticsearch
+- name: Restart | Stop Elasticsearch
   ansible.builtin.include_tasks: restart/stop.yml
   when: >-
     (_r_kibana_triggered_restart and
     'restart_on_configuration_change' in r_kibana_actions)
 
-- name: Stop Elasticsearch
+- name: Restart | Stop Elasticsearch
   ansible.builtin.include_tasks: restart/start.yml
   when: >-
     (_r_kibana_triggered_restart and
