@@ -51,7 +51,9 @@
           author: 'BartokIT'
         template:
           settings:
-            index.lifecycle.name: beattest-ilm
+            index:
+              lifecycle:
+                name: beattest-ilm
     r_elasticsearch_beat_index_management_setup:
       - name: metricbeat
       - name: filebeat

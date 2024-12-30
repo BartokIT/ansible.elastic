@@ -103,10 +103,6 @@ class BartokITElasticsearchUsers(BartokITAnsibleModule):
         logging.debug("Requested to enforce password: %s", self.__enforce_password)
         return parameters[parameter_name_with_items]
 
-    def pre_crud(self, current_keys):
-        # Remove from the list the key managed by the system
-        return False
-
     def transform_key(self, key, value, key_type):
         """Perform value sanitization"""
         if key_type == 'input':

@@ -24,8 +24,6 @@ options:
     data_views:
         description:
           - This is a key value dictionary containing as key the name of the data_views and as value the specifications
-          - 'The allowed keys for the subdictionary are: I(_meta) and/or I(template).'
-          - 'The template key allow only three keys: I(settings), I(mapping) and I(aliases).'
         required: true
         type: dict
 extends_documentation_fragment:
@@ -55,7 +53,7 @@ EXAMPLES = r'''
 RETURN = r'''
 # These are examples of possible return values, and in general should use other names for return values.
 components:
-    description: The list of the components present in the cluster
+    description: The list of the data views present in the cluster
     type: list
     returned: always
 '''

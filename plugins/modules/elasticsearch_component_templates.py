@@ -68,6 +68,7 @@ module_args = dict(
     user=dict(type='str', required=False, default='elastic'),
     password=dict(type='str', required=False, default='', no_log=True),
     api_endpoint=dict(type='str', required=False, default='https://localhost:9200'),
+    skip_regexps=dict(type='list', required=False, default=[]),
     ssl_verify=dict(type='bool', required=False, default=True),
     mode=dict(type='str', required=False, choiches=['multiple', 'present', 'absent'], default='multiple'),
     component_templates=dict(type='dict', required=True)
@@ -88,17 +89,10 @@ class BartokITElasticsearchComponentTemplate(BartokITAnsibleModule):
                                    api_password=self.params['password'],
                                    ssl_verify=self.params['ssl_verify'])
 
-    def initialization(self, parameters_argument, parameters):
-        """ma
-        Initialize the module.
-
-        Return the keys/values and set the behaviour of the base class
-        """
-        self.settings(compare_values=parameters['force'])
-        return parameters[parameters_argument]
 
     def initialization(self, parameter_name_with_items, parameters):
-        """Initialize the base class."""
+        """Initialize the parameters and also the behaviour of the module."""
+        self.settings(compare_values=True, keys_to_be_skipped=parameters['skip_regexps'], exclude_skipped_only_if_not_present=True)
         return parameters[parameter_name_with_items]
 
     def pre_crud(self, current_keys):
