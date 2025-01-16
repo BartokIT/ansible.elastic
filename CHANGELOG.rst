@@ -4,6 +4,25 @@ Bartokit.Elasticsearch Release Notes
 
 .. contents:: Topics
 
+v0.1.4
+======
+
+Major Changes
+-------------
+
+- added logstash role
+
+Minor Changes
+-------------
+
+- added support for all beats (except winlogbeat) dashbaord import
+- improved dataview management
+
+New Modules
+-----------
+
+- bartokit.elastic.logstash_keystore - This module allow to manage the logstash keystore.
+
 v0.1.3
 ======
 

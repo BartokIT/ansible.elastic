@@ -1,97 +1,98 @@
 from __future__ import (absolute_import, division, print_function)
 import logging
-import requests
 import os
+import re
 __metaclass__ = type
 
 
 class LogstashManager:
     def __init__(self,
                  ansible_module,
-                 rest_api_endpoint=None,
-                 api_username=None,
-                 api_password=None,
-                 ssl_verify=True):
+                 rest_api_endpoint=None):
         self.ansible_module = ansible_module
         self._rest_api_endpoint = rest_api_endpoint.rstrip('/') + '/'
-        self._ssl_verify = ssl_verify
-        self.__api_username = api_username
-        self.__api_password = api_password
         self.__bin_path = '/usr/share/logstash/bin/'
+        self.__keystore_path = '/etc/logstash'
         self.__keystore_executable = os.path.join(
             self.__bin_path, 'logstash-keystore')
         logging.debug("----- Manager initializated ---------")
 
-    def _api_call(self, path, method='GET', parameters=None, body=None, ssl_verify=False, json=True):
-        ''' Facility to make an API call '''
-        if self._rest_api_endpoint is None:
-            raise Exception("No endpoint provided")
-
-        api_url = "%s%s" % (self._rest_api_endpoint, path)
-
-        auth = (self.__api_username, self.__api_password)
-
-        req = requests.request(
-            method, api_url, headers=headers, params=parameters, json=body, auth=auth, verify=self._ssl_verify,
-            timeout=10)
-        response = {}
-
-        try:
-            if req.status_code == 401:
-                # try to guess elastic password and resubmit password
-                password = self.guess_elastic_default_password()
-                auth = ('elastic', password)
-                req = requests.request(method, api_url, headers=headers, params=parameters, json=body, auth=auth, verify=self._ssl_verify,
-                                       timeout=10)
-            if json:
-                response = req.json()
-            req.raise_for_status()
-        except requests.exceptions.Timeout as exctimeout:
-            logging.error("%s", exctimeout)
-        except Exception as exc:
-            logging.error("%s", exc)
-            logging.error("Error: %s", response)
-            raise
-
-        if json:
-            return req.json()
-        else:
-            return req
-
     # ------------------ Kibana keystore methods------------------------
-    def list_keystore_password(self):
-        list_command = "{} list".format(self.__keystore_executable)
+    def set_keystore_path(self, keystore_path):
+        """Set the keystore path"""
+        self.__keystore_path = keystore_path
+
+    def is_keystore_present(self):
+        """
+        Check if a keystore exists by checking the file existence
+        """
+        keystore_file = os.path.join(self.__keystore_path, "logstash.keystore" )
+        result = os.path.isfile(keystore_file)
+        if not result:
+            logging.debug("Keystore %s is not present" % keystore_file)
+        return result
+
+    def create_keystore(self, keystore_password=None):
+        """
+        Create the keystore
+        """
+
+        create_command = "{} --path.settings {} create".format(self.__keystore_executable, self.__keystore_path)
+        logging.info("Creating the keystore on %s" % self.__keystore_path)
+        if keystore_password:
+            env_dict = {'LOGSTASH_KEYSTORE_PASS': keystore_password}
         rc, stdout, stderr = self.ansible_module.run_command(
-            list_command, check_rc=True)
-        return stdout.strip().splitlines()
+            create_command, environ_update=env_dict, check_rc=True)
+        if 'created' not in stdout.lower():
+            raise Exception("Impossible to create the keystore")
+        return True
 
-    def get_keystore_key(self, key):
-        """Read keystore settings."""
+    def list_keystore_keys(self, keystore_password=None):
+        list_command = "{} --path.settings {} list".format(self.__keystore_executable, self.__keystore_path)
 
-        read_command = "{} show {}".format(self.__keystore_executable, key)
-        logging.debug(read_command)
+        if not self.is_keystore_present():
+            return []
+
+        env_dict = {}
+        if keystore_password:
+            env_dict = {'LOGSTASH_KEYSTORE_PASS': keystore_password}
+
         rc, stdout, stderr = self.ansible_module.run_command(
-            read_command, check_rc=True)
-        element = stdout.strip()
-        return element
+            list_command, environ_update=env_dict, check_rc=True)
+        parts = stdout.split("\n\n")
+        return parts[1].strip().splitlines() if len(parts) > 1 else []
 
-    def add_keystore_key(self, key, value, keystore_password=None):
+    def add_keystore_key(self, key, value, keystore_password=None, force=False):
         """Add keystore settings."""
-        data = value
-        add_command = [self.__keystore_executable, "add", "--stdin", key]
-        rc, stdout, stderr = self.ansible_module.run_command(
-            add_command, check_rc=True, data=data)
 
-    def update_keystore_key(self, key, value, keystore_password=None):
-        """Overwrite keystore settings."""
+        if not self.is_keystore_present():
+            self.create_keystore(keystore_password)
+
         data = value
-        add_command = [self.__keystore_executable, "add", "--force", "--stdin", key]
+        add_command = "{} --path.settings {} add {}".format(self.__keystore_executable, self.__keystore_path, key)
+
+        add_command += " %s" % key
+        if force:
+            add_command += " --force"
+
+        env_dict = {}
+        if keystore_password:
+            env_dict = {'LOGSTASH_KEYSTORE_PASS': keystore_password}
+
         rc, stdout, stderr = self.ansible_module.run_command(
-            add_command, check_rc=True, data=data)
+            add_command, environ_update=env_dict, check_rc=True, data=data)
+
+        if 'keystore not found' in stdout.lower():
+            return False
 
     def delete_keystore_key(self, key, keystore_password=None):
         """Delete keystore key."""
 
-        delete_command = [self.__keystore_executable, "remove", key]
+        delete_command = "{} --path.settings {} remove {}".format(self.__keystore_executable, self.__keystore_path, key)
+
+        env_dict = {}
+        if keystore_password:
+            env_dict = {'LOGSTASH_KEYSTORE_PASS': keystore_password}
+
         rc, stdout, stderr = self.ansible_module.run_command(
-            delete_command, check_rc=True)
+            delete_command, environ_update=env_dict, check_rc=True)

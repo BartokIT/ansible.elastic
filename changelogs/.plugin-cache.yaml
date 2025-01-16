@@ -119,6 +119,11 @@ plugins:
       name: kibana_spaces
       namespace: ''
       version_added: 0.1.0
+    logstash_keystore:
+      description: This module allow to manage the logstash keystore.
+      name: logstash_keystore
+      namespace: ''
+      version_added: 0.1.4
   netconf: {}
   shell: {}
   strategy: {}
@@ -137,4 +142,4 @@ plugins:
       name: validate_configuration
       version_added: 0.0.3
   vars: {}
-version: 0.1.3
+version: 0.1.4
