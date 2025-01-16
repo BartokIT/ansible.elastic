@@ -1,0 +1,5 @@
+# {{ ansible_managed }}
+# ======================== Logstash Pipelines Configuration =========================
+{% for pipeline in (r_logstash_pipelines | dict2items) %}
+- {{ pipeline.value | combine({'pipeline.id': pipeline.key }, recursive=True) | to_nice_yaml(indent=2) |indent(2)}}
+{% endfor %}

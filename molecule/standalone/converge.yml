@@ -159,12 +159,14 @@
         r_logstash_actions:
           - install
           - configure
-          # - start
+          - start
           # - restart_on_configuration_change
         r_logstash_configure_actions:
           - folders
           - main_files
           - ssl
+          - pipelines
+          - keystore
         #   - enforce_keystore
         #   - component_template
         #   - index_template

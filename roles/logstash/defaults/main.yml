@@ -26,6 +26,7 @@ _r_logstash_configure_actions_allowed:
   - main_files
   - keystore
   - ssl
+  - pipelines
 _r_logstash_triggered_restart: false
 
 # ---- installation variables ----
@@ -50,8 +51,6 @@ _r_logstash_config_folder: /etc/logstash
 _r_logstash_username: logstash
 _r_logstash_group: logstash
 
-
-
 ## elasticsearch.yml configurations
 r_logstash_node_name: ''
 r_logstash_node_rack: ''
@@ -63,24 +62,38 @@ r_logstash_cluster_nodes:
 r_logstash_cluster_name: 'es_cluster'
 
 _r_logstash_configuration:
-  elasticsearch:
-    hosts: "{{ r_logstash_elasticsearch_nodes }}"
-  server:
-    name: '{{ r_logstash_node_name }}'
-    host: '{{ r_logstash_node_name }}'
   path:
     data: /var/lib/logstash
-  logging:
-    root:
-      appenders:
-        - logstash
-    appenders:
-      logstash:
-        type: file
-        fileName: /var/log/logstash/logstash.log
-        layout:
-          type: pattern
+    logs: /var/log/logstash
+  pipeline:
+    ordered: auto
+  config:
+    reload:
+      automatic: true
+      interval: 15s
 
+
+r_logstash_pipelines: {}
+_r_logstash_pipelines:
+  main:
+    path.config: "/etc/logstash/conf.d/*.conf"
+    pipeline.workers: 1
+
+r_logstash_pipelines_confd: {}
+
+_r_logstash_jvm_options:
+  - "-Xms1g"
+  - "-Xmx1g"
+  - "11-13:-XX:+UseConcMarkSweepGC"
+  - "11-13:-XX:CMSInitiatingOccupancyFraction=75"
+  - "11-13:-XX:+UseCMSInitiatingOccupancyOnly"
+  - "-Djava.awt.headless=true"
+  - "-Dfile.encoding=UTF-8"
+  - "-Djruby.compile.invokedynamic=true"
+  - "-XX:+HeapDumpOnOutOfMemoryError"
+
+
+r_logstash_systemd_silence_stdout: true
 r_logstash_configuration_ssl_certificate_authorities: ''
 r_logstash_configuration_ssl_key: ''
 r_logstash_configuration_ssl_certificate: ''

@@ -121,3 +121,17 @@ releases:
     fragments:
     - 2_fix_setup-dashboard.yml
     release_date: '2024-12-19'
+  0.1.4:
+    changes:
+      major_changes:
+      - added logstash role
+      minor_changes:
+      - added support for all beats (except winlogbeat) dashbaord import
+      - improved dataview management
+    fragments:
+    - 0_1_4.yml
+    modules:
+    - description: This module allow to manage the logstash keystore.
+      name: logstash_keystore
+      namespace: ''
+    release_date: '2024-12-31'

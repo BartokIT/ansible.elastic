@@ -20,22 +20,17 @@
     r_logstash_enforce: true
     r_logstash_cluster_name: molecule_cluster
     r_logstash_node_rack: rotating
-    r_logstash_elasticsearch_nodes: >-
-      {%- filter list -%}
-        [{%- for node in groups.cluster -%}
-          'https://{{ node }}:9200',
-      {%- endfor -%}]{%- endfilter -%}
-    r_logstash_users_initial_elastic_password: bA3nb0g.Hyw
     r_logstash_keystore_password: 'adfs8NSM2nc.ug'
-    r_logstash_keystore:
-      keystore.seed: 'J=Z4Y50EUvoAUS?^rQ_@'
-      xpack.security.http.ssl.keystore.secure_password: 'XC9sxbnkTzCP9aTEc74LfQ'
-      xpack.security.transport.ssl.keystore.secure_password: XC9sxbnkTzCP9aTEc74LfQ
-      xpack.security.transport.ssl.truststore.secure_password: XC9sxbnkTzCP9aTEc74LfQ
+    r_logstash_keystore: {}
       # test.secure.key: passwd1
     r_logstash_configuration_ssl_certificate_authorities: "{{ _converge_ssl_ca_certificate.content | b64decode }}"
     r_logstash_configuration_ssl_key: "{{ _converge_ssl_key.content | b64decode }}"
     r_logstash_configuration_ssl_certificate: "{{ _converge_ca_certificate.content | b64decode }}"
     r_logstash_api_password: 'ansiblepassword'
-    r_logstash_pipelines_confd: {}
+    r_logstash_pipelines_confd:
+      testpipeline: |
+        input { stdin { } }
+        output {
+          stdout { codec => rubydebug }
+        }
     r_logstash_configuration: {}
